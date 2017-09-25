@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <config>
     <modules>
-        <Sezzle_Payment>
+        <Sezzle_Pay>
             <version>0.0.1</version>
-        </Sezzle_Payment>
+        </Sezzle_Pay>
     </modules>
     <global>
         <blocks>
