@@ -1,7 +1,53 @@
-# ignore everything
-*
+# ignore word doc
+/docs/*.docx
+  
+# ignore phpstorm files
+/.idea
+*.DS_Store
+  
+# ignore our admin_toolbox stuff if it was used
+/admin_toolbox
 
-# except these files and folders
-!.gitignore
-!README.md
-!app/etc/modules/Sezzle_Payment.xml
+# Ignore all not in specifically included sub folders
+/*
+!/sfcrel/
+!/app/
+!/docs/
+!/js/
+!/lib/
+!/var/
+!/shell/
+!/.gitignore
+!/composer.json
+!/modman
+# Don't ignore build scripts
+!/build.xml
+!/phpunit.xml*
+!/phpdox.xml*
+
+# Allow shell scripts for kount ext
+/shell/*
+!/shell/bv_*.php
+
+# Needed for Magento pacakge configuration file
+/var/*
+!/var/connect/
+
+# ignore all in js, except module files for this module
+/js/*
+
+# Ignore lib other than Bazaarvoice
+/lib/*
+  
+# Ignore all in app, except code & etc
+# Ignore all in app/code except local/SezzlePayment
+/app/*
+!/app/code/
+!/app/etc/
+!/app/design/
+  
+# Ignore all of app/etc except our specific module files
+/app/etc/*
+!/app/etc/modules/
+/app/etc/modules/*
+!/app/etc/modules/Sezzle_Payment.xml
