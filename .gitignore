@@ -36,7 +36,7 @@
 # ignore all in js, except module files for this module
 /js/*
 
-# Ignore lib other than Bazaarvoice
+# Ignore lib other than SezzlePayment
 /lib/*
   
 # Ignore all in app, except code & etc
@@ -51,3 +51,40 @@
 !/app/etc/modules/
 /app/etc/modules/*
 !/app/etc/modules/Sezzle_Payment.xml
+
+#Ignore all of app/design except for our files
+/app/design/*
+!app/design/frontend/
+!app/design/adminhtml/
+!app/design/locale/
+
+/app/design/frontend/*
+!/app/design/frontend/enterprise/
+/app/design/frontend/enterprise/sandbox/
+/app/design/frontend/enterprise/test/
+/app/design/frontend/enterprise/iphone/
+/app/design/frontend/enterprise/default/etc/
+/app/design/frontend/enterprise/default/locale/
+/app/design/frontend/enterprise/default/template/*
+!/app/design/frontend/enterprise/default/template/SezzlePayment/
+/app/design/frontend/enterprise/default/layout/*
+!/app/design/frontend/enterprise/default/layout/Sezzle_Pay.xml
+
+/app/design/adminhtml/*
+!/app/design/adminhtml/default/
+/app/design/adminhtml/default/find/
+/app/design/adminhtml/default/default/etc/
+/app/design/adminhtml/default/default/locale/
+/app/design/adminhtml/default/default/template/*
+!/app/design/adminhtml/default/default/template/SezzlePayment/
+/app/design/adminhtml/default/default/layout/*
+!/app/design/adminhtml/default/default/layout/Sezzle_Pay.xml
+
+/app/design/locale/*
+!/app/design/locale/en_US/
+/app/design/locale/en_US/*
+!/app/design/locale/en_US/template/
+/app/design/locale/en_US/template/*
+!/app/design/locale/en_US/template/email/
+/app/design/locale/en_US/template/email/*
+!/app/design/locale/en_US/template/email/SezzlePayment*
