@@ -1,0 +1,7 @@
+# ignore everything
+*
+
+# except these files and folders
+!.gitignore
+!README.md
+!app/etc/modules/Sezzle_Pay.xml
