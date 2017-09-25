@@ -1,0 +1,96 @@
+# ignore word doc
+/docs/*.docx
+  
+# ignore phpstorm files
+/.idea
+*.DS_Store
+  
+# ignore our admin_toolbox stuff if it was used
+/admin_toolbox
+
+# Ignore all not in specifically included sub folders
+/*
+!/sfcrel/
+!/app/
+!/docs/
+!/js/
+!/lib/
+!/var/
+!/shell/
+!/.gitignore
+!/composer.json
+!/modman
+# Don't ignore build scripts
+!/build.xml
+!/phpunit.xml*
+!/phpdox.xml*
+
+# Allow shell scripts for kount ext
+/shell/*
+!/shell/bv_*.php
+
+# Needed for Magento pacakge configuration file
+/var/*
+!/var/connect/
+
+# ignore all in js, except module files for this module
+/js/*
+
+# Ignore lib other than SezzlePayment
+/lib/*
+  
+# Ignore all in app, except code & etc
+# Ignore all in app/code except local/SezzlePayment
+/app/*
+!/app/code/
+!/app/etc/
+!/app/design/
+
+# Ignore all in app/code/local except Bazaarvoice
+/app/code/core
+/app/code/community
+/app/code/local/*
+!app/code/local/SezzlePayment/
+  
+# Ignore all of app/etc except our specific module files
+/app/etc/*
+!/app/etc/modules/
+/app/etc/modules/*
+!/app/etc/modules/Sezzle_Payment.xml
+
+#Ignore all of app/design except for our files
+/app/design/*
+!app/design/frontend/
+!app/design/adminhtml/
+!app/design/locale/
+
+/app/design/frontend/*
+!/app/design/frontend/enterprise/
+/app/design/frontend/enterprise/sandbox/
+/app/design/frontend/enterprise/test/
+/app/design/frontend/enterprise/iphone/
+/app/design/frontend/enterprise/default/etc/
+/app/design/frontend/enterprise/default/locale/
+/app/design/frontend/enterprise/default/template/*
+!/app/design/frontend/enterprise/default/template/SezzlePayment/
+/app/design/frontend/enterprise/default/layout/*
+!/app/design/frontend/enterprise/default/layout/Sezzle_Pay.xml
+
+/app/design/adminhtml/*
+!/app/design/adminhtml/default/
+/app/design/adminhtml/default/find/
+/app/design/adminhtml/default/default/etc/
+/app/design/adminhtml/default/default/locale/
+/app/design/adminhtml/default/default/template/*
+!/app/design/adminhtml/default/default/template/SezzlePayment/
+/app/design/adminhtml/default/default/layout/*
+!/app/design/adminhtml/default/default/layout/Sezzle_Pay.xml
+
+/app/design/locale/*
+!/app/design/locale/en_US/
+/app/design/locale/en_US/*
+!/app/design/locale/en_US/template/
+/app/design/locale/en_US/template/*
+!/app/design/locale/en_US/template/email/
+/app/design/locale/en_US/template/email/*
+!/app/design/locale/en_US/template/email/SezzlePayment*
