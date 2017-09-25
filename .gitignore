@@ -4,4 +4,4 @@
 # except these files and folders
 !.gitignore
 !README.md
-!app/etc/modules/Sezzle_Pay.xml
+!app/etc/modules/Sezzle_Payment.xml
