@@ -1,8 +1,61 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <config>
     <modules>
         <Sezzle_Payment>
-            <version>1.0.0.0</version>
+            <version>0.0.1</version>
         </Sezzle_Payment>
     </modules>
-</config>
+    <global>
+        <blocks>
+            <pay>
+                <class>Sezzle_Pay_Block</class>
+            </pay>
+        </blocks>
+        <models>
+            <pay>
+                <class>Sezzle_Pay_Model</class>
+            </pay>
+        </models>
+        <resources>
+            <pay_setup>
+                <setup>
+                    <module>Sezzle_Pay</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </pay_setup>
+            <pay_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </pay_write>
+            <pay_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </pay_read>
+        </resources>
+    </global>
+    <default>
+        <payment>
+            <pay>
+                <active>1</active>
+                <model>pay/payment</model>
+                <order_status>pending</order_status>
+                <title>Buy Now Pay Later Using Sezzle</title>
+            </pay>
+        </payment>
+    </default>
+    <frontend>
+        <routers>
+            <pay>
+                <use>standard</use>
+                <args>
+                    <module>Sezzle_Pay</module>
+                    <frontName>pay</frontName>
+                </args>
+            </pay>
+        </routers>
+    </frontend>
+</config> 

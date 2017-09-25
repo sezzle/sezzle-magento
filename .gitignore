@@ -61,7 +61,7 @@
 /app/etc/*
 !/app/etc/modules/
 /app/etc/modules/*
-!/app/etc/modules/Sezzle_Payment.xml
+!/app/etc/modules/Sezzle_Pay.xml
 
 #Ignore all of app/design except for our files
 /app/design/*
@@ -79,7 +79,7 @@
 /app/design/frontend/enterprise/default/template/*
 !/app/design/frontend/enterprise/default/template/Sezzle/
 /app/design/frontend/enterprise/default/layout/*
-!/app/design/frontend/enterprise/default/layout/Sezzle_Payment.xml
+!/app/design/frontend/enterprise/default/layout/Sezzle_Pay.xml
 
 /app/design/adminhtml/*
 !/app/design/adminhtml/default/
@@ -89,7 +89,7 @@
 /app/design/adminhtml/default/default/template/*
 !/app/design/adminhtml/default/default/template/Sezzle/
 /app/design/adminhtml/default/default/layout/*
-!/app/design/adminhtml/default/default/layout/Sezzle_Payment.xml
+!/app/design/adminhtml/default/default/layout/Sezzle_Pay.xml
 
 /app/design/locale/*
 !/app/design/locale/en_US/
