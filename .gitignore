@@ -50,8 +50,9 @@
 !/app/code/
 /app/code/core
 /app/code/local
-/app/etc/community/
-!/app/code/community
+/app/etc/community
+/app/code/community/*
+!/app/code/community/Sezzle
 !/app/code/community/Sezzle/*
 
 
