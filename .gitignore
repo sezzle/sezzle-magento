@@ -36,21 +36,25 @@
 # ignore all in js, except module files for this module
 /js/*
 
-# Ignore lib other than SezzlePayment
+# Ignore lib other than Sezzle
 /lib/*
   
 # Ignore all in app, except code & etc
-# Ignore all in app/code except local/SezzlePayment
+# Ignore all in app/code except local/Sezzle
 /app/*
 !/app/code/
 !/app/etc/
 !/app/design/
 
-# Ignore all in app/code/local except Bazaarvoice
+# Ignore all in app/code except Sezzle
+!/app/code/
 /app/code/core
-/app/code/community
-/app/code/local/*
-!app/code/local/SezzlePayment/
+/app/code/local
+/app/etc/community/
+!/app/code/community
+!/app/code/community/Sezzle/*
+
+
   
 # Ignore all of app/etc except our specific module files
 /app/etc/*
@@ -72,9 +76,9 @@
 /app/design/frontend/enterprise/default/etc/
 /app/design/frontend/enterprise/default/locale/
 /app/design/frontend/enterprise/default/template/*
-!/app/design/frontend/enterprise/default/template/SezzlePayment/
+!/app/design/frontend/enterprise/default/template/Sezzle/
 /app/design/frontend/enterprise/default/layout/*
-!/app/design/frontend/enterprise/default/layout/Sezzle_Pay.xml
+!/app/design/frontend/enterprise/default/layout/Sezzle_Payment.xml
 
 /app/design/adminhtml/*
 !/app/design/adminhtml/default/
@@ -82,9 +86,9 @@
 /app/design/adminhtml/default/default/etc/
 /app/design/adminhtml/default/default/locale/
 /app/design/adminhtml/default/default/template/*
-!/app/design/adminhtml/default/default/template/SezzlePayment/
+!/app/design/adminhtml/default/default/template/Sezzle/
 /app/design/adminhtml/default/default/layout/*
-!/app/design/adminhtml/default/default/layout/Sezzle_Pay.xml
+!/app/design/adminhtml/default/default/layout/Sezzle_Payment.xml
 
 /app/design/locale/*
 !/app/design/locale/en_US/
@@ -93,4 +97,4 @@
 /app/design/locale/en_US/template/*
 !/app/design/locale/en_US/template/email/
 /app/design/locale/en_US/template/email/*
-!/app/design/locale/en_US/template/email/SezzlePayment*
+!/app/design/locale/en_US/template/email/Sezzle*
