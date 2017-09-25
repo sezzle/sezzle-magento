@@ -41,9 +41,9 @@
         <payment>
             <pay>
                 <active>1</active>
-                <model>pay/payment</model>
+                <model>pay/PaymentMethod</model>
                 <order_status>pending</order_status>
-                <title>Buy Now Pay Later Using Sezzle</title>
+                <title>Pay Using Sezzle Pay</title>
             </pay>
         </payment>
     </default>
