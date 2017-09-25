@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <modules>
+        <Foggyline_Stripe>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <Mage_Payment/>
+            </depends>
+        </Foggyline_Stripe>
+    </modules>
+</config>
