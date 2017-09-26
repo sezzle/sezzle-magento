@@ -37,7 +37,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $billingCity = $billingAddress->getCity();
             $billingPhone = $billingAddress->getTelephone();
             $billingZip = $billingAddress->getPostcode();
-            $billingState = $billingAddress->getRegion();
+            $billingState = $billingAddress->getRegionCode();
             $billingCountry = $billingAddress->getCountry();
 
             // User details
