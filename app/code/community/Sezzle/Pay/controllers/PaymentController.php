@@ -63,6 +63,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $countryCode = Mage::getStoreConfig('general/country/default');
             $shopName = Mage::app()->getStore()->getName();
             $testMode = false;
+            $url = Mage::getStoreConfig('payment/pay/base_url', $storeId);;
 
             $data = Array(
                 "x_account_id" => $accountID,
@@ -89,6 +90,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 "x_customer_shipping_zip" => $shippingZip,
                 "x_customer_shipping_state" => $shippingState,
                 "x_reference" => $orderId,
+                "x_shop_country" => $countryCode,
+                "x_shop_name" => $shopName,
                 "x_test" => $testMode,
                 'x_url_complete' => Mage::getUrl('pay/payment/success', array('transaction_id' => $order_id)),
                 'x_url_cancel' => Mage::getUrl('pay/payment/cancel', array('transaction_id' => $order_id)),
@@ -111,16 +114,24 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $sign = hash_hmac("sha256", $message, $private_key);
             $data["x_signature"] = $sign;
 
+            $array_string = json_encode($data);
+
+            // Log the whole form information
             Mage::log(
-                "orderId=$orderId, accountID=$accountID, amount=$amount, currency=$currency,
-                billingAddress1=$billingAddress1, billingAddress2=$billingAddress2, billingCity=$billingCity,
-                billingPhone=$billingPhone, billingZip=$billingZip, billingState=$billingState, email=$email, firstName=$firstName,
-                phone=$phone, shippingAddress1=$shippingAddress1, shippingAddress2=$shippingAddress2, shippingCity=$shippingCity,
-                shippingPhone=$shippingPhone, shippingZip=$shippingZip, shippingState=$shippingState, reference=$reference,
-                countryCode=$countryCode, shopName=$shopName", Zend_Log::DEBUG,
+                "data=$array_string", Zend_Log::DEBUG,
                 $this->LOG_FILE_NAME
             );
 
+            $block = $this
+                ->getLayout()
+                ->createBlock(
+                    'Mage_Core_Block_Template',
+                    'pay', 
+                    array('template' => 'pay/redirect.phtml')
+                )
+                ->assign(Array("data" => $data, "url" => $url));
+            $this->getLayout()->getBlock('content')->append($block);
+            $this->renderLayout();
         } catch (Exception $e){
             Mage::logException($e);
             Mage::log($e, Zend_Log::ERR, $this->LOG_FILE_NAME);
