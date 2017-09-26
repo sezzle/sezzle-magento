@@ -70,16 +70,11 @@
 !app/design/locale/
 
 /app/design/frontend/*
-!/app/design/frontend/enterprise/
-/app/design/frontend/enterprise/sandbox/
-/app/design/frontend/enterprise/test/
-/app/design/frontend/enterprise/iphone/
-/app/design/frontend/enterprise/default/etc/
-/app/design/frontend/enterprise/default/locale/
-/app/design/frontend/enterprise/default/template/*
-!/app/design/frontend/enterprise/default/template/Sezzle/
-/app/design/frontend/enterprise/default/layout/*
-!/app/design/frontend/enterprise/default/layout/Sezzle_Pay.xml
+!/app/design/frontend/base/
+/app/design/frontend/base/default/*
+!/app/design/frontend/base/default/template/
+/app/design/frontend/base/default/template/*
+!/app/design/frontend/base/default/template/Sezzle/*
 
 /app/design/adminhtml/*
 !/app/design/adminhtml/default/
