@@ -24,6 +24,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             // Set status to payment pending
             $order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT, true)->save();
             $accountID = Mage::getStoreConfig('payment/pay/public_key', $storeId);
+            $private_key = Mage::getStoreConfig('payment/pay/private_key', $storeId);
 
             // Cost details
             $amount = $order-> getBaseGrandTotal();
@@ -107,7 +108,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             foreach ($data as $key => $value) {
                 $message .= "$key$value";
             }
-            $sign = hash_hmac("sha256", $message, $private_salt);
+            $sign = hash_hmac("sha256", $message, $private_key);
             $data["x_signature"] = $sign;
 
             Mage::log(
