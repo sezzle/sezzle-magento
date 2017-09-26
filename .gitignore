@@ -71,6 +71,8 @@
 
 /app/design/frontend/*
 !/app/design/frontend/base/
+/app/design/frontend/base/*
+!/app/design/frontend/base/default/
 /app/design/frontend/base/default/*
 !/app/design/frontend/base/default/template/
 /app/design/frontend/base/default/template/*
