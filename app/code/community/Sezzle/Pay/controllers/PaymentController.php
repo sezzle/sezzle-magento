@@ -63,7 +63,14 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $countryCode = Mage::getStoreConfig('general/country/default');
             $shopName = Mage::app()->getStore()->getName();
             $testMode = false;
-            $url = Mage::getStoreConfig('payment/pay/base_url', $storeId);;
+            $url = Mage::getStoreConfig('payment/pay/base_url', $storeId);
+            $tranId = time() . "-" . $orderId;
+
+            // Fix urls
+            $completeUrl = Mage::getUrl('pay/payment/success', array('id' => $tranId));
+            $completeUrl = Mage::getModel('core/url')->sessionUrlVar($completeUrl);
+            $cancelUrl = Mage::getUrl('pay/payment/cancel', array('id' => $tranId));
+            $cancelUrl = Mage::getModel('core/url')->sessionUrlVar($cancelUrl);
 
             $data = Array(
                 "x_account_id" => $accountID,
@@ -93,8 +100,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 "x_shop_country" => $countryCode,
                 "x_shop_name" => $shopName,
                 "x_test" => $testMode,
-                'x_url_complete' => Mage::getUrl('pay/payment/success', array('transaction_id' => $order_id)),
-                'x_url_cancel' => Mage::getUrl('pay/payment/cancel', array('transaction_id' => $order_id)),
+                'x_url_complete' => $completeUrl,
+                'x_url_cancel' => $cancelUrl,
             );
 
             // Create the signature
@@ -111,9 +118,19 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             foreach ($data as $key => $value) {
                 $message .= "$key$value";
             }
-            $sign = hash_hmac("sha256", $message, $private_key);
-            $data["x_signature"] = $sign;
 
+            Mage::log(
+                "message=$message", Zend_Log::DEBUG,
+                $this->LOG_FILE_NAME
+            );
+
+            $sign = hash_hmac("sha256", $message, $private_key);
+            Mage::log(
+                "sign=$sign", Zend_Log::DEBUG,
+                $this->LOG_FILE_NAME
+            );
+            $data["x_signature"] = $sign;
+            
             $array_string = json_encode($data);
 
             // Log the whole form information
