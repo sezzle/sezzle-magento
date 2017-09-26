@@ -139,6 +139,25 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 $this->LOG_FILE_NAME
             );
 
+            // Save this order
+            $payment = $order->getPayment();
+            $payment->setTransactionId($tranId);
+            $transaction = $payment->addTransaction(
+                Mage_Sales_Model_Order_Payment_Transaction::TYPE_AUTH
+            );
+            $transaction->setAdditionalInformation(
+                Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS,
+                array('Context'=>'Token payment',
+                  'Amount'=>$amount,
+                  'Status'=>0,
+                  'Url'=>$url
+                )
+            );
+            $transaction->setIsTransactionClosed(false);
+            $transaction->save();
+            $order->save();
+
+            // Redirect to the redirect page
             $block = $this
                 ->getLayout()
                 ->createBlock(
@@ -157,6 +176,13 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
     }
     // Redirect from Sezzle Pay
     // The response action is triggered when your gateway sends back a response after processing the customer's payment
-    public function responseAction() {
+    public function successAction() {
+
+    }
+
+
+    // Redirect from Sezzle Pay
+    // A cancelled payment
+    public function cancelAction() {
     }
 } 
