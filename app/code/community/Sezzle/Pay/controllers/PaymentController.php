@@ -184,6 +184,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
         Mage::log("Store ID and Code: $storeId | $storeCode", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
 
         // Get the $sezzle_id from the request
+        $sezzle_id = $this->getRequest()->getQuery('x_gateway_reference');
+        Mage::log("sezzle_id: $sezzle_id", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
 
         // Get transaction id from request url
         $tranId = $this->getRequest()->getParam('id');
@@ -203,7 +205,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
         Mage::log("Received order object", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
 
         // Set order state
-        Mage::log("Payment was successfull for $insta_id", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+        Mage::log("Payment was successfull for $sezzle_id", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
         $order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT, false);
         $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
         Mage::log("Pending payment is set to False", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
@@ -213,14 +215,18 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
         $order->setEmailSent(true);
         $order->save();
 
+        Mage::log("Email sent", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
         // Get payment details of this transaction
         $payment = $order->getPayment();
-        $transaction = $payment->getTransaction($transactionId);
+        $transaction = $payment->getTransaction($tranId);
         $data = $transaction->getAdditionalInformation();
         $url = $data['raw_details_info']['Url'];
-        $amount = $data['raw_details_info']['Amount'];
+        $amount = $this->getRequest()->getQuery('x_amount');
 
-        // Set addditional details to have information of successful payment
+        Mage::log("Amount received", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
+        // Set additional details to have information of successful payment
         $transaction->setAdditionalInformation(
             Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS,
             array('SezzleId'=> $sezzle_id,
@@ -231,9 +237,13 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             )
         )->save();
 
+        Mage::log("Transaction additional info saved", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
         // Save and close this transaction
         $transaction->setParentTxnId($sezzle_id)->save();
         $payment->setIsTransactionClosed(1);
+
+        Mage::log("Transaction details saved", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
 
         // Redirect to success page
         $this->_redirect('checkout/onepage/success', array('_secure'=>true));
