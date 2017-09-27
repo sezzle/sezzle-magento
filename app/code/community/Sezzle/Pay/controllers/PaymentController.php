@@ -147,7 +147,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             );
             $transaction->setAdditionalInformation(
                 Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS,
-                array('Context'=>'Token payment',
+                array('Context'=>'Order payment',
                   'Amount'=>$amount,
                   'Status'=>0,
                   'Url'=>$url
@@ -177,12 +177,62 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
     // Redirect from Sezzle Pay
     // The response action is triggered when your gateway sends back a response after processing the customer's payment
     public function successAction() {
-
+        Mage::log("Running response action", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+        
+        $storeId = Mage::app()->getStore()->getStoreId();
+        $storeCode = Mage::app()->getStore()->getCode();
+        Mage::log("Store ID and Code: $storeId | $storeCode", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
     }
 
 
     // Redirect from Sezzle Pay
     // A cancelled payment
     public function cancelAction() {
+        Mage::log("Running response action", Zend_Log::DEBUG, $this->LOG_FILE_NAME); 
+
+        $storeId = Mage::app()->getStore()->getStoreId();
+        $storeCode = Mage::app()->getStore()->getCode();
+        Mage::log("Store ID and Code: $storeId | $storeCode", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
+        // Get transaction id from request url
+        $tranId = $this->getRequest()->getParam('id');
+        Mage::log("TransactionId: $tranId", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
+        // Get the order id from the request url
+        $order_tran_id = explode('-',  $tranId);
+        $transactionId = $order_tran_id[0];
+        $orderId = $order_tran_id[1];
+        Mage::log("TransactionId and orderId: $transactionId | $orderId", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
+        // Get the order object
+        $order = Mage::getModel('sales/order');
+        $cart = Mage::getSingleton('checkout/cart');
+        $order->loadByIncrementId($orderId);
+        $session = Mage::getSingleton('checkout/session');
+        Mage::log("Received order object", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
+        // Cancel the order
+        $order->cancel()->setState(Mage_Sales_Model_Order::STATE_CANCELED, true, 'Payment failed.')->save();
+        Mage::log("Order canceled!", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
+        // Add items back to the cart
+        $items = $order->getItemsCollection();
+        foreach ($items as $item) {
+            try {
+                $cart->addOrderItem($item);
+            } catch (Mage_Core_Exception $e) {
+                $session->addError($this->__($e->getMessage()));
+                Mage::logException($e);
+                continue;
+            }
+        }
+        $cart->save();
+        Mage::log("Cart populated back", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
+        // redirect to the cart
+        Mage::getSingleton('core/session')->addError('Your payment failed.');
+        Mage::log("Redirecting to cart...", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+        $this->_redirect('checkout/cart');
+        return;
     }
 } 
