@@ -182,6 +182,61 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
         $storeId = Mage::app()->getStore()->getStoreId();
         $storeCode = Mage::app()->getStore()->getCode();
         Mage::log("Store ID and Code: $storeId | $storeCode", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
+        // Get the $sezzle_id from the request
+
+        // Get transaction id from request url
+        $tranId = $this->getRequest()->getParam('id');
+        Mage::log("TransactionId: $tranId", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
+        // Get the order id from the request url
+        $order_tran_id = explode('-',  $tranId);
+        $transactionId = $order_tran_id[0];
+        $orderId = $order_tran_id[1];
+        Mage::log("TransactionId and orderId: $transactionId | $orderId", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
+        // Get the order object
+        $order = Mage::getModel('sales/order');
+        $cart = Mage::getSingleton('checkout/cart');
+        $order->loadByIncrementId($orderId);
+        $session = Mage::getSingleton('checkout/session');
+        Mage::log("Received order object", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
+        // Set order state
+        Mage::log("Payment was successfull for $insta_id", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+        $order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT, false);
+        $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
+        Mage::log("Pending payment is set to False", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+
+        // Send email
+        $order->sendNewOrderEmail();
+        $order->setEmailSent(true);
+        $order->save();
+
+        // Get payment details of this transaction
+        $payment = $order->getPayment();
+        $transaction = $payment->getTransaction($transactionId);
+        $data = $transaction->getAdditionalInformation();
+        $url = $data['raw_details_info']['Url'];
+        $amount = $data['raw_details_info']['Amount'];
+
+        // Set addditional details to have information of successful payment
+        $transaction->setAdditionalInformation(
+            Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS,
+            array('SezzleId'=> $sezzle_id,
+                'Context'=>'Successful Payment',
+                'Amount'=>$amount,
+                'Status'=>1,
+                'Url'=>$url
+            )
+        )->save();
+
+        // Save and close this transaction
+        $transaction->setParentTxnId($sezzle_id)->save();
+        $payment->setIsTransactionClosed(1);
+
+        // Redirect to success page
+        $this->_redirect('checkout/onepage/success', array('_secure'=>true));
     }
 
 
