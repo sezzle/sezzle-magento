@@ -1,21 +1,23 @@
 <?php
 if (!function_exists('boolval')) {
-    function boolval($val) {
+    function boolval($val) 
+    {
             return (bool) $val;
     }
 }
+
 class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 {
     // Redirect to sezzle pay 
-    private $LOG_FILE_NAME = 'sezzle-pay.log';
+    protected $_logFileName = 'sezzle-pay.log';
     public function redirectAction()
     {
         try {
-            Mage::Log('Step 5 Process: Loading the redirect.html page', Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::Log('Step 5 Process: Loading the redirect.html page', Zend_Log::DEBUG, $this->_logFileName);
             $this->loadLayout();
             $storeId = Mage::app()->getStore()->getStoreId();
             $storeCode = Mage::app()->getStore()->getCode();
-            Mage::log("Store ID and Code: $storeId | $storeCode", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Store ID and Code: $storeId | $storeCode", Zend_Log::DEBUG, $this->_logFileName);
 
             // Get latest order data
             $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
@@ -24,7 +26,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             // Set status to payment pending
             $order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT, true)->save();
             $accountID = Mage::getStoreConfig('payment/pay/public_key', $storeId);
-            $private_key = Mage::getStoreConfig('payment/pay/private_key', $storeId);
+            $privateKey = Mage::getStoreConfig('payment/pay/private_key', $storeId);
 
             // Cost details
             $amount = $order-> getBaseGrandTotal();
@@ -32,8 +34,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             
             // Billing address
             $billingAddress = $order->getBillingAddress();
-            $billingAddress1 = $billingAddress->getStreet(1);
-            $billingAddress2 = $billingAddress->getStreet2();
+            $billingAddressOne = $billingAddress->getStreet(1);
+            $billingAddressTwo = $billingAddress->getStreet2();
             $billingCity = $billingAddress->getCity();
             $billingPhone = $billingAddress->getTelephone();
             $billingZip = $billingAddress->getPostcode();
@@ -48,8 +50,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 
             // Shipping address
             $shippingAddress = $order->getShippingAddress();
-            $shippingAddress1 = $shippingAddress->getStreet(1);
-            $shippingAddress2 = $shippingAddress->getStreet2();
+            $shippingAddressOne = $shippingAddress->getStreet(1);
+            $shippingAddressTwo = $shippingAddress->getStreet2();
             $shippingCity = $shippingAddress->getCity();
             $shippingPhone = $shippingAddress->getTelephone();
             $shippingZip = $shippingAddress->getPostcode();
@@ -64,7 +66,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $shopName = Mage::app()->getStore()->getName();
             $testMode = false;
             $url = Mage::getStoreConfig('payment/pay/base_url', $storeId);
-            $tranId = time() . "-" . $orderId;
+            $tranId = Mage::getModel('core/date')->gmtDate() . "-" . $orderId;
 
             // Fix urls
             $completeUrl = Mage::getUrl('pay/payment/success', array('id' => $tranId));
@@ -76,8 +78,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 "x_account_id" => $accountID,
                 "x_amount" => $amount,
                 "x_currency" => $currency,
-                "x_customer_billing_address1" => $billingAddress1,
-                "x_customer_billing_address2" => $billingAddress2,
+                "x_customer_billing_address1" => $billingAddressOne,
+                "x_customer_billing_address2" => $billingAddressTwo,
                 "x_customer_billing_city" => $billingCity,
                 "x_customer_billing_country" => $billingCountry,
                 "x_customer_billing_phone" => $billingPhone,
@@ -87,8 +89,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 "x_customer_first_name" => $firstName,
                 "x_customer_last_name" => $lastName,
                 "x_customer_phone" => $phone,
-                "x_customer_shipping_address1" => $shippingAddress1,
-                "x_customer_shipping_address2" => $shippingAddress2,
+                "x_customer_shipping_address1" => $shippingAddressOne,
+                "x_customer_shipping_address2" => $shippingAddressTwo,
                 "x_customer_shipping_city" => $shippingCity,
                 "x_customer_shipping_country" => $shippingCountry,
                 "x_customer_shipping_first_name" => $shippingFirstname,
@@ -108,12 +110,12 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $ver = explode('.', phpversion());
             $major = (int) $ver[0];
             $minor = (int) $ver[1];
-            if($major >= 5 and $minor >= 4){
+            if ($major >= 5 and $minor >= 4) {
                 ksort($data, SORT_STRING | SORT_FLAG_CASE);
-            }
-            else{
+            } else {
                 uksort($data, 'strcasecmp');
             }
+
             $message = "";
             foreach ($data as $key => $value) {
                 $message .= "$key$value";
@@ -121,22 +123,22 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 
             Mage::log(
                 "message=$message", Zend_Log::DEBUG,
-                $this->LOG_FILE_NAME
+                $this->_logFileName
             );
 
-            $sign = hash_hmac("sha256", $message, $private_key);
+            $sign = hash_hmac("sha256", $message, $privateKey);
             Mage::log(
                 "sign=$sign", Zend_Log::DEBUG,
-                $this->LOG_FILE_NAME
+                $this->_logFileName
             );
             $data["x_signature"] = $sign;
             
-            $array_string = json_encode($data);
+            $arrayString = json_encode($data);
 
             // Log the whole form information
             Mage::log(
-                "data=$array_string", Zend_Log::DEBUG,
-                $this->LOG_FILE_NAME
+                "data=$arrayString", Zend_Log::DEBUG,
+                $this->_logFileName
             );
 
             // Save this order
@@ -170,53 +172,54 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $this->renderLayout();
         } catch (Exception $e){
             Mage::logException($e);
-            Mage::log($e, Zend_Log::ERR, $this->LOG_FILE_NAME);
+            Mage::log($e, Zend_Log::ERR, $this->_logFileName);
             parent::_redirect('checkout/cart');
         }
     }
     // Redirect from Sezzle Pay
     // The response action is triggered when your gateway sends back a response after processing the customer's payment
-    public function successAction() {
+    public function successAction() 
+    {
         try {
-            Mage::log("Running response action", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Running response action", Zend_Log::DEBUG, $this->_logFileName);
             
             $storeId = Mage::app()->getStore()->getStoreId();
             $storeCode = Mage::app()->getStore()->getCode();
-            Mage::log("Store ID and Code: $storeId | $storeCode", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Store ID and Code: $storeId | $storeCode", Zend_Log::DEBUG, $this->_logFileName);
 
-            // Get the $sezzle_id from the request
-            $sezzle_id = $this->getRequest()->getQuery('x_gateway_reference');
-            Mage::log("sezzle_id: $sezzle_id", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            // Get the $sezzleId from the request
+            $sezzleId = $this->getRequest()->getQuery('x_gateway_reference');
+            Mage::log("sezzleId: $sezzleId", Zend_Log::DEBUG, $this->_logFileName);
 
             // Get transaction id from request url
             $tranId = $this->getRequest()->getParam('id');
-            Mage::log("TransactionId: $tranId", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("TransactionId: $tranId", Zend_Log::DEBUG, $this->_logFileName);
 
             // Get the order id from the request url
-            $order_tran_id = explode('-',  $tranId);
-            $transactionId = $order_tran_id[0];
-            $orderId = $order_tran_id[1];
-            Mage::log("TransactionId and orderId: $transactionId | $orderId", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            $orderTranId = explode('-', $tranId);
+            $transactionId = $orderTranId[0];
+            $orderId = $orderTranId[1];
+            Mage::log("TransactionId and orderId: $transactionId | $orderId", Zend_Log::DEBUG, $this->_logFileName);
 
             // Get the order object
             $order = Mage::getModel('sales/order');
             $cart = Mage::getSingleton('checkout/cart');
             $order->loadByIncrementId($orderId);
             $session = Mage::getSingleton('checkout/session');
-            Mage::log("Received order object", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Received order object", Zend_Log::DEBUG, $this->_logFileName);
 
             // Set order state
-            Mage::log("Payment was successfull for $sezzle_id", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Payment was successfull for $sezzleId", Zend_Log::DEBUG, $this->_logFileName);
             $order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT, false);
             $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
-            Mage::log("Pending payment is set to False", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Pending payment is set to False", Zend_Log::DEBUG, $this->_logFileName);
 
             // Send email
             $order->sendNewOrderEmail();
             $order->setEmailSent(true);
             $order->save();
 
-            Mage::log("Email sent", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Email sent", Zend_Log::DEBUG, $this->_logFileName);
 
             // Get payment details of this transaction
             $payment = $order->getPayment();
@@ -225,12 +228,12 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $url = $data['raw_details_info']['Url'];
             $amount = $this->getRequest()->getQuery('x_amount');
 
-            Mage::log("Amount received", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Amount received", Zend_Log::DEBUG, $this->_logFileName);
 
             // Set additional details to have information of successful payment
             $transaction->setAdditionalInformation(
                 Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS,
-                array('SezzleId'=> $sezzle_id,
+                array('SezzleId'=> $sezzleId,
                     'Context'=>'Successful Payment',
                     'Amount'=>$amount,
                     'Status'=>1,
@@ -238,19 +241,19 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 )
             )->save();
 
-            Mage::log("Transaction additional info saved", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Transaction additional info saved", Zend_Log::DEBUG, $this->_logFileName);
 
             // Save and close this transaction
-            $transaction->setParentTxnId($sezzle_id)->save();
+            $transaction->setParentTxnId($sezzleId)->save();
             $payment->setIsTransactionClosed(1);
 
-            Mage::log("Transaction details saved", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Transaction details saved", Zend_Log::DEBUG, $this->_logFileName);
 
             // Redirect to success page
             $this->_redirect('checkout/onepage/success', array('_secure'=>true));
         } catch (Exception $e){
             Mage::logException($e);
-            Mage::log($e, Zend_Log::ERR, $this->LOG_FILE_NAME);
+            Mage::log($e, Zend_Log::ERR, $this->_logFileName);
             parent::_redirect('checkout/cart');
         }
     }
@@ -258,34 +261,35 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 
     // Redirect from Sezzle Pay
     // A cancelled payment
-    public function cancelAction() {
+    public function cancelAction() 
+    {
         try {
-            Mage::log("Running response action", Zend_Log::DEBUG, $this->LOG_FILE_NAME); 
+            Mage::log("Running response action", Zend_Log::DEBUG, $this->_logFileName); 
 
             $storeId = Mage::app()->getStore()->getStoreId();
             $storeCode = Mage::app()->getStore()->getCode();
-            Mage::log("Store ID and Code: $storeId | $storeCode", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Store ID and Code: $storeId | $storeCode", Zend_Log::DEBUG, $this->_logFileName);
 
             // Get transaction id from request url
             $tranId = $this->getRequest()->getParam('id');
-            Mage::log("TransactionId: $tranId", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("TransactionId: $tranId", Zend_Log::DEBUG, $this->_logFileName);
 
             // Get the order id from the request url
-            $order_tran_id = explode('-',  $tranId);
-            $transactionId = $order_tran_id[0];
-            $orderId = $order_tran_id[1];
-            Mage::log("TransactionId and orderId: $transactionId | $orderId", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            $orderTranId = explode('-', $tranId);
+            $transactionId = $orderTranId[0];
+            $orderId = $orderTranId[1];
+            Mage::log("TransactionId and orderId: $transactionId | $orderId", Zend_Log::DEBUG, $this->_logFileName);
 
             // Get the order object
             $order = Mage::getModel('sales/order');
             $cart = Mage::getSingleton('checkout/cart');
             $order->loadByIncrementId($orderId);
             $session = Mage::getSingleton('checkout/session');
-            Mage::log("Received order object", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Received order object", Zend_Log::DEBUG, $this->_logFileName);
 
             // Cancel the order
             $order->cancel()->setState(Mage_Sales_Model_Order::STATE_CANCELED, true, 'Payment failed.')->save();
-            Mage::log("Order canceled!", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Order canceled!", Zend_Log::DEBUG, $this->_logFileName);
 
             // Add items back to the cart
             $items = $order->getItemsCollection();
@@ -298,17 +302,18 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                     continue;
                 }
             }
+
             $cart->save();
-            Mage::log("Cart populated back", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Cart populated back", Zend_Log::DEBUG, $this->_logFileName);
 
             // redirect to the cart
             Mage::getSingleton('core/session')->addError('Your payment failed.');
-            Mage::log("Redirecting to cart...", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+            Mage::log("Redirecting to cart...", Zend_Log::DEBUG, $this->_logFileName);
             $this->_redirect('checkout/cart');
             return;
         } catch (Exception $e){
             Mage::logException($e);
-            Mage::log($e, Zend_Log::ERR, $this->LOG_FILE_NAME);
+            Mage::log($e, Zend_Log::ERR, $this->_logFileName);
             parent::_redirect('checkout/cart');
         }
     }

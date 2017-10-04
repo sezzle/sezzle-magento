@@ -1,9 +1,10 @@
 <?php
-class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract{
+class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
+{
     /**
      * Availability options
      */ 
-    private $LOG_FILE_NAME = 'sezzle-pay.log';
+    protected $_logFileName = 'sezzle-pay.log';
     protected $_code = 'pay';
     protected $_isGateway               = true;
     protected $_canAuthorize            = true;
@@ -26,13 +27,18 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract{
     // Construct the redirect URL
     public function getOrderPlaceRedirectUrl()
     {   
-        $redirect_url = Mage::getUrl('pay/payment/redirect');
-        Mage::Log("Step 2 Process: Getting the redirect URL: $redirect_url", Zend_Log::DEBUG, $this->LOG_FILE_NAME);
-        return $redirect_url;      
+        $redirectUrl = Mage::getUrl('pay/payment/redirect');
+        Mage::Log("Step 2 Process: Getting the redirect URL: $redirectUrl", Zend_Log::DEBUG, $this->_logFileName);
+        return $redirectUrl;      
     }
 
-    public function authorize(Varien_Object $payment, $amount){
-        Mage::Log('Step 0 Process: Authorize', Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+    public function authorize(Varien_Object $payment, $amount)
+    {
+        Mage::Log(
+            "Step 0 Process: Authorize Payment: $payment Amount: $amount",
+            Zend_Log::DEBUG,
+            $this->_logFileName
+        );
         return $this;
     }
     /**
@@ -41,7 +47,11 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract{
      */
     public function capture(Varien_Object $payment, $amount)
     {
-        Mage::Log('Step 1 Process: Create and capture the process', Zend_Log::DEBUG, $this->LOG_FILE_NAME);
+        Mage::Log(
+            "Step 1 Process: Create and capture the process Payment: $payment Amount: $amount",
+            Zend_Log::DEBUG, 
+            $this->_logFileName
+        );
         return $this;
     }
 }
