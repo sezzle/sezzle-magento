@@ -43,7 +43,7 @@
                 <active>1</active>
                 <model>pay/PaymentMethod</model>
                 <order_status>pending</order_status>
-                <title>Pay Using Sezzle Pay</title>
+                <title>Sezzle Pay</title>
             </pay>
         </payment>
     </default>
