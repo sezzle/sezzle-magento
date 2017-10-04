@@ -66,7 +66,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $shopName = Mage::app()->getStore()->getName();
             $testMode = false;
             $url = Mage::getStoreConfig('payment/pay/base_url', $storeId);
-            $tranId = Mage::getModel('core/date')->gmtDate() . "-" . $orderId;
+            $tranId = uniqid() . "-" . $orderId;
 
             // Fix urls
             $completeUrl = Mage::getUrl('pay/payment/success', array('id' => $tranId));
@@ -214,12 +214,10 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
             Mage::log("Pending payment is set to False", Zend_Log::DEBUG, $this->_logFileName);
 
-            // Send email
-            $order->sendNewOrderEmail();
-            $order->setEmailSent(true);
+            // Save order
             $order->save();
 
-            Mage::log("Email sent", Zend_Log::DEBUG, $this->_logFileName);
+            Mage::log("Save order", Zend_Log::DEBUG, $this->_logFileName);
 
             // Get payment details of this transaction
             $payment = $order->getPayment();
