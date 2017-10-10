@@ -22,13 +22,23 @@ to:
 
 5.
 Copy all files in the extracted folder's:
-`/app/code/community/`
+`/app/design/frontend/base/default/layout/`
+to:
+`[MAGENTO]/app/design/frontend/base/default/layout`
+
+6.
+Copy all files in the extracted folder's:
+`/app/code/community/Sezzle`
 to:
 `[MAGENTO]/app/code/community`
 
-6. Login to Magento Admin and navigate to System/Cache Management.
+7. Copy all files in the extracted folder's:
+`/js`
+to:
+`[MAGENTO]/js`
 
-7. Flush the cache storage by selecting Flush Cache Storage.
+8. Login to Magento Admin and navigate to System/Cache Management.
+9. Flush the cache storage by selecting Flush Cache Storage.
 
 ## Admin Configuration
 
@@ -45,7 +55,9 @@ to:
     * Set `Sezzle Base URL` to `https://magento.sezzle.com/v1`
 
 4. Save the configuration.
-5. Navigate to System/Cache Management.
-6. Flush the cache storage by selecting Flush Cache Storage.
+5. Go to `System > configuration > Sales > Sezzle Pay > Product Page Widget Display Settings`
+6. Set the widget display settings and save config.
+7. Navigate to System/Cache Management.
+8. Flush the cache storage by selecting Flush Cache Storage.
 
 ### Your store is now ready to accept payments through Sezzle.

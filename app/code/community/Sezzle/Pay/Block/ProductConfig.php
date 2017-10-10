@@ -1,6 +1,6 @@
 <?php
 
-class Sezzle_Pay_Block_Config extends Mage_Core_Block_Template
+class Sezzle_Pay_Block_ProductConfig extends Mage_Core_Block_Template
 {
     public function getJsConfig() {
         $targetXPath = Mage::getStoreConfig('sezzle_pay/product_widget/xpath');
