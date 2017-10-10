@@ -1,7 +1,8 @@
 <?php
 class Sezzle_Pay_Model_WidgetWidth
 {
-    public function toOptionArray() {
+    public function toOptionArray() 
+    {
         return array(
             array(
                 'value' => 'thin',

@@ -1,7 +1,8 @@
 <?php
 class Sezzle_Pay_Model_WidgetAlignment
 {
-    public function toOptionArray() {
+    public function toOptionArray() 
+    {
         return array(
             array(
                 'value' => 'center',

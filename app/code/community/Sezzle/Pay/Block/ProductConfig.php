@@ -2,7 +2,8 @@
 
 class Sezzle_Pay_Block_ProductConfig extends Mage_Core_Block_Template
 {
-    public function getJsConfig() {
+    public function getJsConfig() 
+    {
         $targetXPath = Mage::getStoreConfig('sezzle_pay/product_widget/xpath');
         $forcedShow = Mage::getStoreConfig('sezzle_pay/product_widget/forced_show') == "1" ? true : false;
         $alignment = Mage::getStoreConfig('sezzle_pay/product_widget/alignment');
