@@ -1,0 +1,8 @@
+<?php ?>
+<script type="text/javascript">
+    document.sezzleConfig = <?php echo json_encode($this->getJsConfig()) ?>;
+
+    document.observe('dom:loaded', function () {
+        Sezzle.render();
+    });
+</script>

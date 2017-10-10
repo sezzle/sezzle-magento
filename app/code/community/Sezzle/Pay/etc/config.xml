@@ -2,20 +2,25 @@
 <config>
     <modules>
         <Sezzle_Pay>
-            <version>0.0.1</version>
+            <version>1.0.0</version>
         </Sezzle_Pay>
     </modules>
     <global>
         <blocks>
-            <pay>
+            <sezzle_pay>
                 <class>Sezzle_Pay_Block</class>
-            </pay>
+            </sezzle_pay>
         </blocks>
         <models>
-            <pay>
+            <sezzle_pay>
                 <class>Sezzle_Pay_Model</class>
-            </pay>
+            </sezzle_pay>
         </models>
+        <helpers>
+            <sezzle_pay>
+                <class>Sezzle_Pay_Helper</class>
+            </sezzle_pay>
+        </helpers>
         <resources>
             <pay_setup>
                 <setup>
@@ -48,6 +53,13 @@
         </payment>
     </default>
     <frontend>
+        <layout>
+            <updates>
+                <pay>
+                    <file>sezzle_pay.xml</file>
+                </pay>
+            </updates>
+        </layout>
         <routers>
             <pay>
                 <use>standard</use>

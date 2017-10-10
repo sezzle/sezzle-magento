@@ -35,6 +35,7 @@
 
 # ignore all in js, except module files for this module
 /js/*
+!/js/sezzle/
 
 # Ignore lib other than Sezzle
 /lib/*
@@ -68,6 +69,9 @@
 !/app/design/frontend/base/
 !/app/design/frontend/base/default/
 /app/design/frontend/base/default/*
+!/app/design/frontend/base/default/layout/
+/app/design/frontend/base/default/layout/*
+!/app/design/frontend/base/default/layout/sezzle_pay.xml
 !/app/design/frontend/base/default/template/
 /app/design/frontend/base/default/template/*
 !/app/design/frontend/base/default/template/pay/

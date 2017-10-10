@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package>
+    <name>Sezzle_Pay</name>
+    <version>0.0.1</version>
+    <stability>beta</stability>
+    <license>MIT</license>
+    <channel>community</channel>
+    <extends/>
+    <summary>This extension helps magento merchants have Sezzle as a payment option</summary>
+    <description>Users will be able to checkout using Sezzle to "buy now and pay later".&#xD;
+&#xD;
+Visit https://www.sezzle.com to know more about Sezzle.</description>
+    <notes>In this version here are the highlights:&#xD;
+1. Ability to configure Sezzle API Keys from the magento admin.&#xD;
+2. Ability to add Sezzle as a payment gateway.</notes>
+    <authors><author><name>Rishi Mukherjee</name><user>rishimukherjee</user><email>rishi.mukherjee@sezzle.com</email></author></authors>
+    <date>2017-10-04</date>
+    <time>11:20:46</time>
+    <contents><target name="magecommunity"><dir name="Sezzle"><dir name="Pay"><dir name="controllers"><file name="PaymentController.php" hash="b31d106fc1db309d9bb2992bf60d0712"/></dir><dir name="etc"><file name="config.xml" hash="32044fa1828fd21c82081a9b555ea16e"/><file name="system.xml" hash="5f3502a1d7736d6e583df5a693722802"/></dir><dir name="Model"><file name="PaymentMethod.php" hash="a310480b09b3e9792c33f641081fd075"/></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="Sezzle_Pay.xml" hash="7ef7c3bf70ab03a9ad6d0b06aeb7ea07"/></dir></target><target name="magedesign"><dir name="frontend"><dir name="base"><dir name="default"><dir name="template"><dir name="pay"><file name="cancel.phtml" hash="2be53a2117992d3c1af956b0020394ad"/><file name="redirect.phtml" hash="8abb09dda3d685c7f5c0d5c0d223fb64"/><file name="success.phtml" hash="d41d8cd98f00b204e9800998ecf8427e"/></dir></dir></dir></dir></dir></target></contents>
+    <compatible/>
+    <dependencies><required><php><min>5.4.0</min><max>7.0.0</max></php></required></dependencies>
+</package>
