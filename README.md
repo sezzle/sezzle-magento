@@ -5,38 +5,12 @@
 ### For all purposes assume [Magento] as your root Magento directory.
 
 1. Download the .zip or tar.gz file from Sezzle's github repository.
-
 2. Unzip the file and follow the following instructions.
-
-3. 
-Copy all files in the extracted folder's:
-`/app/etc/modules/`
-to:
-`[MAGENTO]/app/etc/modules`
-
-4.
-Copy all files in the extracted folder's:
-`/app/design/frontend/base/default/template/`
-to:
-`[MAGENTO]/app/design/frontend/base/default/template`
-
-5.
-Copy all files in the extracted folder's:
-`/app/design/frontend/base/default/layout/`
-to:
-`[MAGENTO]/app/design/frontend/base/default/layout`
-
-6.
-Copy all files in the extracted folder's:
-`/app/code/community/Sezzle`
-to:
-`[MAGENTO]/app/code/community`
-
-7. Copy all files in the extracted folder's:
-`/js`
-to:
-`[MAGENTO]/js`
-
+3. Copy all files in the extracted folder's: `/app/etc/modules/` to: `[MAGENTO]/app/etc/modules`
+4. Copy all files in the extracted folder's: `/app/design/frontend/base/default/template/` to: `[MAGENTO]/app/design/frontend/base/default/template`
+5. Copy all files in the extracted folder's: `/app/design/frontend/base/default/layout/` to: `[MAGENTO]/app/design/frontend/base/default/layout`
+6. Copy all files in the extracted folder's: `/app/code/community/Sezzle` to: `[MAGENTO]/app/code/community`
+7. Copy all files in the extracted folder's: `/js` to: `[MAGENTO]/js`
 8. Login to Magento Admin and navigate to System/Cache Management.
 9. Flush the cache storage by selecting Flush Cache Storage.
 
