@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
     <name>Sezzle_Pay</name>
-    <version>0.0.1</version>
-    <stability>beta</stability>
+    <version>1.0.0</version>
+    <stability>stable</stability>
     <license>MIT</license>
     <channel>community</channel>
     <extends/>
@@ -11,12 +11,12 @@
 &#xD;
 Visit https://www.sezzle.com to know more about Sezzle.</description>
     <notes>In this version here are the highlights:&#xD;
-1. Ability to configure Sezzle API Keys from the magento admin.&#xD;
-2. Ability to add Sezzle as a payment gateway.</notes>
-    <authors><author><name>Rishi Mukherjee</name><user>rishimukherjee</user><email>rishi.mukherjee@sezzle.com</email></author></authors>
-    <date>2017-10-04</date>
-    <time>11:20:46</time>
-    <contents><target name="magecommunity"><dir name="Sezzle"><dir name="Pay"><dir name="controllers"><file name="PaymentController.php" hash="b31d106fc1db309d9bb2992bf60d0712"/></dir><dir name="etc"><file name="config.xml" hash="32044fa1828fd21c82081a9b555ea16e"/><file name="system.xml" hash="5f3502a1d7736d6e583df5a693722802"/></dir><dir name="Model"><file name="PaymentMethod.php" hash="a310480b09b3e9792c33f641081fd075"/></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="Sezzle_Pay.xml" hash="7ef7c3bf70ab03a9ad6d0b06aeb7ea07"/></dir></target><target name="magedesign"><dir name="frontend"><dir name="base"><dir name="default"><dir name="template"><dir name="pay"><file name="cancel.phtml" hash="2be53a2117992d3c1af956b0020394ad"/><file name="redirect.phtml" hash="8abb09dda3d685c7f5c0d5c0d223fb64"/><file name="success.phtml" hash="d41d8cd98f00b204e9800998ecf8427e"/></dir></dir></dir></dir></dir></target></contents>
+1. Ability to add Sezzle widget.&#xD;
+2. Ability to configure Sezzle widget from the admin.</notes>
+    <authors><author><name>Rishi Mukherjee</name><user>rishimukherjee</user><email>rishi.mukherjee@sezzle.com</email></author><author><name>Charlie Youakim</name><user>charlieyouakim</user><email>charlie.youakim@sezzle.com</email></author><author><name>Killian Brackey</name><user>killianbrackey</user><email>killian.brackey@sezzle.com</email></author></authors>
+    <date>2017-10-10</date>
+    <time>16:44:50</time>
+    <contents><target name="magecommunity"><dir name="Sezzle"><dir name="Pay"><dir><dir name="Block"><file name="ProductConfig.php" hash="605ee80bb81ca15f24d975ec1bb4f106"/></dir><dir name="Helper"><file name="Data.php" hash="f3dd844762d89ce7a4eae3d00c3820b5"/></dir><dir name="Model"><file name="PaymentMethod.php" hash="a310480b09b3e9792c33f641081fd075"/><file name="WidgetAlignment.php" hash="8deeb7218fc6619f479290e349a82d97"/><file name="WidgetTheme.php" hash="ef7b15912322283105f0dbe6e1340b11"/><file name="WidgetWidth.php" hash="15d45848f298c8b2cc4f9be1866c3128"/></dir><dir name="controllers"><file name="PaymentController.php" hash="b31d106fc1db309d9bb2992bf60d0712"/></dir><dir name="etc"><file name="adminhtml.xml" hash="86c31310d32cf9d1f1af3e69486ddf59"/><file name="config.xml" hash="c1b27cf9c4f59d3726b26397d6f2b165"/><file name="system.xml" hash="4404f206d28e3c047a424ec602739172"/></dir></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="Sezzle_Pay.xml" hash="92233594e0fa5116d65f90e69074152f"/></dir></target><target name="magedesign"><dir name="frontend"><dir name="base"><dir name="default"><dir name="template"><dir name="pay"><file name="cancel.phtml" hash="2be53a2117992d3c1af956b0020394ad"/><file name="productConfig.phtml" hash="8406a1e63f2890e217278d489d0b2288"/><file name="redirect.phtml" hash="8abb09dda3d685c7f5c0d5c0d223fb64"/><file name="success.phtml" hash="d41d8cd98f00b204e9800998ecf8427e"/></dir></dir><dir name="layout"><file name="sezzle_pay.xml" hash="38747645f1f27b3d9fde745da3a9f3b5"/></dir></dir></dir></dir></target><target name="mageweb"><dir name="js"><dir name="sezzle"><dir><dir name="pay"><file name="sezzle_pay.js" hash="b802451fdeabf8c1e10db3cb449c2a97"/></dir></dir></dir></dir></target></contents>
     <compatible/>
     <dependencies><required><php><min>5.4.0</min><max>7.0.0</max></php></required></dependencies>
 </package>

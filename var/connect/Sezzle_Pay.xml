@@ -1,5 +1,5 @@
 <_>
-   <form_key>jpF80jwPR1mLrqLx</form_key>
+   <form_key>805xKBHGX7T7erfG</form_key>
    <name>Sezzle_Pay</name>
    <channel>community</channel>
    <version_ids>
@@ -11,20 +11,26 @@
 Visit https://www.sezzle.com to know more about Sezzle.</description>
    <license>MIT</license>
    <license_uri/>
-   <version>0.0.1</version>
-   <stability>beta</stability>
+   <version>1.0.0</version>
+   <stability>stable</stability>
    <notes>In this version here are the highlights:
-1. Ability to configure Sezzle API Keys from the magento admin.
-2. Ability to add Sezzle as a payment gateway.</notes>
+1. Ability to add Sezzle widget.
+2. Ability to configure Sezzle widget from the admin.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
+         <name>Charlie Youakim</name>
+         <name>Killian Brackey</name>
       </name>
       <user>
          <user>rishimukherjee</user>
+         <user>charlieyouakim</user>
+         <user>killianbrackey</user>
       </user>
       <email>
          <email>rishi.mukherjee@sezzle.com</email>
+         <email>charlie.youakim@sezzle.com</email>
+         <email>killian.brackey@sezzle.com</email>
       </email>
    </authors>
    <depends_php_min>5.4.0</depends_php_min>
@@ -44,7 +50,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>          </files>
+            <files>                     </files>
          </files>
       </package>
       <extension>
@@ -63,35 +69,26 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
       <target>
          <target>magelocal</target>
          <target>magecommunity</target>
-         <target>magecommunity</target>
-         <target>magecommunity</target>
-         <target>magecommunity</target>
          <target>mageetc</target>
          <target>magedesign</target>
          <target>magedesign</target>
-         <target>magedesign</target>
+         <target>mageweb</target>
       </target>
       <path>
          <path/>
-         <path>Sezzle/Pay/controllers/PaymentController.php</path>
-         <path>Sezzle/Pay/etc/config.xml</path>
-         <path>Sezzle/Pay/etc/system.xml</path>
-         <path>Sezzle/Pay/Model/PaymentMethod.php</path>
+         <path>Sezzle/Pay/</path>
          <path>modules/Sezzle_Pay.xml</path>
-         <path>frontend/base/default/template/pay/cancel.phtml</path>
-         <path>frontend/base/default/template/pay/redirect.phtml</path>
-         <path>frontend/base/default/template/pay/success.phtml</path>
+         <path>frontend/base/default/template/pay/</path>
+         <path>frontend/base/default/layout/sezzle_pay.xml</path>
+         <path>js/sezzle/</path>
       </path>
       <type>
          <type>file</type>
+         <type>dir</type>
          <type>file</type>
+         <type>dir</type>
          <type>file</type>
-         <type>file</type>
-         <type>file</type>
-         <type>file</type>
-         <type>file</type>
-         <type>file</type>
-         <type>file</type>
+         <type>dir</type>
       </type>
       <include>
          <include/>
@@ -100,14 +97,8 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
          <include/>
          <include/>
          <include/>
-         <include/>
-         <include/>
-         <include/>
       </include>
       <ignore>
-         <ignore/>
-         <ignore/>
-         <ignore/>
          <ignore/>
          <ignore/>
          <ignore/>
