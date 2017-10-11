@@ -210,12 +210,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 
             // Set order state
             Mage::log("Payment was successfull for $sezzleId", Zend_Log::DEBUG, $this->_logFileName);
-            $order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT, false);
             $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
             Mage::log("Pending payment is set to False", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Save order
-            $order->save();
 
             Mage::log("Save order", Zend_Log::DEBUG, $this->_logFileName);
 
@@ -241,11 +237,30 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 
             Mage::log("Transaction additional info saved", Zend_Log::DEBUG, $this->_logFileName);
 
+            // create invoice
+            if ($order->canInvoice()) {
+                $invoice = $order->prepareInvoice();
+                $invoice->register()->capture();
+                $order->addRelatedObject($invoice);   
+            }
+
+            Mage::log("Transaction invoice created", Zend_Log::DEBUG, $this->_logFileName);
+
+            // send new order email
+            $order->queueNewOrderEmail();
+            $order->setEmailSent(true);
+            $order->setIsCustomerNotified(true);
+
+            Mage::log("Transaction email sent", Zend_Log::DEBUG, $this->_logFileName);
+
             // Save and close this transaction
             $transaction->setParentTxnId($sezzleId)->save();
             $payment->setIsTransactionClosed(1);
 
             Mage::log("Transaction details saved", Zend_Log::DEBUG, $this->_logFileName);
+
+            // Save order
+            $order->save();
 
             // Redirect to success page
             $this->_redirect('checkout/onepage/success', array('_secure'=>true));
