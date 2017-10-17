@@ -17,6 +17,8 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
     protected $_canUseForMultishipping  = true;
     protected $_canSaveCc               = false;
     protected $_isInitializeNeeded      = false;
+    protected $_formBlockType           = 'sezzle_pay/form_paylater';
+
     /**
     * @return Mage_Checkout_Model_Session
     */
