@@ -63,7 +63,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             // Reference
             $reference = $orderId;
             $countryCode = Mage::getStoreConfig('general/country/default');
-            $shopName = Mage::app()->getStore()->getFrontendName();
+            $shopName = Mage::app()->getStore()->getName();
             $testMode = false;
             $url = Mage::getStoreConfig('payment/pay/base_url', $storeId);
             $tranId = uniqid() . "-" . $orderId;

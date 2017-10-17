@@ -1,0 +1,12 @@
+<config>
+    <modules>
+        <Sezzle_Pay>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <Mage_Payment />
+                <Mage_Sales />
+            </depends>
+        </Sezzle_Pay>
+    </modules>
+</config>
