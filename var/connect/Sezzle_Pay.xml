@@ -17,7 +17,8 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
 1. Changed the look and feel of the sezzle payment option.
 2. Added support for multiple price watchers.
 3. Added support for hiding classes.
-4. Added support to render to element.</notes>
+4. Added support to render to element.
+5. Fixed shop name bug.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -52,7 +53,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                              </files>
+            <files>                               </files>
          </files>
       </package>
       <extension>
