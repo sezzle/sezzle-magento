@@ -95,6 +95,15 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </xpath>
+                        <renderXPath translate="label">
+                            <label>Product page: render to element path</label>
+                            <comment>Path of the element to which to render widget</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </renderXPath>
                         <forced_show translate="label">
                             <label>Show in all countries</label>
                             <comment>If false, the widget is shown only in countries where Sezzle Pay is supported</comment>

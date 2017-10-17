@@ -5,6 +5,7 @@ class Sezzle_Pay_Block_ProductConfig extends Mage_Core_Block_Template
     public function getJsConfig() 
     {
         $targetXPath = Mage::getStoreConfig('sezzle_pay/product_widget/xpath');
+        $renderToPath = Mage::getStoreConfig('sezzle_pay/product_widget/renderXPath');
         $forcedShow = Mage::getStoreConfig('sezzle_pay/product_widget/forced_show') == "1" ? true : false;
         $alignment = Mage::getStoreConfig('sezzle_pay/product_widget/alignment');
         $merchantID = Mage::getStoreConfig('sezzle_pay/product_widget/merchant_id');
@@ -14,6 +15,7 @@ class Sezzle_Pay_Block_ProductConfig extends Mage_Core_Block_Template
 
         return array(
             'targetXPath'          => $targetXPath,
+            'renderToPath'         => $renderToPath,
             'forcedShow'           => $forcedShow,
             'alignment'            => $alignment,
             'merchantID'           => $merchantID,
