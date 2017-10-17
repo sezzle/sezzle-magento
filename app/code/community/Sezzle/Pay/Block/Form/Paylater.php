@@ -1,6 +1,7 @@
 <?php
 
-class Sezzle_Pay_Block_Form_Paylater extends Mage_Payment_Block_Form {
+class Sezzle_Pay_Block_Form_Paylater extends Mage_Payment_Block_Form
+{
     
     protected function _construct()
     {
