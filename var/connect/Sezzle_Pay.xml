@@ -11,10 +11,13 @@
 Visit https://www.sezzle.com to know more about Sezzle.</description>
    <license>MIT</license>
    <license_uri/>
-   <version>1.0.3</version>
+   <version>1.0.2</version>
    <stability>stable</stability>
    <notes>In this version here are the highlights:
-1. Changed the look and feel of the sezzle payment option.</notes>
+1. Changed the look and feel of the sezzle payment option.
+2. Added support for multiple price watchers.
+3. Added support for hiding classes.
+4. Added support to render to element.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -49,7 +52,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                            </files>
+            <files>                              </files>
          </files>
       </package>
       <extension>
