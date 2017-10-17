@@ -45,10 +45,10 @@
     <default>
         <payment>
             <pay>
+                <title>Sezzle Pay PayLater 0% Interest</title>
                 <active>1</active>
                 <model>sezzle_pay/PaymentMethod</model>
                 <order_status>pending</order_status>
-                <title>Sezzle Pay</title>
             </pay>
         </payment>
     </default>

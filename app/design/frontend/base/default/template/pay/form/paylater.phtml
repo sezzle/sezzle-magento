@@ -1,0 +1,76 @@
+<span id="sezzle-paylater">
+</span>
+<script type="text/javascript">
+    (function (Prototype, Element) {
+        // Get the css
+        var head = document.head;
+        var link = document.createElement('link');
+        link.type = 'text/css'
+        link.rel = 'stylesheet'
+        link.href = 'https://d3svog4tlx445w.cloudfront.net/shopify-app/assets/sezzle-styles-global1.1.7.css';
+        head.appendChild(link);
+
+        // Get the element above which to insert the widget
+        var sezzlePaylaterElement = Element.getElementById('sezzle-paylater');
+
+        // create the sezzle element
+        var sezzlePayment = Element.createElement('div');
+        sezzlePayment.className = "sezzle-payment";
+
+        // create the logo
+        var sezzleLogo = Element.createElement("img");
+        sezzleLogo.className = "sezzle-logo v-middle";
+        sezzleLogo.src = 'https://d3svog4tlx445w.cloudfront.net/branding/sezzle-logos/png/sezzle-logo-sm-100w.png';
+        sezzlePayment.appendChild(sezzleLogo);
+
+        // create text container
+        var sezzleTextContainer = Element.createElement('div');
+        sezzleTextContainer.className = "sezzle-text";
+        sezzlePayment.appendChild(sezzleTextContainer);
+
+        // create the text
+        var sezzleText = Element.createTextNode('Pay Later');
+        sezzleTextContainer.appendChild(sezzleText);
+
+        // create the know more container
+        var knowMoreContainer = Element.createElement("a");
+        knowMoreContainer.className = "sezzle-know-more";
+        sezzlePayment.appendChild(knowMoreContainer);
+        
+        // create the know more text
+        var knowMoreText = Element.createTextNode('learn more');
+        knowMoreContainer.appendChild(knowMoreText);
+
+        sezzlePaylaterElement.parentNode.insertBefore(sezzlePayment, sezzlePaylaterElement);
+
+        // Render modal
+        (function() {
+            if (!Element.getElementsByClassName('sezzle-checkout-modal-lightbox').length) {
+                var modalNode = Element.createElement('div');
+                modalNode.className = "sezzle-checkout-modal-lightbox close-sezzle-modal";
+                modalNode.style.display = 'none';
+                modalNode.innerHTML = '<div class="sezzle-checkout-modal sezzle-checkout-modal-hidden"><div class="sezzle-no-thanks close-sezzle-modal">x</div><div class="sezzle-modal-title"><div class="sezzle-title-text-left">How does</div><img class="sezzle-modal-logo" src="https://sezzlemedia.s3.amazonaws.com/branding/sezzle-logos/sezzle-logo.svg"><div class="sezzle-title-text-right">work?</div></div><div class="sezzle-header-text">We have partnered with Sezzle to give you the ability to Buy Now and Pay Later.</div><div class="sezzle-sub-header-text"></div><div class="sezzle-modal-flex"><div class="sezzle-modal-half"><img src="https://d3svog4tlx445w.cloudfront.net/shopify-app/assets/cal2.png"><p><b>Simple Installments</b> Sezzle splits your purchase into 4 automatic installments. Only 25% is due today. The remaining installments occur every 2 weeks.</p></div><div class="sezzle-modal-half"><img src="https://d3svog4tlx445w.cloudfront.net/shopify-app/assets/time2.png"><p><b>Quick and Easy</b> It takes only 1-2 minutes to checkout with Sezzle the first time. Future checkouts take seconds.</p></div></div><div class="sezzle-simply-select"><div class="sezzle-inline-text-left">Just select</div><img src="https://sezzlemedia.s3.amazonaws.com/branding/sezzle-logos/sezzle-logo.svg"><div class="sezzle-inline-text-right">at checkout.</div></div><div class="sezzle-footer-text">Subject to approval. Estimated payment amount excludes taxes and shipping fees. Your actual installment payments will be presented for confirmation in your checkout with Sezzle.</div></div>';
+                    Element.getElementsByTagName('html')[0].appendChild(modalNode);
+
+                // Event listenr for click in know more button
+                Array.from(Element.getElementsByClassName('sezzle-know-more'))
+                .forEach(function(el) {
+                    el.addEventListener('click', function() {
+                    // Show modal node
+                    modalNode.style.display = 'block';
+                    // Remove hidden class to show the item
+                    modalNode.getElementsByClassName('sezzle-checkout-modal')[0].className = "sezzle-checkout-modal";
+                    })
+                });
+                // Event listenr for close in modal
+                Element.getElementsByClassName('close-sezzle-modal')[0]
+                .addEventListener('click', function() {
+                    // Display the modal node
+                    modalNode.style.display = 'none';
+                    // Add hidden class hide the item
+                    modalNode.getElementsByClassName('sezzle-checkout-modal')[0].className = "sezzle-checkout-modal sezzle-checkout-modal-hidden";
+                });
+            }
+        })();
+    })(window.Prototype, document);
+</script>
