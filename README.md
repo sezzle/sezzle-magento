@@ -1,4 +1,4 @@
-# Magento Extension for Sezzle Pay
+# Sezzle Pay Extension for Magento 1
 
 ## This will help you install Sezzle's magento extension
 
