@@ -29,8 +29,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $privateKey = Mage::getStoreConfig('payment/pay/private_key', $storeId);
 
             // Cost details
-            $amount = $order-> getBaseGrandTotal();
-            $currency = $order->getOrderCurrencyCode();
+            $amount = $order->getBaseGrandTotal();
+            $currency = Mage::app()->getStore()->getCurrentCurrencyCode();
             
             // Billing address
             $billingAddress = $order->getBillingAddress();
