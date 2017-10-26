@@ -247,7 +247,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             Mage::log("Transaction invoice created", Zend_Log::DEBUG, $this->_logFileName);
 
             // send new order email
-            $order->queueNewOrderEmail();
+            $order->sendNewOrderEmail();
             $order->setEmailSent(true);
             $order->setIsCustomerNotified(true);
 
