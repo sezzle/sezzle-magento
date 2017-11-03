@@ -11,12 +11,12 @@ class Sezzle_Pay_Model_Api_Router {
     const API_MODE_SANDBOX = 'sandbox';
 
     // Returns the authentication token url
-    protected function getAuthTokenUrl() {
-        return getBaseApiUrl() . '/authentication';
+    public function getAuthTokenUrl() {
+        return $this->getBaseApiUrl() . '/authentication';
     }
 
-    protected function getSubmitCheckoutDetailsAndGetRedirectUrl() {
-        return getBaseApiUrl() . '/checkouts';
+    public function getSubmitCheckoutDetailsAndGetRedirectUrl() {
+        return $this->getBaseApiUrl() . '/checkouts';
     }
 
     // Returns base api url
