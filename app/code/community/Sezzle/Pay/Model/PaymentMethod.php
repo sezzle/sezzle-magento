@@ -75,6 +75,11 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         return $token;
     }
 
+    // Send quote data and get the redirect URL from Sezzle API
+    protected function submitQuoteAndGetRedirectUrl($quote) {
+        
+    }
+
     // Get auth token from Sezzle API
     protected function getApiRouter() {
         return Mage::getModel('pay/api_router');

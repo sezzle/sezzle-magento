@@ -8,8 +8,10 @@ if (!function_exists('boolval')) {
 
 class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 {
+    protected $_quote;
+
     // Redirect to sezzle pay 
-    protected $_logFileName = 'sezzle-pay.log';
+    
     public function redirectAction()
     {
         try {
@@ -323,5 +325,96 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             Mage::log($e, Zend_Log::ERR, $this->_logFileName);
             parent::_redirect('checkout/cart');
         }
+    }
+
+    // Entrypoint: Redirect user to Sezzle
+    public function startAction() {
+        try {
+            $this->_initCheckout();
+
+            if ($this->_getQuote()->getIsMultiShipping()) {
+                Mage::throwException(Mage::helper('pay')->__('Sezzle payment is not supported for this checkout.'));
+            }
+
+            // Check if customer has to be logged in to process to checkout
+            $quoteCheckoutMethod = $this->_getQuote()->getCheckoutMethod();
+            if ($quoteCheckoutMethod == Mage_Checkout_Model_Type_Onepage::METHOD_GUEST &&
+                !Mage::helper('checkout')->isAllowedGuestCheckout(
+                $this->_getQuote(),
+                $this->_getQuote()->getStoreId()
+            )) {
+                Mage::getSingleton('core/session')->addNotice(
+                    Mage::helper('pay')->__('To proceed to Checkout, please log in using your email address.')
+                );
+                $this->redirectLogin();
+                Mage::getSingleton('customer/session')
+                ->setBeforeAuthUrl(Mage::getUrl('*/*/*', array('_current' => true)));
+                return;
+            }
+
+            
+        }
+    }
+
+    protected function helper()
+    {
+        return Mage::helper('pay');
+    }
+
+    // Init checkout model
+    protected function _initCheckout()
+    {
+        $quote = $this->_getQuote();
+        
+        if (!$quote->hasItems() || $quote->getHasError()) {
+            $this->getResponse()->setHeader('HTTP/1.1','403 Forbidden');
+
+            if (!$quote->hasItems()) {
+                $message = 'No items in quote';
+                $this->helper()->log(
+                    $message,
+                    Zend_Log::DEBUG
+                );
+            }
+            else if($quote->getHasError()) {
+                $message = 'Quote Error Received: ' . $quote->getMessage();
+                $this->helper()->log(
+                    $message,
+                    Zend_Log::DEBUG
+                );
+            }
+
+            Mage::throwException(Mage::helper('pay')->__('Unable to initialize Sezzle Pay: ' . $message));
+        }
+    }
+
+
+    private function _getSession()
+    {
+        return Mage::getSingleton('core/session');
+    }
+
+    protected function _getCheckoutSession()
+    {
+        return Mage::getSingleton('checkout/session');
+    }
+
+    private function _getQuote()
+    {
+        if (!$this->_quote) {
+            $this->_quote = $this->_getCheckoutSession()->getQuote();
+        }
+        return $this->_quote;
+    }
+
+    public function redirectLogin()
+    {
+        $this->setFlag('', 'no-dispatch', true);
+        $this->getResponse()->setRedirect(
+            Mage::helper('core/url')->addRequestParam(
+                Mage::helper('customer')->getLoginUrl(),
+                array('context' => 'checkout')
+            )
+        );
     }
 } 
