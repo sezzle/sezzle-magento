@@ -15,6 +15,10 @@ class Sezzle_Pay_Model_Api_Router {
         return getBaseApiUrl() . '/authentication';
     }
 
+    protected function getSubmitCheckoutDetailsAndGetRedirectUrl() {
+        return getBaseApiUrl() . '/checkouts';
+    }
+
     // Returns base api url
     protected function getBaseApiUrl() {
         $apiMode      = Mage::getStoreConfig('payment/pay/' . Sezzle_Pay_Model_PaymentMethod::API_MODE_CONFIG_FIELD);

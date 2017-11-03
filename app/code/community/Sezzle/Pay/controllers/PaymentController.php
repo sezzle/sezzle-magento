@@ -352,8 +352,35 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 return;
             }
 
+            $redirectUrl = Mage::getModel('pay/paymentmethod')->start($this->_quote, Mage::getUrl('*/*/cancel'), Mage::getUrl('*/*/complete'));
+            $response = array(
+                'success' => true,
+                'redirectUrl'  => $redirectUrl,
+            );
+        } catch (Exception $e) {
+            // Debug log
+            if (empty($this->_quote)) {
+                $this->helper()->log($this->__('Error occur during process, Quote not found. %s.', $e->getMessage(), Zend_Log::ERR));
+            }
+            else {
+                $this->helper()->log($this->__('Error occur during process. %s. QuoteID=%s', $e->getMessage(), $this->_quote->getId()), Zend_Log::ERR);
+            }
             
+            // Adding error for redirect and JSON
+            $message = Mage::helper('pay')->__('There was an error processing your order. %s', $e->getMessage());
+
+            $this->_getCheckoutSession()->addError($message);
+            // Response to the
+            $response = array(
+                'success'  => false,
+                'message'  => $message,
+                'redirect' => Mage::getUrl('checkout/cart'),
+            );
         }
+
+        $this->getResponse()
+            ->setHeader('Content-type', 'application/json')
+            ->setBody(json_encode($response));
     }
 
     protected function helper()
