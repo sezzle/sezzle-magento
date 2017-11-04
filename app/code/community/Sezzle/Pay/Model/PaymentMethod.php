@@ -6,17 +6,23 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
      */ 
     protected $_logFileName = 'sezzle-pay.log';
     protected $_code = 'pay';
-    protected $_isGateway               = true;
-    protected $_canAuthorize            = true;
-    protected $_canCapture              = true;
-    protected $_canCapturePartial       = false;
-    protected $_canRefund               = true;
-    protected $_canVoid                 = false;
-    protected $_canUseInternal          = true;
-    protected $_canUseCheckout          = true;
-    protected $_canUseForMultishipping  = true;
-    protected $_canSaveCc               = false;
-    protected $_isInitializeNeeded      = true;
+    protected $_isGateway                  = false;
+    protected $_canOrder                   = true;
+    protected $_canAuthorize               = false;
+    protected $_canCapture                 = false;
+    protected $_canCapturePartial          = false;
+    protected $_canCaptureOnce             = false;
+    protected $_canRefund                  = true;
+    protected $_canRefundInvoicePartial    = true;
+    protected $_canVoid                    = false;
+    protected $_canUseInternal             = false;
+    protected $_canUseCheckout             = true;
+    protected $_canUseForMultishipping     = false;
+    protected $_isInitializeNeeded         = true;
+    protected $_canFetchTransactionInfo    = true;
+    protected $_canReviewPayment           = true;
+    protected $_canCreateBillingAgreement  = false;
+    protected $_canManageRecurringProfiles = false;
     protected $_formBlockType           = 'sezzle_pay/form_paylater';
 
     /**
@@ -26,6 +32,20 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
     const API_PRIVATE_KEY_CONFIG_PATH = 'payment/pay/private_key';
     const API_MODE_CONFIG_FIELD = 'api_mode';
     const API_BASE_URL_CONFIG_FIELD = 'base_url';
+
+    public function initialize($paymentAction, $stateObject)
+    {
+        try {
+            $stateObject->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT);
+            $stateObject->setStatus('pending_payment');
+            $stateObject->setIsNotified(false);
+        } catch (Exception $e) {
+            Mage::logException($e);
+            $this->helper()->log('Payment method initialization error: ' . $e->getMessage(), Zend_Log::ERR);
+            throw $e;
+        }
+        return $this;
+    }
 
     /**
     * @return Mage_Checkout_Model_Session
@@ -73,14 +93,14 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         if (empty($token)) {
             throw Mage::exception(
                 'Sezzle_Pay',
-                "Sezzle Pay API Error: Cannot get auth token. $resultJson"
+                "Sezzle Pay API Error: Cannot get auth token."
             );
         }
         return $token;
     }
 
     // Send quote data and get the redirect URL from Sezzle API
-    public function start($quote, $cancelUrl, $completeUrl) {
+    public function start($quote) {
 
         $quote->collectTotals();
 
@@ -89,6 +109,9 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         }
 
         $quote->reserveOrderId()->save();
+
+        $cancelUrl = Mage::getUrl('*/*/cancel');
+        $completeUrl = Mage::getUrl('*/*/complete') . "id/" . $quote->getReservedOrderId();
 
         // create request body for sezzle checkout init
         $requestBody = $this->createCheckoutRequestBody($quote, $cancelUrl, $completeUrl);
@@ -118,13 +141,99 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         return $checkoutUrl;
     }
 
+    // Place order using quote
+    public function place($quote) {
+        // Converting quote to order
+        $service = Mage::getModel('sales/service_quote', $quote);
+        
+        $service->submitAll();
+        $order = $service->getOrder();
+    
+        // ensure that Grand Total is not doubled
+        $order->setBaseGrandTotal($quote->getBaseGrandTotal());
+        $order->setGrandTotal($quote->getGrandTotal());
+
+
+        // adjust the Quote currency to prevent the default currency being stuck
+        $order->setBaseCurrencyCode(Mage::app()->getStore()->getCurrentCurrencyCode());
+        $order->setQuoteCurrencyCode(Mage::app()->getStore()->getCurrentCurrencyCode());
+        $order->setOrderCurrencyCode(Mage::app()->getStore()->getCurrentCurrencyCode());
+        $order->save();
+
+        $session = $this->_getSession();
+
+        if ($order->getId()) {
+            // Check with recurring payment
+            $profiles = $service->getRecurringPaymentProfiles();
+            if ($profiles) {
+                $ids = array();
+                foreach($profiles as $profile) {
+                    $ids[] = $profile->getId();
+                }
+                $session->setLastRecurringProfileIds($ids);
+            }
+
+            //ensure the order amount due is 0
+            $order->setTotalDue(0);
+            $order->setData('sezzle_id', $quote->getData('sezzle_id'));
+            $order->save();
+                        
+            if (!$order->getEmailSent()) {
+                $order->sendNewOrderEmail();
+            }
+
+            // Create invoice
+            $helper = Mage::helper('sezzle_pay');
+            try {
+                $helper->createInvoice($order);
+                $helper->log($helper->__('Invoice successfully created'), Zend_Log::DEBUG);
+            } catch (Sezzle_Pay_Exception $e) {
+                $orderStatusHistory = $order->addStatusHistoryComment(
+                    $helper->__('%s. Invoice is not created', $e->getMessage())
+                );
+                $orderStatusHistory->save();
+                $helper->log($helper->__('%s. Invoice is not created', $e->getMessage()), Zend_Log::INFO);
+            } catch (Exception $e) {
+                Mage::logException($e);
+                $helper->log($helper->__('Invoice creation failed with message: %s', $e->getMessage()), Zend_Log::ERR);
+            }
+
+            // prepare session to success or cancellation page clear current session
+            $session->clearHelperData();
+
+            // "last successful quote" for correctly redirect to success page
+            $quoteId = $session->getQuote()->getId();
+            $session->setLastQuoteId($quoteId)->setLastSuccessQuoteId($quoteId);
+
+            // an order may be created
+            $session->setLastOrderId($order->getId())
+                ->setLastRealOrderId($order->getIncrementId());
+
+            //clear the checkout session
+            $session->getQuote()->setIsActive(0)->save();
+            return true;
+        }
+
+        return false; 
+    }
+
+    protected function _getSession()
+    {
+        return Mage::getSingleton('checkout/session');
+    }
+
+    // Create unique reference ID
+    protected function createUniqueReferenceId($referenceId) {
+        return uniqid() . "-" . $referenceId;
+    }
+
     // Create checkout data for sezzle API from quote
     protected function createCheckoutRequestBody($quote, $cancelUrl, $completeUrl) {
         $requestBody = array();
         $requestBody["amount_in_cents"] = $quote->getGrandTotal() * 100;
         $requestBody["currency_code"] = $quote->getBaseCurrencyCode();
-        $requestBody["order_description"] = $quote->getReservedOrderId();
-        $requestBody["order_reference_id"] = $quote->getReservedOrderId();
+        $requestBody["order_description"] = $this->createUniqueReferenceId($quote->getReservedOrderId());
+        $requestBody["order_reference_id"] = $this->createUniqueReferenceId($quote->getReservedOrderId());
         $requestBody["checkout_cancel_url"] = $cancelUrl;
         $requestBody["checkout_complete_url"] = $completeUrl;
         $requestBody["customer_details"] = array(
@@ -168,7 +277,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
             );
             array_push($requestBody["items"], $itemData);
         }
-        $requestBody["merchant_completes"] = true;
+        $requestBody["merchant_completes"] = false;
 
         return $requestBody;
     }
