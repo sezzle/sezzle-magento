@@ -101,7 +101,6 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
 
         // create request body for sezzle checkout init
         $requestBody = $this->createCheckoutRequestBody($quote, $cancelUrl, $completeUrl);
-        $quote->setData('order_reference_id', $requestBody['order_reference_id']);
         // Send request
         $result = $this->_sendApiRequest(
             $this->getApiRouter()->getSubmitCheckoutDetailsAndGetRedirectUrl(),
@@ -128,7 +127,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
     }
 
     // Place order using quote
-    public function place($quote) {
+    public function place($quote, $reference) {
         // Converting quote to order
         $service = Mage::getModel('sales/service_quote', $quote);
         
@@ -161,7 +160,6 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
 
             //ensure the order amount due is 0
             $order->setTotalDue(0);
-            $order->setData('order_reference_id', $quote->getData('order_reference_id'));
             $order->save();
                         
             if (!$order->getEmailSent()) {
@@ -181,6 +179,22 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
 
             //clear the checkout session
             $session->getQuote()->setIsActive(0)->save();
+
+            // send the id
+            $result = $this->_sendApiRequest(
+                $this->getApiRouter()->getOrderIdUrl($reference),
+                array(
+                    "order_id" => $order->getId()
+                ),
+                true,
+                Varien_Http_Client::POST
+            );
+            if ($result->isError()) {
+                throw Mage::exception(
+                    'Sezzle_Pay',
+                    __('Sezzle Pay API Error: %s', $result->getMessage())
+                );
+            }
             return true;
         }
 

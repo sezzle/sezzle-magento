@@ -15,6 +15,10 @@ class Sezzle_Pay_Model_Api_Router {
         return $this->getBaseApiUrl() . '/authentication';
     }
 
+    public function getOrderIdUrl($reference) {
+        return $this->getBaseApiUrl() . '/orders' . '/' . $reference . '/save_order_id';
+    }
+
     public function getSubmitCheckoutDetailsAndGetRedirectUrl() {
         return $this->getBaseApiUrl() . '/checkouts';
     }

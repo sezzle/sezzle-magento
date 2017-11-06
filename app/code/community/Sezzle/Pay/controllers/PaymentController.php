@@ -110,6 +110,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 
     public function placeOrderAction() {
         try {
+            $reference = $this->getRequest()->getQuery('order_reference_id');
+            $this->helper()->log($reference, Zend_Log::DEBUG);
             // Load the checkout session
             $this->_initCheckout();
 
@@ -124,11 +126,11 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 $this->_prepareSezzleCustomerQuote();
             }
 
-            $placeOrder = Mage::getModel('sezzle_pay/paymentmethod')->place($this->_quote);
+            $placeOrder = Mage::getModel('sezzle_pay/paymentmethod')->place($this->_quote, $reference);
             $this->_redirect('checkout/onepage/success');
         } catch (Exception $e) {
             // Debug log
-            $this->getSession()->addError($e->getMessage());
+            $this->_getSession()->addError($e->getMessage());
 
             $this->_redirect('checkout/cart');
         }
