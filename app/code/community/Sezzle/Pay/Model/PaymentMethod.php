@@ -18,7 +18,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
     protected $_canUseInternal             = false;
     protected $_canUseCheckout             = true;
     protected $_canUseForMultishipping     = false;
-    protected $_isInitializeNeeded         = true;
+    protected $_isInitializeNeeded         = false;
     protected $_canFetchTransactionInfo    = true;
     protected $_canReviewPayment           = true;
     protected $_canCreateBillingAgreement  = false;
@@ -32,20 +32,6 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
     const API_PRIVATE_KEY_CONFIG_PATH = 'payment/pay/private_key';
     const API_MODE_CONFIG_FIELD = 'api_mode';
     const API_BASE_URL_CONFIG_FIELD = 'base_url';
-
-    public function initialize($paymentAction, $stateObject)
-    {
-        try {
-            $stateObject->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT);
-            $stateObject->setStatus('pending_payment');
-            $stateObject->setIsNotified(false);
-        } catch (Exception $e) {
-            Mage::logException($e);
-            $this->helper()->log('Payment method initialization error: ' . $e->getMessage(), Zend_Log::ERR);
-            throw $e;
-        }
-        return $this;
-    }
 
     /**
     * @return Mage_Checkout_Model_Session
