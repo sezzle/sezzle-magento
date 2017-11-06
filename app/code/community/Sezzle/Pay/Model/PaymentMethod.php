@@ -6,10 +6,10 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
      */ 
     protected $_logFileName = 'sezzle-pay.log';
     protected $_code = 'pay';
-    protected $_isGateway                  = false;
+    protected $_isGateway                  = true;
     protected $_canOrder                   = true;
-    protected $_canAuthorize               = false;
-    protected $_canCapture                 = false;
+    protected $_canAuthorize               = true;
+    protected $_canCapture                 = true;
     protected $_canCapturePartial          = false;
     protected $_canCaptureOnce             = false;
     protected $_canRefund                  = true;
@@ -166,22 +166,6 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
                         
             if (!$order->getEmailSent()) {
                 $order->sendNewOrderEmail();
-            }
-
-            // Create invoice
-            $helper = Mage::helper('sezzle_pay');
-            try {
-                $helper->createInvoice($order);
-                $helper->log($helper->__('Invoice successfully created'), Zend_Log::DEBUG);
-            } catch (Sezzle_Pay_Exception $e) {
-                $orderStatusHistory = $order->addStatusHistoryComment(
-                    $helper->__('%s. Invoice is not created', $e->getMessage())
-                );
-                $orderStatusHistory->save();
-                $helper->log($helper->__('%s. Invoice is not created', $e->getMessage()), Zend_Log::INFO);
-            } catch (Exception $e) {
-                Mage::logException($e);
-                $helper->log($helper->__('Invoice creation failed with message: %s', $e->getMessage()), Zend_Log::ERR);
             }
 
             // prepare session to success or cancellation page clear current session
