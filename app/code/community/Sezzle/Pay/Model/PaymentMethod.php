@@ -91,7 +91,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         $quote->collectTotals();
 
         if (!$quote->getGrandTotal() && !$quote->hasNominalItems()) {
-            Mage::throwException(Mage::helper('paypal')->__('Sezzle does not support processing orders with zero amount. To complete your purchase, proceed to the standard checkout process.'));
+            Mage::throwException(Mage::helper('Sezzle_Pay')->__('Sezzle does not support processing orders with zero amount. To complete your purchase, proceed to the standard checkout process.'));
         }
 
         $quote->reserveOrderId()->save();

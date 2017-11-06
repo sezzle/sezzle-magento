@@ -103,9 +103,9 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $this->_forward('placeOrder');
         } catch (Exception $e) {
             // Add error message
-            $this->getSession()->addError($e->getMessage());
+            $this->_getSession()->addError($e->getMessage());
 
-            $this->helper()->log($this->__('Exception during order creation. %s', $e->getMessage()), Zend_Log::ERR);
+            $this->_getSession()->log($this->__('Exception during order creation. %s', $e->getMessage()), Zend_Log::ERR);
         }
     }
 
