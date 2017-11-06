@@ -101,7 +101,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
 
         // create request body for sezzle checkout init
         $requestBody = $this->createCheckoutRequestBody($quote, $cancelUrl, $completeUrl);
-        
+        $quote->setData('order_reference_id', $requestBody['order_reference_id']);
         // Send request
         $result = $this->_sendApiRequest(
             $this->getApiRouter()->getSubmitCheckoutDetailsAndGetRedirectUrl(),
@@ -161,7 +161,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
 
             //ensure the order amount due is 0
             $order->setTotalDue(0);
-            $order->setData('sezzle_id', $quote->getData('sezzle_id'));
+            $order->setData('order_reference_id', $quote->getData('order_reference_id'));
             $order->save();
                         
             if (!$order->getEmailSent()) {

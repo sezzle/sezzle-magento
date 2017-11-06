@@ -95,7 +95,6 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $this->_quote->collectTotals();
 
             $payment = $this->_quote->getPayment();
-            $this->_quote->getPayment()->setData('sezzle_id', $orderId);
             // Debug log
             $this->helper()->log($this->__('Payment succeeded with Sezzlepay. QuoteID=%s ReservedOrderID=%s',$this->_quote->getId(), $this->_quote->getReservedOrderId()), Zend_Log::NOTICE);
             
