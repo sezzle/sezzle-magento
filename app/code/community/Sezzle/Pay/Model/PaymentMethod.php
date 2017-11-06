@@ -202,8 +202,9 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         $requestBody = array();
         $requestBody["amount_in_cents"] = $quote->getGrandTotal() * 100;
         $requestBody["currency_code"] = $quote->getBaseCurrencyCode();
-        $requestBody["order_description"] = $this->createUniqueReferenceId($quote->getReservedOrderId());
-        $requestBody["order_reference_id"] = $this->createUniqueReferenceId($quote->getReservedOrderId());
+        $reference = $this->createUniqueReferenceId($quote->getReservedOrderId());
+        $requestBody["order_description"] = $reference;
+        $requestBody["order_reference_id"] = $reference;
         $requestBody["checkout_cancel_url"] = $cancelUrl;
         $requestBody["checkout_complete_url"] = $completeUrl;
         $requestBody["customer_details"] = array(
