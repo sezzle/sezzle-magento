@@ -11,11 +11,11 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
     protected $_quote;
 
     // Entrypoint: Redirect user to Sezzle
-    public function startAction() {
+    public function startAction() 
+    {
         try {
             // Check with security updated on form key
             if (!$this->_validateFormKey()) {
-                
                 $frontend_form_key  =   Mage::app()->getRequest()->getParam('form_key');
                 $session_form_key   =   Mage::getSingleton('core/session')->getFormKey();
 
@@ -35,9 +35,9 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $quoteCheckoutMethod = $this->_getQuote()->getCheckoutMethod();
             if ($quoteCheckoutMethod == Mage_Checkout_Model_Type_Onepage::METHOD_GUEST &&
                 !Mage::helper('checkout')->isAllowedGuestCheckout(
-                $this->_getQuote(),
-                $this->_getQuote()->getStoreId()
-            )) {
+                    $this->_getQuote(),
+                    $this->_getQuote()->getStoreId()
+                )) {
                 Mage::getSingleton('core/session')->addNotice(
                     Mage::helper('sezzle_pay')->__('To proceed to Checkout, please log in using your email address.')
                 );
@@ -67,10 +67,10 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $this->_getCheckoutSession()->addError($message);
 
             // Utilise Magento Session to preserve Store Credit details
-    	    if( Mage::getEdition() == Mage::EDITION_ENTERPRISE ) {
-    	    	$this->_quote = $this->helper()->storeCreditSessionSet($this->_quote);
-    	    	$this->_quote = $this->helper()->giftCardsSessionSet($this->_quote);
-    	    }
+            if(Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
+                $this->_quote = $this->helper()->storeCreditSessionSet($this->_quote);
+                $this->_quote = $this->helper()->giftCardsSessionSet($this->_quote);
+            }
 
             // Response to the
             $response = array(
@@ -86,34 +86,38 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
     }
 
     // User returned to store without paying
-    public function cancelAction() {
-        if( Mage::getEdition() == Mage::EDITION_ENTERPRISE ) {
+    public function cancelAction() 
+    {
+        if(Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
             $this->helper()->storeCreditSessionUnset();
             $this->helper()->giftCardsSessionUnset();
         }
+
         $this->_redirect('checkout/cart');
     }
 
-    public function completeAction() {
+    public function completeAction() 
+    {
         $this->_capture();
     }
 
-    protected function _capture() {
+    protected function _capture() 
+    {
         try {
             $orderId = $this->getRequest()->getParam('id');
 
             $this->_initCheckout();
             $this->_quote->collectTotals();
 
-            if( Mage::getEdition() == Mage::EDITION_ENTERPRISE ) {
+            if(Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
                 $this->_quote = $this->helper()->storeCreditCapture($this->_quote);
                 $this->_quote = $this->helper()->giftCardsCapture($this->_quote); 
-		        $this->_quote->save();
-    	    }
+                $this->_quote->save();
+            }
 
             $payment = $this->_quote->getPayment();
             // Debug log
-            $this->helper()->log($this->__('Payment succeeded with Sezzlepay. QuoteID=%s ReservedOrderID=%s',$this->_quote->getId(), $this->_quote->getReservedOrderId()), Zend_Log::NOTICE);
+            $this->helper()->log($this->__('Payment succeeded with Sezzlepay. QuoteID=%s ReservedOrderID=%s', $this->_quote->getId(), $this->_quote->getReservedOrderId()), Zend_Log::NOTICE);
             
             // Place order when validation is correct
             $this->_forward('placeOrder');
@@ -125,7 +129,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
         }
     }
 
-    public function placeOrderAction() {
+    public function placeOrderAction() 
+    {
         try {
             $reference = $this->getRequest()->getParam('magento_sezzle_id');
             $this->helper()->log("reference: $reference", Zend_Log::DEBUG);
@@ -133,10 +138,10 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $this->_initCheckout();
 
             $checkout_method = $this->_quote->getCheckoutMethod();
-            if( $checkout_method == Mage_Checkout_Model_Type_Onepage::METHOD_REGISTER ) {
+            if($checkout_method == Mage_Checkout_Model_Type_Onepage::METHOD_REGISTER) {
                 $this->_prepareNewSezzleCustomerQuote();
             }
-            else if( $checkout_method == Mage_Checkout_Model_Type_Onepage::METHOD_GUEST ) {
+            else if($checkout_method == Mage_Checkout_Model_Type_Onepage::METHOD_GUEST) {
                 $this->_prepareSezzleGuestQuote();
             }
             else {
@@ -145,7 +150,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 
             $placeOrder = Mage::getModel('sezzle_pay/paymentmethod')->place($this->_quote, $reference);
             
-            if( Mage::getEdition() == Mage::EDITION_ENTERPRISE ) {
+            if(Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
                 $this->helper()->storeCreditPlaceOrder();
                 $this->helper()->giftCardsPlaceOrder();
             }
@@ -180,6 +185,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $customer->addAddress($customerBilling);
             $billing->setCustomerAddress($customerBilling);
         }
+
         if ($shipping && ((!$shipping->getCustomerId() && !$shipping->getSameAsBilling())
             || (!$shipping->getSameAsBilling() && $shipping->getSaveInAddressBook()))) {
             $customerShipping = $shipping->exportCustomerAddress();
@@ -190,11 +196,13 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
         if (isset($customerBilling) && !$customer->getDefaultBilling()) {
             $customerBilling->setIsDefaultBilling(true);
         }
+
         if ($shipping && isset($customerBilling) && !$customer->getDefaultShipping() && $shipping->getSameAsBilling()) {
             $customerBilling->setIsDefaultShipping(true);
         } elseif ($shipping && isset($customerShipping) && !$customer->getDefaultShipping()) {
             $customerShipping->setIsDefaultShipping(true);
         }
+
         $quote->setCustomer($customer)->setCustomerIsGuest(false);
     }
 
@@ -280,7 +288,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
         $quote = $this->_getQuote();
         
         if (!$quote->hasItems() || $quote->getHasError()) {
-            $this->getResponse()->setHeader('HTTP/1.1','403 Forbidden');
+            $this->getResponse()->setHeader('HTTP/1.1', '403 Forbidden');
 
             if (!$quote->hasItems()) {
                 $message = 'No items in quote';
@@ -316,6 +324,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
         if (!$this->_quote) {
             $this->_quote = $this->_getCheckoutSession()->getQuote();
         }
+
         return $this->_quote;
     }
 

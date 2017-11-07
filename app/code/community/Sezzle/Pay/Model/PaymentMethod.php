@@ -49,7 +49,8 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
     }
 
     // Get the auth data to be sent to sezzle API to get a token
-    protected function getSezzleAuthHeader() {
+    protected function getSezzleAuthHeader() 
+    {
         $merchantPublicKey     = trim(Mage::getStoreConfig(self::API_PUBLIC_KEY_CONFIG_PATH));
         $merchantPrivateKey    = trim(Mage::getStoreConfig(self::API_PRIVATE_KEY_CONFIG_PATH));
 
@@ -60,7 +61,8 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
     }
 
     // Get auth token from Sezzle API
-    protected function getSezzleAuthToken() {
+    protected function getSezzleAuthToken() 
+    {
         $result = $this->_sendApiRequest(
             $this->getApiRouter()->getAuthTokenUrl(),
             $this->getSezzleAuthHeader(),
@@ -73,6 +75,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
                 __('Sezzle Pay API Error: %s', $result->getMessage())
             );
         }
+
         $resultJson = $result->getBody();
         $resultObject = json_decode($resultJson, true);
         $token = $resultObject['token'];
@@ -82,11 +85,13 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
                 "Sezzle Pay API Error: Cannot get auth token."
             );
         }
+
         return $token;
     }
 
     // Send quote data and get the redirect URL from Sezzle API
-    public function start($quote) {
+    public function start($quote) 
+    {
 
         $quote->collectTotals();
 
@@ -124,11 +129,13 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
                 'Sezzle Pay API Error: Cannot get checkout Url'
             );
         }
+
         return $checkoutUrl;
     }
 
     // Place order using quote
-    public function place($quote, $reference) {
+    public function place($quote, $reference) 
+    {
         // Converting quote to order
         $service = Mage::getModel('sales/service_quote', $quote);
         
@@ -156,6 +163,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
                 foreach($profiles as $profile) {
                     $ids[] = $profile->getId();
                 }
+
                 $session->setLastRecurringProfileIds($ids);
             }
 
@@ -200,6 +208,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
                     __('Sezzle Pay API Error: %s', $result->getMessage())
                 );
             }
+
             return true;
         }
 
@@ -212,12 +221,14 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
     }
 
     // Create unique reference ID
-    protected function createUniqueReferenceId($referenceId) {
+    protected function createUniqueReferenceId($referenceId) 
+    {
         return uniqid() . "-" . $referenceId;
     }
 
     // Create checkout data for sezzle API from quote
-    protected function createCheckoutRequestBody($quote, $reference, $cancelUrl, $completeUrl) {
+    protected function createCheckoutRequestBody($quote, $reference, $cancelUrl, $completeUrl) 
+    {
         $requestBody = array();
         $requestBody["amount_in_cents"] = $quote->getGrandTotal() * 100;
         $requestBody["currency_code"] = $quote->getBaseCurrencyCode();
@@ -266,28 +277,33 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
             );
             array_push($requestBody["items"], $itemData);
         }
+
         $requestBody["merchant_completes"] = false;
 
         return $requestBody;
     }
 
     // Get auth token from Sezzle API
-    protected function getApiRouter() {
+    protected function getApiRouter() 
+    {
         return Mage::getModel('sezzle_pay/api_router');
     }
 
     // send request
-    protected function _sendApiRequest($url, $body, $isAuth = true, $method = Varien_Http_Client::GET) {
+    protected function _sendApiRequest($url, $body, $isAuth = true, $method = Varien_Http_Client::GET) 
+    {
         $client = new Varien_Http_Client($url);
         if ($body !== false) {
             $client->setRawData(Mage::helper('core')->jsonEncode($body), 'application/json');
         }
+
         if ($isAuth) {
             // Get the auth token
             $token = $this->getSezzleAuthToken();
             // set auth header
             $client->setHeaders('Authorization', "Bearer $token");
         }
+
         $response = $client->request($method);
         return $response;
     }
