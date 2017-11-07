@@ -65,6 +65,13 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $message = Mage::helper('sezzle_pay')->__('There was an error processing your order. %s', $e->getMessage());
 
             $this->_getCheckoutSession()->addError($message);
+
+            // Utilise Magento Session to preserve Store Credit details
+    	    if( Mage::getEdition() == Mage::EDITION_ENTERPRISE ) {
+    	    	$this->_quote = $this->helper()->storeCreditSessionSet($this->_quote);
+    	    	$this->_quote = $this->helper()->giftCardsSessionSet($this->_quote);
+    	    }
+
             // Response to the
             $response = array(
                 'success'  => false,
@@ -80,6 +87,10 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 
     // User returned to store without paying
     public function cancelAction() {
+        if( Mage::getEdition() == Mage::EDITION_ENTERPRISE ) {
+            $this->helper()->storeCreditSessionUnset();
+            $this->helper()->giftCardsSessionUnset();
+        }
         $this->_redirect('checkout/cart');
     }
 
@@ -93,6 +104,12 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 
             $this->_initCheckout();
             $this->_quote->collectTotals();
+
+            if( Mage::getEdition() == Mage::EDITION_ENTERPRISE ) {
+                $this->_quote = $this->helper()->storeCreditCapture($this->_quote);
+                $this->_quote = $this->helper()->giftCardsCapture($this->_quote); 
+		        $this->_quote->save();
+    	    }
 
             $payment = $this->_quote->getPayment();
             // Debug log
@@ -127,6 +144,12 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             }
 
             $placeOrder = Mage::getModel('sezzle_pay/paymentmethod')->place($this->_quote, $reference);
+            
+            if( Mage::getEdition() == Mage::EDITION_ENTERPRISE ) {
+                $this->helper()->storeCreditPlaceOrder();
+                $this->helper()->giftCardsPlaceOrder();
+            }
+
             $this->_redirect('checkout/onepage/success');
         } catch (Exception $e) {
             // Debug log
