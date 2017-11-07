@@ -95,12 +95,13 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         }
 
         $quote->reserveOrderId()->save();
+        $reference = $this->createUniqueReferenceId($quote->getReservedOrderId());
 
         $cancelUrl = Mage::getUrl('*/*/cancel');
-        $completeUrl = Mage::getUrl('*/*/complete') . "id/" . $quote->getReservedOrderId();
+        $completeUrl = Mage::getUrl('*/*/complete') . "id/" . $quote->getReservedOrderId() . '/' . 'magento_sezzle_id/' . $reference;
 
         // create request body for sezzle checkout init
-        $requestBody = $this->createCheckoutRequestBody($quote, $cancelUrl, $completeUrl);
+        $requestBody = $this->createCheckoutRequestBody($quote, $reference, $cancelUrl, $completeUrl);
         // Send request
         $result = $this->_sendApiRequest(
             $this->getApiRouter()->getSubmitCheckoutDetailsAndGetRedirectUrl(),
@@ -180,11 +181,15 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
             //clear the checkout session
             $session->getQuote()->setIsActive(0)->save();
 
+            $referenceArr = explode('-', $reference);
+            $transactionId = $referenceArr[0];
+            $orderId = $referenceArr[1];
+
             // send the id
             $result = $this->_sendApiRequest(
                 $this->getApiRouter()->getOrderIdUrl($reference),
                 array(
-                    "order_id" => $order->getId()
+                    "order_id" => $orderId
                 ),
                 true,
                 Varien_Http_Client::POST
@@ -212,15 +217,14 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
     }
 
     // Create checkout data for sezzle API from quote
-    protected function createCheckoutRequestBody($quote, $cancelUrl, $completeUrl) {
+    protected function createCheckoutRequestBody($quote, $reference, $cancelUrl, $completeUrl) {
         $requestBody = array();
         $requestBody["amount_in_cents"] = $quote->getGrandTotal() * 100;
         $requestBody["currency_code"] = $quote->getBaseCurrencyCode();
-        $reference = $this->createUniqueReferenceId($quote->getReservedOrderId());
         $requestBody["order_description"] = $reference;
         $requestBody["order_reference_id"] = $reference;
-        $requestBody["checkout_cancel_url"] = $cancelUrl;
-        $requestBody["checkout_complete_url"] = $completeUrl;
+        $requestBody["checkout_cancel_url"] = Mage::getModel('core/url')->sessionUrlVar($cancelUrl);
+        $requestBody["checkout_complete_url"] = Mage::getModel('core/url')->sessionUrlVar($completeUrl);
         $requestBody["customer_details"] = array(
             "first_name" => $quote->getCustomerFirstname(),
             "last_name" => $quote->getCustomerLastname(),

@@ -110,8 +110,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 
     public function placeOrderAction() {
         try {
-            $reference = $this->getRequest()->getQuery('order_reference_id');
-            $this->helper()->log($reference, Zend_Log::DEBUG);
+            $reference = $this->getRequest()->getParam('magento_sezzle_id');
+            $this->helper()->log("reference: $reference", Zend_Log::DEBUG);
             // Load the checkout session
             $this->_initCheckout();
 
