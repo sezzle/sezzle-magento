@@ -16,10 +16,13 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             // Check with security updated on form key
             if (!$this->_validateFormKey()) {
                 
-                $frontend_form_key  =   Mage::app()->getRequest()->getParam('form_key');
-                $session_form_key   =   Mage::getSingleton('core/session')->getFormKey();
+                $frontendFormKey  =   Mage::app()->getRequest()->getParam('form_key');
+                $sessionFormKey   =   Mage::getSingleton('core/session')->getFormKey();
 
-                $this->helper()->log('Detected fraud. Front-End Key:' . $frontend_form_key . ' Session Key:' . $session_form_key, Zend_Log::ERR);
+                $this->helper()->log(
+                    'Detected fraud. Front-End Key:' . $frontendFormKey . ' Session Key:' . $sessionFormKey,
+                    Zend_Log::ERR
+                );
 
                 Mage::throwException(Mage::helper('sezzle_pay')->__('Detected fraud.'));
                 return;
@@ -56,9 +59,9 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             // Debug log
             if (empty($this->_quote)) {
                 $this->helper()->log($this->__('Error occur during process, Quote not found. %s.', $e->getMessage(), Zend_Log::ERR));
-            }
-            else {
-                $this->helper()->log($this->__('Error occur during process. %s. QuoteID=%s', $e->getMessage(), $this->_quote->getId()), Zend_Log::ERR);
+            } else {
+                $this->helper()->log($this->__('Error occur during process. %s. QuoteID=%s', $e->getMessage(), $this->_quote->getId()),
+                Zend_Log::ERR);
             }
             
             // Adding error for redirect and JSON
@@ -132,14 +135,12 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             // Load the checkout session
             $this->_initCheckout();
 
-            $checkout_method = $this->_quote->getCheckoutMethod();
-            if( $checkout_method == Mage_Checkout_Model_Type_Onepage::METHOD_REGISTER ) {
+            $checkoutMethod = $this->_quote->getCheckoutMethod();
+            if( $checkoutMethod == Mage_Checkout_Model_Type_Onepage::METHOD_REGISTER ) {
                 $this->_prepareNewSezzleCustomerQuote();
-            }
-            else if( $checkout_method == Mage_Checkout_Model_Type_Onepage::METHOD_GUEST ) {
+            } else if( $checkoutMethod == Mage_Checkout_Model_Type_Onepage::METHOD_GUEST ) {
                 $this->_prepareSezzleGuestQuote();
-            }
-            else {
+            } else {
                 $this->_prepareSezzleCustomerQuote();
             }
 
@@ -214,7 +215,6 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
         }
 
         $customer = $quote->getCustomer();
-        /** @var $customer Mage_Customer_Model_Customer */
         $customerBilling = $billing->exportCustomerAddress();
         $customer->addAddress($customerBilling);
         $billing->setCustomerAddress($customerBilling);
@@ -224,7 +224,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $customer->addAddress($customerShipping);
             $shipping->setCustomerAddress($customerShipping);
             $customerShipping->setIsDefaultShipping(true);
-        } elseif ($shipping) {
+        } else if ($shipping) {
             $customerBilling->setIsDefaultShipping(true);
         }
 
@@ -288,8 +288,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                     $message,
                     Zend_Log::DEBUG
                 );
-            }
-            else if($quote->getHasError()) {
+            } else if($quote->getHasError()) {
                 $message = 'Quote Error Received: ' . $quote->getMessage();
                 $this->helper()->log(
                     $message,
@@ -301,7 +300,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
         }
     }
 
-    private function _getSession()
+    protected function _getSession()
     {
         return Mage::getSingleton('core/session');
     }
@@ -311,7 +310,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
         return Mage::getSingleton('checkout/session');
     }
 
-    private function _getQuote()
+    protected function _getQuote()
     {
         if (!$this->_quote) {
             $this->_quote = $this->_getCheckoutSession()->getQuote();
