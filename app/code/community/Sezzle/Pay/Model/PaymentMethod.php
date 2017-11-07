@@ -95,15 +95,29 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
 
         $quote->collectTotals();
 
-        if (!$quote->getGrandTotal() && !$quote->hasNominalItems()) {
-            Mage::throwException(Mage::helper('Sezzle_Pay')->__('Sezzle does not support processing orders with zero amount. To complete your purchase, proceed to the standard checkout process.'));
+        if (!$quote->getGrandTotal()
+            && !$quote->hasNominalItems()
+        ) {
+            Mage::throwException(
+                Mage::helper('Sezzle_Pay')->__(
+                    'Sezzle does not support
+                    processing orders with zero amount.
+                    To complete your purchase,
+                    proceed to the standard checkout process.'
+                )
+            );
         }
 
         $quote->reserveOrderId()->save();
         $reference = $this->createUniqueReferenceId($quote->getReservedOrderId());
 
         $cancelUrl = Mage::getUrl('*/*/cancel');
-        $completeUrl = Mage::getUrl('*/*/complete') . "id/" . $quote->getReservedOrderId() . '/' . 'magento_sezzle_id/' . $reference;
+        $completeUrl = Mage::getUrl('*/*/complete')
+            . "id/"
+            . $quote->getReservedOrderId()
+            . '/'
+            . 'magento_sezzle_id/'
+            . $reference;
 
         // create request body for sezzle checkout init
         $requestBody = $this->createCheckoutRequestBody($quote, $reference, $cancelUrl, $completeUrl);
@@ -160,7 +174,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
             $profiles = $service->getRecurringPaymentProfiles();
             if ($profiles) {
                 $ids = array();
-                foreach($profiles as $profile) {
+                foreach ($profiles as $profile) {
                     $ids[] = $profile->getId();
                 }
 

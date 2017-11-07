@@ -2,7 +2,7 @@
 
 class Sezzle_Pay_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    protected $logFileName = 'sezzle-pay.log';
+    protected $_logFileName = 'sezzle-pay.log';
 
     /**
      * Get the current version of the Sezzle Pay extension
@@ -16,7 +16,7 @@ class Sezzle_Pay_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function log($message, $level = null)
     {
-        Mage::log($message, $level, $this->logFileName);
+        Mage::log($message, $level, $this->_logFileName);
     }
 
     public function createInvoice(Mage_Sales_Model_Order $order)
@@ -70,24 +70,31 @@ class Sezzle_Pay_Helper_Data extends Mage_Core_Helper_Abstract
     
         $params = Mage::app()->getRequest()->getParams();
         
-        if(Mage::getSingleton('customer/session')->isLoggedIn() && $quote->getCustomerBalanceAmountUsed()) {
-            Mage::getSingleton('checkout/session')->setData('sezzleCustomerBalance', $quote->getCustomerBalanceAmountUsed());
-        }
-        else if(Mage::getSingleton('customer/session')->isLoggedIn() && !empty($params) && !empty($params["payment"]) && isset($params["payment"]["use_customer_balance"]) && $params["payment"]["use_customer_balance"]) {
+        if (Mage::getSingleton('customer/session')->isLoggedIn() &&
+            $quote->getCustomerBalanceAmountUsed()
+        ) {
+            Mage::getSingleton('checkout/session')
+            ->setData('sezzleCustomerBalance', $quote->getCustomerBalanceAmountUsed());
+        } else if (Mage::getSingleton('customer/session')->isLoggedIn() &&
+            !empty($params) &&
+            !empty($params["payment"]) &&
+            isset($params["payment"]["use_customer_balance"]) &&
+            $params["payment"]["use_customer_balance"]
+        ) {
             // Handler for Default One Page Checkout
             $customerId = Mage::getSingleton('customer/session')->getId();
-            $website_id = Mage::app()->getStore()->getWebsiteId(); 
+            $websiteId = Mage::app()->getStore()->getWebsiteId(); 
 
             $balance = Mage::getModel('enterprise_customerbalance/balance')
                     ->setCustomerId($customerId)
-                    ->setWebsiteId($website_id)
+                    ->setWebsiteId($websiteId)
                     ->loadByCustomer();
             
             $quote->setUseCustomerBalance(1);
             $quote->setCustomerBalanceAmountUsed($balance->getAmount());
             
-            $grand_total = $quote->getGrandTotal();
-            $quote->setGrandTotal($grand_total - $balance->getAmount());
+            $grandTotal = $quote->getGrandTotal();
+            $quote->setGrandTotal($grandTotal - $balance->getAmount());
             
             $quote->save();
         
@@ -101,24 +108,25 @@ class Sezzle_Pay_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function storeCreditSessionUnset() 
     {
-        if(Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance')) {
+        if (Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance')) {
             Mage::getSingleton('checkout/session')->unsetData('sezzleCustomerBalance');
         }
     
-        if(Mage::getSingleton('checkout/session')->getData('sezzleGrandTotal')) {
+        if (Mage::getSingleton('checkout/session')->getData('sezzleGrandTotal')) {
             Mage::getSingleton('checkout/session')->unsetData('sezzleGrandTotal');
         }
     
-        if(Mage::getSingleton('checkout/session')->getData('sezzleSubtotal')) {
+        if (Mage::getSingleton('checkout/session')->getData('sezzleSubtotal')) {
             Mage::getSingleton('checkout/session')->unsetData('sezzleSubtotal');
         }
     }
 
     public function storeCreditCapture($quote) 
     {
-        if(Mage::getSingleton('customer/session')->isLoggedIn() && Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance')) {
-            //$grand_total = $quote->getGrandTotal();
-            $grand_total = Mage::getSingleton('checkout/session')->getData('sezzleGrandTotal');
+        if (Mage::getSingleton('customer/session')->isLoggedIn() &&
+            Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance')
+        ) {
+            $grandTotal = Mage::getSingleton('checkout/session')->getData('sezzleGrandTotal');
             $subtotal = Mage::getSingleton('checkout/session')->getData('sezzleSubtotal');
             $balance = Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance');
             
@@ -127,12 +135,12 @@ class Sezzle_Pay_Helper_Data extends Mage_Core_Helper_Abstract
             $quote->setCustomerBalanceAmountUsed($balance);
                 $quote->setBaseCustomerBalanceAmountUsed($balance);
                 
-            if($quote->getSubtotal() == $subtotal) {
-                $quote->setGrandTotal($grand_total)->save();
+            if ($quote->getSubtotal() == $subtotal) {
+                $quote->setGrandTotal($grandTotal)->save();
             }
 
             
-            $this->log($this->__('Store Credit being used: ' . $balance . ", Grand Total: " . $grand_total));
+            $this->log($this->__('Store Credit being used: ' . $balance . ", Grand Total: " . $grandTotal));
         
             return $quote;
         }
@@ -142,7 +150,7 @@ class Sezzle_Pay_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function giftCardsSessionSet($quote) 
     {
-        if($quote->getGiftCardsAmountUsed()) {
+        if ($quote->getGiftCardsAmountUsed()) {
             Mage::getSingleton('checkout/session')->setData('sezzleGiftCards', $quote->getGiftCards());
             Mage::getSingleton('checkout/session')->setData('sezzleGiftCardsAmount', $quote->getGiftCardsAmountUsed());
         }
@@ -152,7 +160,7 @@ class Sezzle_Pay_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function giftCardsSessionUnset() 
     {
-        if(Mage::getSingleton('checkout/session')->getData('sezzleGiftCards')) {
+        if (Mage::getSingleton('checkout/session')->getData('sezzleGiftCards')) {
             Mage::getSingleton('checkout/session')->unsetData('sezzleGiftCards');
             Mage::getSingleton('checkout/session')->unsetData('sezzleGiftCardsAmount');
         }
@@ -162,36 +170,34 @@ class Sezzle_Pay_Helper_Data extends Mage_Core_Helper_Abstract
     {
         
         $balance = Mage::getSingleton('checkout/session')->getData('sezzleGiftCardsAmount');
-        $gift_cards = Mage::getSingleton('checkout/session')->getData('sezzleGiftCards');
+        $giftCards = Mage::getSingleton('checkout/session')->getData('sezzleGiftCards');
         
-        if(!empty($balance) && $balance > 0) {
-        $grand_total = $quote->getGrandTotal();
+        if (!empty($balance) && $balance > 0) {
+        $grandTotal = $quote->getGrandTotal();
             
         $quote->setGiftCardsAmountUsed($balance);
-        $quote->setGiftCards($gift_cards);
+        $quote->setGiftCards($giftCards);
         
         //deduct the gift card
-        $gift_cards_data = unserialize($gift_cards);
-        $gift_cards_account = Mage::getModel('enterprise_giftcardaccount/giftcardaccount')
-                ->loadByCode($gift_cards_data[0]['c']);
+        $giftCardsData = unserialize($giftCards);
+        $giftCardsAccount = Mage::getModel('enterprise_giftcardaccount/giftcardaccount')
+                ->loadByCode($giftCardsData[0]['c']);
             
-        if (!$gift_cards_account->getId()) {
+        if (!$giftCardsAccount->getId()) {
             Mage::throwException('Gift Card Code Not Found');
-        }
-        else {
-        if(!empty($gift_card_account) && $gift_card_account->getGiftCardsAmount() >= $balance) {
-            $gift_cards_new_amount = $balance;
-            $gift_cards_account->charge($gift_cards_new_amount);
-            $gift_cards_account->save();
-            
-            $this->log($this->__('Gift Cards used: ' . $gift_cards  . ' Amount being used: ' . $balance));
-        }
-        else {
-            $this->log($this->__('Gift Cards used: ' . $gift_cards  . ' Amount is deducted already'));
-        }
-              
-        Mage::getSingleton('checkout/session')->unsetData('sezzleGiftCards');
-        Mage::getSingleton('checkout/session')->unsetData('sezzleGiftCardsAmount');
+        } else {
+            if (!empty($giftCardAccount) && $giftCardAccount->getGiftCardsAmount() >= $balance) {
+                $giftCardsNewAmount = $balance;
+                $giftCardsAccount->charge($giftCardsNewAmount);
+                $giftCardsAccount->save();
+                
+                $this->log($this->__('Gift Cards used: ' . $giftCards  . ' Amount being used: ' . $balance));
+            } else {
+                $this->log($this->__('Gift Cards used: ' . $giftCards  . ' Amount is deducted already'));
+            }
+
+            Mage::getSingleton('checkout/session')->unsetData('sezzleGiftCards');
+            Mage::getSingleton('checkout/session')->unsetData('sezzleGiftCardsAmount');
         }
 
             return $quote;
@@ -202,7 +208,9 @@ class Sezzle_Pay_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function storeCreditPlaceOrder()
     {
-        if(Mage::getSingleton('customer/session')->isLoggedIn() && Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance')) {
+        if (Mage::getSingleton('customer/session')->isLoggedIn()
+            && Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance')
+        ) {
             $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
             $order = Mage::getSingleton('sales/order')->loadByIncrementId($orderId);
 
@@ -234,28 +242,33 @@ class Sezzle_Pay_Helper_Data extends Mage_Core_Helper_Abstract
                 ->setWebsiteId(Mage::app()->getWebsite()->getId($orderId))
                 ->loadByCustomer();
 
-        if($balance->getAmount() > 0) {
+        if ($balance->getAmount() > 0) {
             //safeguard against a possibility of minus balance
             $balance->setAmountDelta(-1 * $balanceUsed)
                     ->setUpdatedActionAdditionalInfo("Order #" . $orderId);
             
-            $this->log("Customer Balance deduction fallback engaged. Order: " . $orderId . " Balance Delta: " . $balanceUsed);
+            $this->log(
+                "Customer Balance deduction fallback engaged. Order: "
+                . $orderId
+                . " Balance Delta: "
+                . $balanceUsed
+            );
             $balance->save();
         }
     }
 
     public function giftCardsPlaceOrder()
     {
-        if(Mage::getSingleton('checkout/session')->getData('sezzleGiftCards')) {
+        if (Mage::getSingleton('checkout/session')->getData('sezzleGiftCards')) {
             $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
             $order = Mage::getSingleton('sales/order')->loadByIncrementId($orderId);
 
-            $gift_cards = Mage::getSingleton('checkout/session')->getData('sezzleGiftCards');
-            $balance_used = Mage::getSingleton('checkout/session')->getData('sezzleGiftCardsAmount');
+            $giftCards = Mage::getSingleton('checkout/session')->getData('sezzleGiftCards');
+            $balanceUsed = Mage::getSingleton('checkout/session')->getData('sezzleGiftCardsAmount');
 
-            $order->setGiftCards($gift_cards);
-            $order->setGiftCardsAmount($balance_used);
-            $order->setGiftCardsInvoiced($balance_used);
+            $order->setGiftCards($giftCards);
+            $order->setGiftCardsAmount($balanceUsed);
+            $order->setGiftCardsInvoiced($balanceUsed);
            
             $order->save();
                     

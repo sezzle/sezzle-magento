@@ -30,8 +30,12 @@ class Sezzle_Pay_Model_Api_Router
     // Returns base api url
     protected function getBaseApiUrl() 
     {
-        $apiMode      = Mage::getStoreConfig('payment/pay/' . Sezzle_Pay_Model_PaymentMethod::API_MODE_CONFIG_FIELD);
-        $overrideBaseUrl = Mage::getStoreConfig('payment/pay/' . Sezzle_Pay_Model_PaymentMethod::API_BASE_URL_CONFIG_FIELD);
+        $apiMode      = Mage::getStoreConfig(
+            'payment/pay/' . Sezzle_Pay_Model_PaymentMethod::API_MODE_CONFIG_FIELD
+        );
+        $overrideBaseUrl = Mage::getStoreConfig(
+            'payment/pay/' . Sezzle_Pay_Model_PaymentMethod::API_BASE_URL_CONFIG_FIELD
+        );
         if ($overrideBaseUrl) {
             return $this->removeSlashFromUrl($overrideBaseUrl);
         }
@@ -53,7 +57,7 @@ class Sezzle_Pay_Model_Api_Router
     // Removes / from end of url if present
     protected function removeSlashFromUrl($url) 
     {
-        if(substr($url, -1) == '/') {
+        if (substr($url, -1) == '/') {
             $url = substr($string, 0, -1);
         }
 
