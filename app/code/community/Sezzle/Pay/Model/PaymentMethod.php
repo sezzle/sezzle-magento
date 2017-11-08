@@ -150,6 +150,20 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
     // Place order using quote
     public function place($quote, $reference) 
     {
+        // charge
+        $result = $this->_sendApiRequest(
+            $this->getApiRouter()->checkoutCompleteUrl($reference),
+            null,
+            true,
+            Varien_Http_Client::POST
+        );
+        if ($result->isError()) {
+            throw Mage::exception(
+                'Sezzle_Pay',
+                __('Sezzle Pay API Error: %s', $result->getMessage())
+            );
+        }
+
         // Converting quote to order
         $service = Mage::getModel('sales/service_quote', $quote);
         
@@ -292,7 +306,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
             array_push($requestBody["items"], $itemData);
         }
 
-        $requestBody["merchant_completes"] = false;
+        $requestBody["merchant_completes"] = true;
 
         return $requestBody;
     }
