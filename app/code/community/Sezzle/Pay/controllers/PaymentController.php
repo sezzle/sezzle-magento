@@ -171,7 +171,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             }
 
             $placeOrder = Mage::getModel('sezzle_pay/paymentmethod')->place($this->_quote, $reference);
-            
+
             if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
                 $this->helper()->storeCreditPlaceOrder();
                 $this->helper()->giftCardsPlaceOrder();

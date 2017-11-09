@@ -41,6 +41,17 @@
                 </connection>
             </pay_read>
         </resources>
+        <events>
+            <checkout_type_onepage_save_order>
+                <observers>
+                    <Sezzle_Pay_Order_ReferenceID_Save_observer>
+                        <type>singleton</type>
+                        <class>Sezzle_Pay/observer</class>
+                        <method>SaveSezzleOrderReferenceID</method>
+                    </Sezzle_Pay_Order_ReferenceID_Save_observer>
+                </observers>
+            </checkout_type_onepage_save_order>
+        </events>        
     </global>
     <default>
         <payment>

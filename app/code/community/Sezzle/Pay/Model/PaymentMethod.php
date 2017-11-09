@@ -14,8 +14,8 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
     protected $_canCaptureOnce             = false;
     protected $_canRefund                  = true;
     protected $_canRefundInvoicePartial    = true;
-    protected $_canVoid                    = false;
-    protected $_canUseInternal             = false;
+    protected $_canVoid                    = true;
+    protected $_canUseInternal             = true;
     protected $_canUseCheckout             = true;
     protected $_canUseForMultishipping     = false;
     protected $_isInitializeNeeded         = false;
@@ -108,7 +108,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
             );
         }
 
-        $quote->reserveOrderId()->save();
+        $quote->reserveOrderId();
         // use reserved merchant order id as reference id
         $reference = $quote->getReservedOrderId();
 
@@ -148,6 +148,22 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         return $checkoutUrl;
     }
 
+    public function capture(Varien_Object $payment, $amount)
+    {
+   
+        $this->helper()->log(
+            array("Logging: " => 'Please work'),
+            Zend_Log::DEBUG
+        );
+        $p = $quote->getPayment();
+        $this->helper()->log(
+            array("Logging: " => $amount),
+            Zend_Log::DEBUG
+        );
+                
+        return $this;
+    }
+
     // Place order using quote
     public function place($quote, $reference) 
     {
@@ -180,9 +196,16 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         $order->setBaseCurrencyCode(Mage::app()->getStore()->getCurrentCurrencyCode());
         $order->setQuoteCurrencyCode(Mage::app()->getStore()->getCurrentCurrencyCode());
         $order->setOrderCurrencyCode(Mage::app()->getStore()->getCurrentCurrencyCode());
-        // add Sezzle reference id for doing refunds
-        $order->setExternalReferenceId($reference);
         
+        $payment = $order->getPayment();
+        $payment->setTransactionId($reference);
+        $payment->setParentTransactionId($payment->getTransactionId());
+        $transaction = $payment->addTransaction(Mage_Sales_Model_Order_Payment_Transaction::TYPE_PAYMENT, null, true, "");
+        $transaction->setParentTxnId($payment->getTransactionId());
+        $transaction->setIsClosed(true);
+        // $transaction->setAdditionalInformation("array info", serialize($arrInformation));
+        $transaction->save();
+
         $order->save();
 
         $session = $this->_getSession();
@@ -338,6 +361,34 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
 
         $response = $client->request($method);
         return $response;
+    }
+
+    public function refund(Varien_Object $payment, $amount)
+    {
+
+        // $order = $payment->getOrder();
+
+        // $this->helper()->log(
+        //     array("Refund Order: " => $order),
+        //     Zend_Log::DEBUG
+        // );
+
+        // $this->helper()->log(
+        //     array("Refund Payment: " => $payment),
+        //     Zend_Log::DEBUG
+        // );
+
+        $this->helper()->log(
+            array("Refund Amount: " => $amount),
+            Zend_Log::DEBUG
+        );
+
+        return $this;
+    }
+
+    protected function helper()
+    {
+        return Mage::helper('sezzle_pay');
     }
 
 }
