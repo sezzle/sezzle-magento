@@ -154,6 +154,38 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         return Mage::helper('sezzle_pay');
     }
 
+    public function refund(Varien_Object $payment, $amount) {
+        $reference = $payment->getData('sezzle_reference_id');
+        $currency = $payment->getOrder()->getOrderCurrencyCode();
+        $this->helper()->log('Refunding order reference: ' . $reference . ' amount: ' . $amount, Zend_Log::DEBUG);
+        
+        if( $amount == 0 ) {
+            $this->helper()->log("Zero amount refund is detected", Zend_Log::ERR);
+            return $this;
+        }
+
+        // Refund
+        $result = $this->_sendApiRequest(
+            $this->getApiRouter()->checkoutRefundUrl($reference),
+            array(
+                "amount" => array(
+                    "amount_in_cents" => $amount * 100,
+                    "currency" => $currency
+                )
+            ),
+            true,
+            Varien_Http_Client::POST
+        );
+        if ($result->isError()) {
+            throw Mage::exception(
+                'Sezzle_Pay',
+                __('Sezzle Pay API Error: %s', $result->getMessage())
+            );
+        }
+        $this->helper()->log('Refund with sezzle successful' . $amount, Zend_Log::DEBUG);
+        return $this;
+    }
+
     public function capture(Varien_Object $payment, $amount)
     {
         $reference = $payment->getData('sezzle_reference_id');
@@ -256,10 +288,6 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
 
             //clear the checkout session
             $session->getQuote()->setIsActive(0)->save();
-
-            // save sezzle reference id
-            $order->setData('sezzle_reference_id', $reference);
-            $order->save();
             return true;
         }
 
