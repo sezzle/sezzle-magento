@@ -206,27 +206,6 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
 
         $payment->setTransactionId($reference)->save();
 
-        // Get the order id
-        $referenceArr = explode('-', $reference);
-        $transactionId = $referenceArr[0];
-        $orderId = $referenceArr[1];
-
-        // send the id
-        $result = $this->_sendApiRequest(
-            $this->getApiRouter()->getOrderIdUrl($reference),
-            array(
-                "order_id" => $orderId
-            ),
-            true,
-            Varien_Http_Client::POST
-        );
-        if ($result->isError()) {
-            throw Mage::exception(
-                'Sezzle_Pay',
-                __('Sezzle Pay API Error: %s', $result->getMessage())
-            );
-        }
-
         return $this;
     }
 
@@ -313,6 +292,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         $requestBody["currency_code"] = $quote->getBaseCurrencyCode();
         $requestBody["order_description"] = $reference;
         $requestBody["order_reference_id"] = $reference;
+        $requestBody["display_order_reference_id"] = $quote->getReservedOrderId();
         $requestBody["checkout_cancel_url"] = Mage::getModel('core/url')->sessionUrlVar($cancelUrl);
         $requestBody["checkout_complete_url"] = Mage::getModel('core/url')->sessionUrlVar($completeUrl);
         $requestBody["customer_details"] = array(
