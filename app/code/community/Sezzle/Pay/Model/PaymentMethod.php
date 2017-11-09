@@ -109,7 +109,8 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         }
 
         $quote->reserveOrderId()->save();
-        $reference = $this->createUniqueReferenceId($quote->getReservedOrderId());
+        // use reserved merchant order id as reference id
+        $reference = $quote->getReservedOrderId();
 
         $cancelUrl = Mage::getUrl('*/*/cancel');
         $completeUrl = Mage::getUrl('*/*/complete')
@@ -179,6 +180,9 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         $order->setBaseCurrencyCode(Mage::app()->getStore()->getCurrentCurrencyCode());
         $order->setQuoteCurrencyCode(Mage::app()->getStore()->getCurrentCurrencyCode());
         $order->setOrderCurrencyCode(Mage::app()->getStore()->getCurrentCurrencyCode());
+        // add Sezzle reference id for doing refunds
+        $order->setExternalReferenceId($reference);
+        
         $order->save();
 
         $session = $this->_getSession();
