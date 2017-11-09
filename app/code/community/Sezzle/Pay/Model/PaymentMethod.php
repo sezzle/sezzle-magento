@@ -110,7 +110,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
 
         $quote->reserveOrderId()->save();
         // use reserved merchant order id as reference id
-        $reference = $quote->getReservedOrderId();
+        $reference = $this->createUniqueReferenceId($quote->getReservedOrderId());
 
         $cancelUrl = Mage::getUrl('*/*/cancel');
         $completeUrl = Mage::getUrl('*/*/complete')
@@ -241,6 +241,9 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
                 );
             }
 
+            // save sezzle reference id
+            $order->setData('sezzle_reference_id', $reference);
+            $order->save();
             return true;
         }
 
