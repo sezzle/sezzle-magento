@@ -111,6 +111,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         $quote->reserveOrderId()->save();
         // use reserved merchant order id as reference id
         $reference = $this->createUniqueReferenceId($quote->getReservedOrderId());
+        $quote->getPayment()->setData('sezzle_reference_id', $reference)->save();
 
         $cancelUrl = Mage::getUrl('*/*/cancel');
         $completeUrl = Mage::getUrl('*/*/complete')
@@ -148,10 +149,16 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         return $checkoutUrl;
     }
 
-    // Place order using quote
-    public function place($quote, $reference) 
+    protected function helper()
     {
-        // charge
+        return Mage::helper('sezzle_pay');
+    }
+
+    public function capture(Varien_Object $payment, $amount)
+    {
+        $reference = $payment->getData('sezzle_reference_id');
+
+        // Charge
         $result = $this->_sendApiRequest(
             $this->getApiRouter()->checkoutCompleteUrl($reference),
             null,
@@ -165,6 +172,35 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
             );
         }
 
+        $payment->setTransactionId($reference)->save();
+
+        // Get the order id
+        $referenceArr = explode('-', $reference);
+        $transactionId = $referenceArr[0];
+        $orderId = $referenceArr[1];
+
+        // send the id
+        $result = $this->_sendApiRequest(
+            $this->getApiRouter()->getOrderIdUrl($reference),
+            array(
+                "order_id" => $orderId
+            ),
+            true,
+            Varien_Http_Client::POST
+        );
+        if ($result->isError()) {
+            throw Mage::exception(
+                'Sezzle_Pay',
+                __('Sezzle Pay API Error: %s', $result->getMessage())
+            );
+        }
+
+        return $this;
+    }
+
+    // Place order using quote
+    public function place($quote, $reference) 
+    {
         // Converting quote to order
         $service = Mage::getModel('sales/service_quote', $quote);
         
@@ -220,26 +256,6 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
 
             //clear the checkout session
             $session->getQuote()->setIsActive(0)->save();
-
-            $referenceArr = explode('-', $reference);
-            $transactionId = $referenceArr[0];
-            $orderId = $referenceArr[1];
-
-            // send the id
-            $result = $this->_sendApiRequest(
-                $this->getApiRouter()->getOrderIdUrl($reference),
-                array(
-                    "order_id" => $orderId
-                ),
-                true,
-                Varien_Http_Client::POST
-            );
-            if ($result->isError()) {
-                throw Mage::exception(
-                    'Sezzle_Pay',
-                    __('Sezzle Pay API Error: %s', $result->getMessage())
-                );
-            }
 
             // save sezzle reference id
             $order->setData('sezzle_reference_id', $reference);
