@@ -76,3 +76,5 @@
 /app/design/frontend/base/default/template/*
 !/app/design/frontend/base/default/template/pay/
 !/app/design/frontend/base/default/template/pay/*
+
+composer.json

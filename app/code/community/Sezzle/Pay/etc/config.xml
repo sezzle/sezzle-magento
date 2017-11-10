@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Sezzle_Pay>
-            <version>1.0.0</version>
+            <version>2.0.4</version>
         </Sezzle_Pay>
     </modules>
     <global>
@@ -21,25 +21,20 @@
                 <class>Sezzle_Pay_Helper</class>
             </sezzle_pay>
         </helpers>
+        <fieldsets>
+            <sales_convert_quote_payment>
+                <sezzle_reference_id>
+                    <to_order_payment>*</to_order_payment>
+                </sezzle_reference_id>
+            </sales_convert_quote_payment>
+        </fieldsets>
         <resources>
-            <pay_setup>
+            <sezzlepay_setup>
                 <setup>
                     <module>Sezzle_Pay</module>
+                    <class>Mage_Sales_Model_Resource_Setup</class>
                 </setup>
-                <connection>
-                    <use>core_setup</use>
-                </connection>
-            </pay_setup>
-            <pay_write>
-                <connection>
-                    <use>core_write</use>
-                </connection>
-            </pay_write>
-            <pay_read>
-                <connection>
-                    <use>core_read</use>
-                </connection>
-            </pay_read>
+            </sezzlepay_setup>
         </resources>
     </global>
     <default>
@@ -48,7 +43,8 @@
                 <title>Sezzle Pay PayLater 0% Interest</title>
                 <active>1</active>
                 <model>sezzle_pay/PaymentMethod</model>
-                <order_status>pending</order_status>
+                <order_status>processing</order_status>
+                <payment_action>authorize_capture</payment_action>
             </pay>
         </payment>
     </default>

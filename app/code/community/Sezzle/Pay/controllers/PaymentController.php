@@ -8,320 +8,352 @@ if (!function_exists('boolval')) {
 
 class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 {
-    // Redirect to sezzle pay 
-    protected $_logFileName = 'sezzle-pay.log';
-    public function redirectAction()
+    protected $_quote;
+
+    // Entrypoint: Redirect user to Sezzle
+    public function startAction() 
     {
         try {
-            Mage::Log('Step 5 Process: Loading the redirect.html page', Zend_Log::DEBUG, $this->_logFileName);
-            $this->loadLayout();
-            $storeId = Mage::app()->getStore()->getStoreId();
-            $storeCode = Mage::app()->getStore()->getCode();
-            Mage::log("Store ID and Code: $storeId | $storeCode", Zend_Log::DEBUG, $this->_logFileName);
+            // Check with security updated on form key
+            if (!$this->_validateFormKey()) {
+                $frontendFormKey  =   Mage::app()->getRequest()->getParam('form_key');
+                $sessionFormKey   =   Mage::getSingleton('core/session')->getFormKey();
 
-            // Get latest order data
-            $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
-            $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
-            
-            // Set status to payment pending
-            $order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT, true)->save();
-            $accountID = Mage::getStoreConfig('payment/pay/public_key', $storeId);
-            $privateKey = Mage::getStoreConfig('payment/pay/private_key', $storeId);
+                $this->helper()->log(
+                    'Detected fraud. Front-End Key:' . $frontendFormKey . ' Session Key:' . $sessionFormKey,
+                    Zend_Log::ERR
+                );
 
-            // Cost details
-            $amount = $order->getBaseGrandTotal();
-            $currency = Mage::app()->getStore()->getCurrentCurrencyCode();
-            
-            // Billing address
-            $billingAddress = $order->getBillingAddress();
-            $billingAddressOne = $billingAddress->getStreet(1);
-            $billingAddressTwo = $billingAddress->getStreet2();
-            $billingCity = $billingAddress->getCity();
-            $billingPhone = $billingAddress->getTelephone();
-            $billingZip = $billingAddress->getPostcode();
-            $billingState = $billingAddress->getRegionCode();
-            $billingCountry = $billingAddress->getCountry();
+                Mage::throwException(Mage::helper('sezzle_pay')->__('Detected fraud.'));
+                return;
+            }
 
-            // User details
-            $email = $order->getCustomerEmail();
-            $firstName = $order->getCustomerFirstname();
-            $lastName = $order->getCustomerLastname();
-            $phone = $billingAddress->getTelephone();
+            $this->_initCheckout();
 
-            // Shipping address
-            $shippingAddress = $order->getShippingAddress();
-            $shippingAddressOne = $shippingAddress->getStreet(1);
-            $shippingAddressTwo = $shippingAddress->getStreet2();
-            $shippingCity = $shippingAddress->getCity();
-            $shippingPhone = $shippingAddress->getTelephone();
-            $shippingZip = $shippingAddress->getPostcode();
-            $shippingState = $shippingAddress->getRegionCode();
-            $shippingCountry = $shippingAddress->getCountry();
-            $shippingFirstname = $shippingAddress->getFirstname();
-            $shippingLastname = $shippingAddress->getLastname();
-            
-            // Reference
-            $reference = $orderId;
-            $countryCode = Mage::getStoreConfig('general/country/default');
-            $shopName = Mage::app()->getStore()->getFrontendName();
-            $testMode = false;
-            $url = Mage::getStoreConfig('payment/pay/base_url', $storeId);
-            $tranId = uniqid() . "-" . $orderId;
+            if ($this->_getQuote()->getIsMultiShipping()) {
+                Mage::throwException(
+                    Mage::helper('sezzle_pay')->__('Sezzle payment is not supported for this checkout.')
+                );
+            }
 
-            // Fix urls
-            $completeUrl = Mage::getUrl('pay/payment/success', array('id' => $tranId));
-            $completeUrl = Mage::getModel('core/url')->sessionUrlVar($completeUrl);
-            $cancelUrl = Mage::getUrl('pay/payment/cancel', array('id' => $tranId));
-            $cancelUrl = Mage::getModel('core/url')->sessionUrlVar($cancelUrl);
+            // Check if customer has to be logged in to process to checkout
+            $quoteCheckoutMethod = $this->_getQuote()->getCheckoutMethod();
+            if ($quoteCheckoutMethod == Mage_Checkout_Model_Type_Onepage::METHOD_GUEST &&
+                !Mage::helper('checkout')->isAllowedGuestCheckout(
+                    $this->_getQuote(),
+                    $this->_getQuote()->getStoreId()
+                )) {
+                Mage::getSingleton('core/session')->addNotice(
+                    Mage::helper('sezzle_pay')->__('To proceed to Checkout, please log in using your email address.')
+                );
+                $this->redirectLogin();
+                Mage::getSingleton('customer/session')
+                ->setBeforeAuthUrl(Mage::getUrl('*/*/*', array('_current' => true)));
+                return;
+            }
 
-            $data = Array(
-                "x_account_id" => $accountID,
-                "x_amount" => $amount,
-                "x_currency" => $currency,
-                "x_customer_billing_address1" => $billingAddressOne,
-                "x_customer_billing_address2" => $billingAddressTwo,
-                "x_customer_billing_city" => $billingCity,
-                "x_customer_billing_country" => $billingCountry,
-                "x_customer_billing_phone" => $billingPhone,
-                "x_customer_billing_zip" => $billingZip,
-                "x_customer_billing_state" => $billingState,
-                "x_customer_email" => $email,
-                "x_customer_first_name" => $firstName,
-                "x_customer_last_name" => $lastName,
-                "x_customer_phone" => $phone,
-                "x_customer_shipping_address1" => $shippingAddressOne,
-                "x_customer_shipping_address2" => $shippingAddressTwo,
-                "x_customer_shipping_city" => $shippingCity,
-                "x_customer_shipping_country" => $shippingCountry,
-                "x_customer_shipping_first_name" => $shippingFirstname,
-                "x_customer_shipping_last_name" => $shippingLastname,
-                "x_customer_shipping_phone" => $shippingPhone,
-                "x_customer_shipping_zip" => $shippingZip,
-                "x_customer_shipping_state" => $shippingState,
-                "x_reference" => $orderId,
-                "x_shop_country" => $countryCode,
-                "x_shop_name" => $shopName,
-                "x_test" => $testMode,
-                'x_url_complete' => $completeUrl,
-                'x_url_cancel' => $cancelUrl,
+            $redirectUrl = Mage::getModel('sezzle_pay/paymentmethod')->start($this->_quote);
+            $response = array(
+                'success' => true,
+                'redirect'  => $redirectUrl,
             );
-
-            // Create the signature
-            $ver = explode('.', phpversion());
-            $major = (int) $ver[0];
-            $minor = (int) $ver[1];
-            if ($major >= 5 and $minor >= 4) {
-                ksort($data, SORT_STRING | SORT_FLAG_CASE);
+        } catch (Exception $e) {
+            // Debug log
+            if (empty($this->_quote)) {
+                $this->helper()->log(
+                    $this->__(
+                        'Error occur during process, Quote not found. %s.', $e->getMessage(),
+                        Zend_Log::ERR
+                    )
+                );
             } else {
-                uksort($data, 'strcasecmp');
+                $this->helper()->log(
+                    $this->__(
+                        'Error occur during process. %s. QuoteID=%s', $e->getMessage(), $this->_quote->getId()
+                    ), Zend_Log::ERR
+                );
             }
-
-            $message = "";
-            foreach ($data as $key => $value) {
-                $message .= "$key$value";
-            }
-
-            Mage::log(
-                "message=$message", Zend_Log::DEBUG,
-                $this->_logFileName
-            );
-
-            $sign = hash_hmac("sha256", $message, $privateKey);
-            Mage::log(
-                "sign=$sign", Zend_Log::DEBUG,
-                $this->_logFileName
-            );
-            $data["x_signature"] = $sign;
             
-            $arrayString = json_encode($data);
+            // Adding error for redirect and JSON
+            $message = Mage::helper('sezzle_pay')->__('There was an error processing your order. %s', $e->getMessage());
 
-            // Log the whole form information
-            Mage::log(
-                "data=$arrayString", Zend_Log::DEBUG,
-                $this->_logFileName
-            );
+            $this->_getCheckoutSession()->addError($message);
 
-            // Save this order
-            $payment = $order->getPayment();
-            $payment->setTransactionId($tranId);
-            $transaction = $payment->addTransaction(
-                Mage_Sales_Model_Order_Payment_Transaction::TYPE_AUTH
-            );
-            $transaction->setAdditionalInformation(
-                Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS,
-                array('Context'=>'Order payment',
-                  'Amount'=>$amount,
-                  'Status'=>0,
-                  'Url'=>$url
-                )
-            );
-            $transaction->setIsTransactionClosed(false);
-            $transaction->save();
-            $order->save();
-
-            // Redirect to the redirect page
-            $block = $this
-                ->getLayout()
-                ->createBlock(
-                    'Mage_Core_Block_Template',
-                    'pay', 
-                    array('template' => 'pay/redirect.phtml')
-                )
-                ->assign(Array("data" => $data, "url" => $url));
-            $this->getLayout()->getBlock('content')->append($block);
-            $this->renderLayout();
-        } catch (Exception $e){
-            Mage::logException($e);
-            Mage::log($e, Zend_Log::ERR, $this->_logFileName);
-            parent::_redirect('checkout/cart');
-        }
-    }
-    // Redirect from Sezzle Pay
-    // The response action is triggered when your gateway sends back a response after processing the customer's payment
-    public function successAction() 
-    {
-        try {
-            Mage::log("Running response action", Zend_Log::DEBUG, $this->_logFileName);
-            
-            $storeId = Mage::app()->getStore()->getStoreId();
-            $storeCode = Mage::app()->getStore()->getCode();
-            Mage::log("Store ID and Code: $storeId | $storeCode", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Get the $sezzleId from the request
-            $sezzleId = $this->getRequest()->getQuery('x_gateway_reference');
-            Mage::log("sezzleId: $sezzleId", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Get transaction id from request url
-            $tranId = $this->getRequest()->getParam('id');
-            Mage::log("TransactionId: $tranId", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Get the order id from the request url
-            $orderTranId = explode('-', $tranId);
-            $transactionId = $orderTranId[0];
-            $orderId = $orderTranId[1];
-            Mage::log("TransactionId and orderId: $transactionId | $orderId", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Get the order object
-            $order = Mage::getModel('sales/order');
-            $cart = Mage::getSingleton('checkout/cart');
-            $order->loadByIncrementId($orderId);
-            $session = Mage::getSingleton('checkout/session');
-            Mage::log("Received order object", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Get payment details of this transaction
-            $payment = $order->getPayment();
-            $transaction = $payment->getTransaction($tranId);
-            $data = $transaction->getAdditionalInformation();
-            $url = $data['raw_details_info']['Url'];
-            $amount = $this->getRequest()->getQuery('x_amount');
-
-            Mage::log("Amount received", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Set additional details to have information of successful payment
-            $transaction->setAdditionalInformation(
-                Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS,
-                array('SezzleId'=> $sezzleId,
-                    'Context'=>'Successful Payment',
-                    'Amount'=>$amount,
-                    'Status'=>1,
-                    'Url'=>$url
-                )
-            )->save();
-
-            Mage::log("Transaction additional info saved", Zend_Log::DEBUG, $this->_logFileName);
-
-            // create invoice
-            if ($order->canInvoice()) {
-                $invoice = $order->prepareInvoice();
-                $invoice->register()->capture();
-                $invoice->sendEmail()->setEmailSent(true);
-                $order->addRelatedObject($invoice);
+            // Utilise Magento Session to preserve Store Credit details
+            if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
+                $this->_quote = $this->helper()->storeCreditSessionSet($this->_quote);
+                $this->_quote = $this->helper()->giftCardsSessionSet($this->_quote);
             }
 
-            Mage::log("Transaction invoice created", Zend_Log::DEBUG, $this->_logFileName);
-
-            // send new order email
-            $order->setEmailSent(true);
-            $order->setIsCustomerNotified(true);
-
-            Mage::log("Transaction email sent", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Save and close this transaction
-            $transaction->setParentTxnId($sezzleId)->save();
-            $payment->setIsTransactionClosed(1);
-
-            Mage::log("Transaction details saved", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Save order
-            $order->save();
-            Mage::log("Save order", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Redirect to success page
-            $this->_redirect('checkout/onepage/success', array('_secure'=>true));
-        } catch (Exception $e){
-            Mage::logException($e);
-            Mage::log($e, Zend_Log::ERR, $this->_logFileName);
-            parent::_redirect('checkout/cart');
+            // Response to the
+            $response = array(
+                'success'  => false,
+                'message'  => $message,
+                'redirect' => Mage::getUrl('checkout/cart'),
+            );
         }
+
+        $this->getResponse()
+            ->setHeader('Content-type', 'application/json')
+            ->setBody(json_encode($response));
     }
 
-
-    // Redirect from Sezzle Pay
-    // A cancelled payment
+    // User returned to store without paying
     public function cancelAction() 
     {
+        if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
+            $this->helper()->storeCreditSessionUnset();
+            $this->helper()->giftCardsSessionUnset();
+        }
+
+        $this->_redirect('checkout/cart');
+    }
+
+    public function completeAction() 
+    {
+        $this->_capture();
+    }
+
+    protected function _capture() 
+    {
         try {
-            Mage::log("Running response action", Zend_Log::DEBUG, $this->_logFileName); 
+            $orderId = $this->getRequest()->getParam('id');
 
-            $storeId = Mage::app()->getStore()->getStoreId();
-            $storeCode = Mage::app()->getStore()->getCode();
-            Mage::log("Store ID and Code: $storeId | $storeCode", Zend_Log::DEBUG, $this->_logFileName);
+            $this->_initCheckout();
+            $this->_quote->collectTotals();
 
-            // Get transaction id from request url
-            $tranId = $this->getRequest()->getParam('id');
-            Mage::log("TransactionId: $tranId", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Get the order id from the request url
-            $orderTranId = explode('-', $tranId);
-            $transactionId = $orderTranId[0];
-            $orderId = $orderTranId[1];
-            Mage::log("TransactionId and orderId: $transactionId | $orderId", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Get the order object
-            $order = Mage::getModel('sales/order');
-            $cart = Mage::getSingleton('checkout/cart');
-            $order->loadByIncrementId($orderId);
-            $session = Mage::getSingleton('checkout/session');
-            Mage::log("Received order object", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Cancel the order
-            $order->cancel()->setState(Mage_Sales_Model_Order::STATE_CANCELED, true, 'Payment failed.')->save();
-            Mage::log("Order canceled!", Zend_Log::DEBUG, $this->_logFileName);
-
-            // Add items back to the cart
-            $items = $order->getItemsCollection();
-            foreach ($items as $item) {
-                try {
-                    $cart->addOrderItem($item);
-                } catch (Mage_Core_Exception $e) {
-                    $session->addError($this->__($e->getMessage()));
-                    Mage::logException($e);
-                    continue;
-                }
+            if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
+                $this->_quote = $this->helper()->storeCreditCapture($this->_quote);
+                $this->_quote = $this->helper()->giftCardsCapture($this->_quote); 
+                $this->_quote->save();
             }
 
-            $cart->save();
-            Mage::log("Cart populated back", Zend_Log::DEBUG, $this->_logFileName);
+            $payment = $this->_quote->getPayment();
+            // Debug log
+            $this->helper()->log(
+                $this->__(
+                    'Payment succeeded with Sezzlepay. QuoteID=%s ReservedOrderID=%s', $this->_quote->getId(),
+                    $this->_quote->getReservedOrderId()
+                ), 
+                Zend_Log::NOTICE
+            );
+            
+            // Place order when validation is correct
+            $this->_forward('placeOrder');
+        } catch (Exception $e) {
+            // Add error message
+            $this->_getSession()->addError($e->getMessage());
 
-            // redirect to the cart
-            Mage::getSingleton('core/session')->addError('Your payment failed.');
-            Mage::log("Redirecting to cart...", Zend_Log::DEBUG, $this->_logFileName);
-            $this->_redirect('checkout/cart');
-            return;
-        } catch (Exception $e){
-            Mage::logException($e);
-            Mage::log($e, Zend_Log::ERR, $this->_logFileName);
-            parent::_redirect('checkout/cart');
+            $this->_getSession()->log(
+                $this->__(
+                    'Exception during order creation. %s', $e->getMessage()
+                ), 
+                Zend_Log::ERR
+            );
         }
+    }
+
+    public function placeOrderAction() 
+    {
+        try {
+            $reference = $this->getRequest()->getParam('magento_sezzle_id');
+            $this->helper()->log("reference: $reference", Zend_Log::DEBUG);
+            // Load the checkout session
+            $this->_initCheckout();
+
+            $checkoutMethod = $this->_quote->getCheckoutMethod();
+            if ($checkoutMethod == Mage_Checkout_Model_Type_Onepage::METHOD_REGISTER) {
+                $this->_prepareNewSezzleCustomerQuote();
+            } else if ($checkoutMethod == Mage_Checkout_Model_Type_Onepage::METHOD_GUEST) {
+                $this->_prepareSezzleGuestQuote();
+            } else {
+                $this->_prepareSezzleCustomerQuote();
+            }
+
+            $placeOrder = Mage::getModel('sezzle_pay/paymentmethod')->place($this->_quote, $reference);
+            
+            if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
+                $this->helper()->storeCreditPlaceOrder();
+                $this->helper()->giftCardsPlaceOrder();
+            }
+
+            $this->_redirect('checkout/onepage/success');
+        } catch (Exception $e) {
+            // Debug log
+            $this->_getSession()->addError($e->getMessage());
+
+            $this->_redirect('checkout/cart');
+        }
+    }
+
+    protected function _prepareSezzleGuestQuote()
+    {
+        $quote = $this->_quote;
+        $quote->setCustomerId(null)
+            ->setCustomerEmail($quote->getBillingAddress()->getEmail())
+            ->setCustomerIsGuest(true)
+            ->setCustomerGroupId(Mage_Customer_Model_Group::NOT_LOGGED_IN_ID);
+    }
+
+    protected function _prepareSezzleCustomerQuote()
+    {
+        $quote      = $this->_quote;
+        $billing    = $quote->getBillingAddress();
+        $shipping   = $quote->isVirtual() ? $quote->getBillingAddress() : $quote->getShippingAddress();
+
+        $customer = $quote->getCustomer();
+        if (!$billing->getCustomerId() || $billing->getSaveInAddressBook()) {
+            $customerBilling = $billing->exportCustomerAddress();
+            $customer->addAddress($customerBilling);
+            $billing->setCustomerAddress($customerBilling);
+        }
+
+        if ($shipping && ((!$shipping->getCustomerId() && !$shipping->getSameAsBilling())
+            || (!$shipping->getSameAsBilling() && $shipping->getSaveInAddressBook()))) {
+            $customerShipping = $shipping->exportCustomerAddress();
+            $customer->addAddress($customerShipping);
+            $shipping->setCustomerAddress($customerShipping);
+        }
+
+        if (isset($customerBilling) && !$customer->getDefaultBilling()) {
+            $customerBilling->setIsDefaultBilling(true);
+        }
+
+        if ($shipping && isset($customerBilling) && !$customer->getDefaultShipping() && $shipping->getSameAsBilling()) {
+            $customerBilling->setIsDefaultShipping(true);
+        } elseif ($shipping && isset($customerShipping) && !$customer->getDefaultShipping()) {
+            $customerShipping->setIsDefaultShipping(true);
+        }
+
+        $quote->setCustomer($customer)->setCustomerIsGuest(false);
+    }
+
+    protected function _prepareNewSezzleCustomerQuote()
+    {
+        $quote      = $this->_quote;
+        $billing    = $quote->getBillingAddress();
+        $shipping   = $quote->isVirtual() ? $quote->getBillingAddress() : $quote->getShippingAddress();
+
+        $customer = $this->_lookupCustomer();
+
+        if ($customer->getData()) {
+            $session = Mage::getSingleton('customer/session')->setCustomerAsLoggedIn($customer);
+            return $this->_prepareSezzleCustomerQuote();
+        }
+
+        $customer = $quote->getCustomer();
+        $customerBilling = $billing->exportCustomerAddress();
+        $customer->addAddress($customerBilling);
+        $billing->setCustomerAddress($customerBilling);
+        $customerBilling->setIsDefaultBilling(true);
+        if ($shipping && !$shipping->getSameAsBilling()) {
+            $customerShipping = $shipping->exportCustomerAddress();
+            $customer->addAddress($customerShipping);
+            $shipping->setCustomerAddress($customerShipping);
+            $customerShipping->setIsDefaultShipping(true);
+        } else if ($shipping) {
+            $customerBilling->setIsDefaultShipping(true);
+        }
+
+        if ($quote->getCustomerDob() && !$billing->getCustomerDob()) {
+            $billing->setCustomerDob($quote->getCustomerDob());
+        }
+
+        if ($quote->getCustomerTaxvat() && !$billing->getCustomerTaxvat()) {
+            $billing->setCustomerTaxvat($quote->getCustomerTaxvat());
+        }
+
+        if ($quote->getCustomerGender() && !$billing->getCustomerGender()) {
+            $billing->setCustomerGender($quote->getCustomerGender());
+        }
+
+        Mage::helper('core')->copyFieldset('checkout_onepage_billing', 'to_customer', $billing, $customer);
+
+        $email = $quote->getCustomerEmail();
+        $password = $customer->decryptPassword($quote->getPasswordHash());
+
+        $customer->setEmail($email);
+        $customer->setPrefix($quote->getCustomerPrefix());
+        $customer->setFirstname($quote->getCustomerFirstname());
+        $customer->setMiddlename($quote->getCustomerMiddlename());
+        $customer->setLastname($quote->getCustomerLastname());
+        $customer->setSuffix($quote->getCustomerSuffix());
+        $customer->setPassword($password);
+        $customer->setPasswordHash($customer->hashPassword($customer->getPassword()));
+        $customer->save();
+
+        //force login
+        $session = Mage::getSingleton('customer/session')->setCustomerAsLoggedIn($customer);
+        $session->login($email, $password);
+
+        $quote->setCustomer($customer)->setCustomerIsGuest(false);
+    }
+
+    protected function _lookupCustomer()
+    {
+        return Mage::getModel('customer/customer')
+            ->setWebsiteId(Mage::app()->getWebsite()->getId())
+            ->loadByEmail($this->_quote->getCustomerEmail());
+    }
+
+    protected function helper()
+    {
+        return Mage::helper('sezzle_pay');
+    }
+
+    // Init checkout model
+    protected function _initCheckout()
+    {
+        $quote = $this->_getQuote();
+        
+        if (!$quote->hasItems() || $quote->getHasError()) {
+            $this->getResponse()->setHeader('HTTP/1.1', '403 Forbidden');
+
+            if (!$quote->hasItems()) {
+                $message = 'No items in quote';
+                $this->helper()->log(
+                    $message,
+                    Zend_Log::DEBUG
+                );
+            } else if ($quote->getHasError()) {
+                $message = 'Quote Error Received: ' . $quote->getMessage();
+                $this->helper()->log(
+                    $message,
+                    Zend_Log::DEBUG
+                );
+            }
+
+            Mage::throwException(Mage::helper('sezzle_pay')->__('Unable to initialize Sezzle Pay: ' . $message));
+        }
+    }
+
+    protected function _getSession()
+    {
+        return Mage::getSingleton('core/session');
+    }
+
+    protected function _getCheckoutSession()
+    {
+        return Mage::getSingleton('checkout/session');
+    }
+
+    protected function _getQuote()
+    {
+        if (!$this->_quote) {
+            $this->_quote = $this->_getCheckoutSession()->getQuote();
+        }
+
+        return $this->_quote;
+    }
+
+    public function redirectLogin()
+    {
+        $this->setFlag('', 'no-dispatch', true);
+        $this->getResponse()->setRedirect(
+            Mage::helper('core/url')->addRequestParam(
+                Mage::helper('customer')->getLoginUrl(),
+                array('context' => 'checkout')
+            )
+        );
     }
 } 
