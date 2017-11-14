@@ -60,12 +60,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 $this->_quote = $this->helper()->giftCardsSessionSet($this->_quote);
             }
 
-			$sezzleModel = Mage::getModel('sezzle_pay/PaymentMethod');
-			$this->helper()->log(
-				array('Sezzle_payment_method_model' => $sezzleModel),
-				Zend_Log::ERR
-			);
-            $redirectUrl = $sezzleModel->start($this->_quote);
+            $redirectUrl = Mage::getModel('sezzle_pay/paymentmethod')->start($this->_quote);
             $response = array(
                 'success' => true,
                 'redirect'  => $redirectUrl,
@@ -207,7 +202,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 $this->_prepareSezzleCustomerQuote();
             }
 
-            $placeOrder = Mage::getModel('sezzle_pay/PaymentMethod')->place($this->_quote, $reference);
+            $placeOrder = Mage::getModel('sezzle_pay/paymentmethod')->place($this->_quote, $reference);
 
             if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
                 $this->helper()->storeCreditPlaceOrder();
