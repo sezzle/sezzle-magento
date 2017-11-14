@@ -36,6 +36,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 );
             }
 
+            $this->userProcessing($this->_quote, $this->getRequest());
+
             // Check if customer has to be logged in to process to checkout
             $quoteCheckoutMethod = $this->_getQuote()->getCheckoutMethod();
             if ($quoteCheckoutMethod == Mage_Checkout_Model_Type_Onepage::METHOD_GUEST &&
@@ -96,6 +98,36 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
         $this->getResponse()
             ->setHeader('Content-type', 'application/json')
             ->setBody(json_encode($response));
+    }
+
+    public function userProcessing($quote, $request)
+    {
+        $logged_in = Mage::getSingleton('customer/session')->isLoggedIn();
+        $create_account = $request->getParam("create_account");
+	
+	    if( !is_null($quote->getCheckoutMethod()) && (empty($create_account))) {
+            return;
+        }
+
+        try {
+
+            if( $create_account ) {
+                $quote->setCheckoutMethod(Mage_Checkout_Model_Type_Onepage::METHOD_REGISTER);
+            }
+            else if( !$create_account && !$logged_in ) {
+                $quote->setCheckoutMethod(Mage_Checkout_Model_Type_Onepage::METHOD_GUEST);
+            }
+            else {
+                $quote->setCheckoutMethod(Mage_Checkout_Model_Type_Onepage::METHOD_CUSTOMER);
+            }
+
+            $quote->save();
+	      
+        }
+        catch (Exception $e) {
+            // Add error message
+            $this->_getSession()->addError($e->getMessage());
+        }
     }
 
     // User returned to store without paying
