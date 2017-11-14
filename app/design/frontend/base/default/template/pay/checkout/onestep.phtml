@@ -1,0 +1,11 @@
+<?php
+$mage_store = Mage::helper('core')->isModuleEnabled("Magestore_Onestepcheckout");
+$idev = Mage::helper('core')->isModuleEnabled("Idev_Onestepcheckout");
+$iksanika = Mage::helper('core')->isModuleEnabled("Iksanika_Onestepcheckout");
+?>
+
+<?php if($mage_store): ?>
+	<script src="<?php echo $this->getJsUrl('sezzle/checkout/magestore_onestep.js') ?>"></script>
+<?php else: ?>
+	<script src="<?php echo $this->getJsUrl('sezzle/checkout/idev_onestep.js') ?>"></script>
+<?php endif; ?>

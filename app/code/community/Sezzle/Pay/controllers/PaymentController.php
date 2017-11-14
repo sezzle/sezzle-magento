@@ -52,6 +52,12 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 return;
             }
 
+            // Utilise Magento Session to preserve Store Credit details
+            if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
+                $this->_quote = $this->helper()->storeCreditSessionSet($this->_quote);
+                $this->_quote = $this->helper()->giftCardsSessionSet($this->_quote);
+            }
+
             $redirectUrl = Mage::getModel('sezzle_pay/paymentmethod')->start($this->_quote);
             $response = array(
                 'success' => true,
@@ -78,12 +84,6 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $message = Mage::helper('sezzle_pay')->__('There was an error processing your order. %s', $e->getMessage());
 
             $this->_getCheckoutSession()->addError($message);
-
-            // Utilise Magento Session to preserve Store Credit details
-            if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
-                $this->_quote = $this->helper()->storeCreditSessionSet($this->_quote);
-                $this->_quote = $this->helper()->giftCardsSessionSet($this->_quote);
-            }
 
             // Response to the
             $response = array(
