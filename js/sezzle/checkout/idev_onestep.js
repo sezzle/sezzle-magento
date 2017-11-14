@@ -40,7 +40,6 @@ function doSezzlepayAPICall(saveURL, params) {
             method: 'post',
             parameters: params,
             onSuccess: function (transport) {
-                console.log(transport);
                 var response = {};
 
                 try {
