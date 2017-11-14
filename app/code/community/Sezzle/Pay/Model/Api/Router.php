@@ -47,15 +47,15 @@ class Sezzle_Pay_Model_Api_Router
 
         switch ($apiMode) {
             case self::API_MODE_STAGING:
-                return 'https://staging.api.sezzle.com/v1';
+                return 'https://staging.gateway.sezzle.com';
             case self::API_MODE_SANDBOX:
-                return 'https://sandbox.api.sezzle.com/v1';
+                return 'https://sandbox.gateway.sezzle.com';
             case self:API_MODE_LOCAL:
-                return 'http://127.0.0.1:9002/v1';
+                return 'http://127.0.0.1:9002';
             case self:API_MODE_LIVE:
-                return 'https://api.sezzle.com/v1';
+                return 'https://gateway.sezzle.com';
             default:
-                return 'https://api.sezzle.com/v1';
+                return 'https://gateway.sezzle.com';
         }
     }
 

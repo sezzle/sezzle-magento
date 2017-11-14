@@ -26,7 +26,7 @@
     * Set `Payment from Specific Countries` to `United States`.
     * Set `Private Key` as received from `API Keys` section of `Sezzle Merchant Dashboard`.
     * Set `Public Key` as received from your `API Keys` section of `Sezzle Merchant Dashboard`.
-    * Set `Sezzle Base URL` to `https://gateway.sezzle.com/v1`
+    * Set `Sezzle Base URL` to `https://gateway.sezzle.com` (NOTE: older versions of this were required to have /v1 at the end of the URL).
 
 4. Save the configuration.
 5. Go to `System > configuration > Sales > Sezzle Pay > Product Page Widget Display Settings`
