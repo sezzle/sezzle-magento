@@ -1,6 +1,6 @@
 <?php
 if (!function_exists('boolval')) {
-    function boolval($val) 
+    function boolval($val)
     {
             return (bool) $val;
     }
@@ -11,7 +11,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
     protected $_quote;
 
     // Entrypoint: Redirect user to Sezzle
-    public function startAction() 
+    public function startAction()
     {
         try {
             // Check with security updated on form key
@@ -60,7 +60,12 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 $this->_quote = $this->helper()->giftCardsSessionSet($this->_quote);
             }
 
-            $redirectUrl = Mage::getModel('sezzle_pay/paymentmethod')->start($this->_quote);
+			$sezzleModel = Mage::getModel('sezzle_pay/PaymentMethod');
+			$this->helper()->log(
+				array('Sezzle_payment_method_model' => $sezzleModel),
+				Zend_Log::ERR
+			);
+            $redirectUrl = $sezzleModel->start($this->_quote);
             $response = array(
                 'success' => true,
                 'redirect'  => $redirectUrl,
@@ -81,7 +86,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                     ), Zend_Log::ERR
                 );
             }
-            
+
             // Adding error for redirect and JSON
             $message = Mage::helper('sezzle_pay')->__('There was an error processing your order. %s', $e->getMessage());
 
@@ -104,7 +109,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
     {
         $logged_in = Mage::getSingleton('customer/session')->isLoggedIn();
         $create_account = $request->getParam("create_account");
-	
+
 	    if( !is_null($quote->getCheckoutMethod()) && (empty($create_account))) {
             return;
         }
@@ -122,7 +127,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             }
 
             $quote->save();
-	      
+
         }
         catch (Exception $e) {
             // Add error message
@@ -131,7 +136,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
     }
 
     // User returned to store without paying
-    public function cancelAction() 
+    public function cancelAction()
     {
         if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
             $this->helper()->storeCreditSessionUnset();
@@ -141,12 +146,12 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
         $this->_redirect('checkout/cart');
     }
 
-    public function completeAction() 
+    public function completeAction()
     {
         $this->_capture();
     }
 
-    protected function _capture() 
+    protected function _capture()
     {
         try {
             $orderId = $this->getRequest()->getParam('id');
@@ -156,7 +161,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
 
             if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
                 $this->_quote = $this->helper()->storeCreditCapture($this->_quote);
-                $this->_quote = $this->helper()->giftCardsCapture($this->_quote); 
+                $this->_quote = $this->helper()->giftCardsCapture($this->_quote);
                 $this->_quote->save();
             }
 
@@ -166,10 +171,10 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 $this->__(
                     'Payment succeeded with Sezzlepay. QuoteID=%s ReservedOrderID=%s', $this->_quote->getId(),
                     $this->_quote->getReservedOrderId()
-                ), 
+                ),
                 Zend_Log::NOTICE
             );
-            
+
             // Place order when validation is correct
             $this->_forward('placeOrder');
         } catch (Exception $e) {
@@ -179,13 +184,13 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             $this->_getSession()->log(
                 $this->__(
                     'Exception during order creation. %s', $e->getMessage()
-                ), 
+                ),
                 Zend_Log::ERR
             );
         }
     }
 
-    public function placeOrderAction() 
+    public function placeOrderAction()
     {
         try {
             $reference = $this->getRequest()->getParam('magento_sezzle_id');
@@ -202,8 +207,8 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                 $this->_prepareSezzleCustomerQuote();
             }
 
-            $placeOrder = Mage::getModel('sezzle_pay/paymentmethod')->place($this->_quote, $reference);
-            
+            $placeOrder = Mage::getModel('sezzle_pay/PaymentMethod')->place($this->_quote, $reference);
+
             if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
                 $this->helper()->storeCreditPlaceOrder();
                 $this->helper()->giftCardsPlaceOrder();
@@ -337,7 +342,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
     protected function _initCheckout()
     {
         $quote = $this->_getQuote();
-        
+
         if (!$quote->hasItems() || $quote->getHasError()) {
             $this->getResponse()->setHeader('HTTP/1.1', '403 Forbidden');
 
@@ -388,4 +393,4 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
             )
         );
     }
-} 
+}

@@ -12,28 +12,28 @@ class Sezzle_Pay_Model_Api_Router
     const API_MODE_SANDBOX = 'sandbox';
 
     // Returns the authentication token url
-    public function getAuthTokenUrl() 
+    public function getAuthTokenUrl()
     {
-        return $this->getBaseApiUrl() . '/authentication';
+        return $this->getBaseApiUrl() . '/v1/authentication';
     }
 
-    public function checkoutRefundUrl($reference) 
+    public function checkoutRefundUrl($reference)
     {
-        return $this->getBaseApiUrl() . '/orders' . '/' . $reference . '/refund';
+        return $this->getBaseApiUrl() . '/v1/orders' . '/' . $reference . '/refund';
     }
 
-    public function checkoutCompleteUrl($reference) 
+    public function checkoutCompleteUrl($reference)
     {
-        return $this->getBaseApiUrl() . '/checkouts' . '/' . $reference . '/complete';
+        return $this->getBaseApiUrl() . '/v1/checkouts' . '/' . $reference . '/complete';
     }
 
-    public function getSubmitCheckoutDetailsAndGetRedirectUrl() 
+    public function getSubmitCheckoutDetailsAndGetRedirectUrl()
     {
-        return $this->getBaseApiUrl() . '/checkouts';
+        return $this->getBaseApiUrl() . '/v1/checkouts';
     }
 
     // Returns base api url
-    protected function getBaseApiUrl() 
+    protected function getBaseApiUrl()
     {
         $apiMode      = Mage::getStoreConfig(
             'payment/pay/' . Sezzle_Pay_Model_PaymentMethod::API_MODE_CONFIG_FIELD
@@ -60,7 +60,7 @@ class Sezzle_Pay_Model_Api_Router
     }
 
     // Removes / from end of url if present
-    protected function removeSlashFromUrl($url) 
+    protected function removeSlashFromUrl($url)
     {
         if (substr($url, -1) == '/') {
             $url = substr($string, 0, -1);
