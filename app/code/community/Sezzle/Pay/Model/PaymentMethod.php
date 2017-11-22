@@ -99,7 +99,7 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
             && !$quote->hasNominalItems()
         ) {
             Mage::throwException(
-                Mage::helper('Sezzle_Pay')->__(
+                Mage::helper('sezzle_pay')->__(
                     'Sezzle does not support
                     processing orders with zero amount.
                     To complete your purchase,
