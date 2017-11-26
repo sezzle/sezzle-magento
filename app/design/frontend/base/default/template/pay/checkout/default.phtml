@@ -1,1 +1,8 @@
-<script src="<?php echo $this->getJsUrl('sezzle/checkout/onepage.js') ?> "></script>
+<?php
+$mw_onestepcheckout = Mage::helper('core')->isModuleEnabled("MW_Onestepcheckout");
+?>
+<?php if( $mw_onestepcheckout ): ?>
+	<script src="<?php echo $this->getJsUrl('sezzle/checkout/mageworld_onestep.js') ?> "></script>
+<?php else: ?>
+	<script src="<?php echo $this->getJsUrl('sezzle/checkout/onepage.js') ?> "></script>
+<?php endif; ?>
