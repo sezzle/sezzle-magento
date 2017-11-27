@@ -201,6 +201,30 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </hide-classes>
+                        <minPrice translate="label">
+                            <label>Minimum Price</label>
+                            <comment>
+                                Minimum product price (use amount in cents) to show widget on.
+                                Eg: 15000 for $150
+                            </comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </minPrice>
+                        <maxPrice translate="label">
+                            <label>Maximum Price</label>
+                            <comment>
+                                Maximum product price to display widget on.
+                                Eg: 15000 for $150 
+                            </comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </maxPrice>                                           
                     </fields>
                 </product_widget>
             </groups>

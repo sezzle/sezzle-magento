@@ -13,6 +13,8 @@ class Sezzle_Pay_Block_ProductConfig extends Mage_Core_Block_Template
         $widthType = Mage::getStoreConfig('sezzle_pay/product_widget/width-type');
         $imageUrl = Mage::getStoreConfig('sezzle_pay/product_widget/image-url');
         $hideClasses = explode('|', Mage::getStoreConfig('sezzle_pay/product_widget/hide-classes'));
+        $minPrice = Mage::getStoreConfig('sezzle_pay/product_widget/minPrice');
+        $maxPrice = Mage::getStoreConfig('sezzle_pay/product_widget/maxPrice');
 
         return array(
             'targetXPath'          => $targetXPath,
@@ -23,9 +25,9 @@ class Sezzle_Pay_Block_ProductConfig extends Mage_Core_Block_Template
             'theme'                => $theme,
             'widthType'            => $widthType,
             'widgetType'           => 'product-page',
-            'minPrice'             => 0,
-            'maxPrice'             => 100000,
             'imageUrl'             => $imageUrl,
+            'minPrice'             => $minPrice,
+            'maxPrice'             => $maxPrice,
             'hideClasses'          => $hideClasses,
         );
     }
