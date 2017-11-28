@@ -222,11 +222,6 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
         $order->setBaseGrandTotal($quote->getBaseGrandTotal());
         $order->setGrandTotal($quote->getGrandTotal());
 
-
-        // adjust the Quote currency to prevent the default currency being stuck
-        $order->setBaseCurrencyCode(Mage::app()->getStore()->getCurrentCurrencyCode());
-        $order->setQuoteCurrencyCode(Mage::app()->getStore()->getCurrentCurrencyCode());
-        $order->setOrderCurrencyCode(Mage::app()->getStore()->getCurrentCurrencyCode());
         // add Sezzle reference id for doing refunds
         $order->setExternalReferenceId($reference);
         
