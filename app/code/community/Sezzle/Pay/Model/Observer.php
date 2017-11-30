@@ -2,36 +2,62 @@
 class Sezzle_Pay_Model_Observer
 {
     public function sendDailyData(Mage_Cron_Model_Schedule $schedule) {
+        $this->sendOrdersToSezzle();
+    }
+
+    protected function helper()
+    {
+        return Mage::helper('sezzle_pay');
+    }
+
+    protected function sendOrdersToSezzle() {
         $today = date("Y-m-d H:i:s");
-        $yesterday = date("Y-m-d H:i:s", strtotime("-1 days"));
+        $yesterday = date("Y-m-d H:i:s", strtotime("-5 days"));
 
         $yesterday = date('Y-m-d H:i:s', strtotime($yesterday));
         $today = date('Y-m-d H:i:s', strtotime($today));
-
-        $orders = Mage::getModel('sales/order')->getCollection()
+        $ordersCollection = Mage::getModel('sales/order')->getCollection()
+            // Get only if status is complete or processing
             ->addFieldToFilter('status',
                 array(
                     'eq' => 'complete',
                     'eq' => 'processing'
                 )
             )
+            // Get last day to today
             ->addAttributeToFilter('created_at',
                 array(
                     'from' => $yesterday,
                     'to' => $today
                 )
             )
-            ->addAttributeToSelect('customer_email')
-            ->addAttributeToSelect('status');
-        foreach ($orders as $order) {
-            $email = $order->getCustomerEmail();
-            $status = $order->getStatus();
-            $this->helper()->log("$email $status");
-        }
-    }
+            ->addAttributeToSelect('increment_id');
+        $body = array();
+        foreach ($ordersCollection as $orderObj) {
+            $orderIncrementId = $orderObj->getIncrementId();
+            $order = Mage::getModel('sales/order')->loadByIncrementId($orderIncrementId);
+            $payment = $order->getPayment();
+            $billing = $order->getBillingAddress();
 
-    protected function helper()
-    {
-        return Mage::helper('sezzle_pay');
+            $orderForSezzle = array(
+                'order_number' => $orderIncrementId,
+                'payment_method' => $payment->getMethod() == 'pay' ? 'sezzlepay' : $payment->getMethod(),
+                'amount' => $order->getGrandTotal() * 100,
+                'currency' => $order->getOrderCurrencyCode(),
+                'sezzle_reference' => $payment->getData('sezzle_reference_id'),
+                'customer_email' => $billing->getEmail(),
+                'customer_phone' => $billing->getTelephone(),
+                'billing_address1' => $billing->getStreet(1),
+                'billing_address2' => $billing->getStreet2(),
+                'billing_city' => $billing->getCity(),
+                'billing_state' => $billing->getRegionCode(),
+                'billing_postcode' => $billing->getPostcode(),
+                'billing_country' => $billing->getCountry()
+            );
+            array_push($body, $orderForSezzle);
+        }
+        $this->helper()->log(
+            json_encode($body)
+        );
     }
 }
