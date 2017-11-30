@@ -32,6 +32,11 @@ class Sezzle_Pay_Model_Api_Router
         return $this->getBaseApiUrl() . '/v1/checkouts';
     }
 
+    public function getOrdersSubmitUrl()
+    {
+        return $this->getBaseApiUrl() . '/v1/merchant_data' . '/magento/merchant_orders';
+    }
+
     // Returns base api url
     protected function getBaseApiUrl() 
     {

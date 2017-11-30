@@ -56,8 +56,30 @@ class Sezzle_Pay_Model_Observer
             );
             array_push($body, $orderForSezzle);
         }
-        $this->helper()->log(
-            json_encode($body)
+
+        $url = $this->getApiRouter()->getOrdersSubmitUrl();
+
+        $result = $this->getSezzleBaseModel()->_sendApiRequest(
+            $url,
+            $body,
+            true,
+            Varien_Http_Client::POST
         );
+        if ($result->isError()) {
+            throw Mage::exception(
+                'Sezzle_Pay',
+                __('Sezzle Pay API Error: %s', $result->getMessage())
+            );
+        }
+        $this->helper()->log('Order data sent to sezzle succefully');
+    }
+
+    private function getSezzleBaseModel() {
+        return Mage::getModel('sezzle_pay/PaymentMethod');
+    }
+
+    protected function getApiRouter() 
+    {
+        return Mage::getModel('sezzle_pay/api_router');
     }
 }
