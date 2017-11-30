@@ -37,6 +37,11 @@ class Sezzle_Pay_Model_Api_Router
         return $this->getBaseApiUrl() . '/v1/merchant_data' . '/magento/merchant_orders';
     }
 
+    public function getHeartbeatUrl()
+    {
+        return $this->getBaseApiUrl() . '/v1/merchant_data' . '/magento/heartbeat';
+    }
+
     // Returns base api url
     protected function getBaseApiUrl() 
     {
