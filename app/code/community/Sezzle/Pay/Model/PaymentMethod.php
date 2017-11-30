@@ -344,8 +344,9 @@ class Sezzle_Pay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
     }
 
     // send request
-    protected function _sendApiRequest($url, $body, $isAuth = true, $method = Varien_Http_Client::GET) 
+    public function _sendApiRequest($url, $body, $isAuth = true, $method = Varien_Http_Client::GET) 
     {
+        $this->helper()->log("Sending Request $url");
         $client = new Varien_Http_Client($url);
         if ($body !== false) {
             $client->setRawData(Mage::helper('core')->jsonEncode($body), 'application/json');

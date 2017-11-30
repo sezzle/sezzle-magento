@@ -66,4 +66,12 @@
             </pay>
         </routers>
     </frontend>
+    <crontab>
+        <jobs>
+            <sezzle_pay_daily_send>
+                <schedule><cron_expr>0 0 * * *</cron_expr></schedule>
+                <run><model>sezzle_pay/observer::sendDailyData</model></run>
+            </sezzle_pay_daily_send>
+        </jobs>
+    </crontab>
 </config> 
