@@ -23,9 +23,10 @@ class Sezzle_Pay_Model_Observer
             'is_widget_active' => true,
             'is_widget_configured' => $is_widget_configured,
             'is_merchant_id_entered' => $is_merchant_id_entered,
+            'merchant_id' => Mage::getStoreConfig('sezzle_pay/product_widget/merchant_id'),
         );
 
-        if ($is_public_key_entered && $is_private_key_entered) {
+        if ($is_public_key_entered && $is_private_key_entered && $is_merchant_id_entered) {
             $url = $this->getApiRouter()->getHeartbeatUrl();
 
             $result = $this->getSezzleBaseModel()->_sendApiRequest(
@@ -88,7 +89,8 @@ class Sezzle_Pay_Model_Observer
                 'billing_city' => $billing->getCity(),
                 'billing_state' => $billing->getRegionCode(),
                 'billing_postcode' => $billing->getPostcode(),
-                'billing_country' => $billing->getCountry()
+                'billing_country' => $billing->getCountry(),
+                'merchant_id' => Mage::getStoreConfig('sezzle_pay/product_widget/merchant_id'),
             );
             array_push($body, $orderForSezzle);
         }
