@@ -1,5 +1,6 @@
 <_>
-   <form_key>ZEOcUIoIvPo5w2df</form_key>
+   <form_key>vWDkzoG5pz3XvAAu</form_key>
+   <_create/>
    <name>Sezzle_Pay</name>
    <channel>community</channel>
    <version_ids>
@@ -11,10 +12,13 @@
 Visit https://www.sezzle.com to know more about Sezzle.</description>
    <license>MIT</license>
    <license_uri/>
-   <version>1.0.3</version>
+   <version>2.0.4</version>
    <stability>stable</stability>
    <notes>In this version here are the highlights:
-1. Fixed a bug in currency conversion.</notes>
+1. Change payment type to quote based instead of order based. So user&apos;s cart doesn&apos;t get empty when coming back from Sezzle pay if they wish to not pay using Sezzle.
+2. Any failed sezzle payment is out of payment list.
+3. Refunds can be made online.
+4. Support for onestepcheckout.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -49,7 +53,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                                </files>
+            <files>                                   </files>
          </files>
       </package>
       <extension>
