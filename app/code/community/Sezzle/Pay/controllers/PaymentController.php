@@ -414,7 +414,7 @@ class Sezzle_Pay_PaymentController extends Mage_Core_Controller_Front_Action
                     $result = Mage::getModel('checkout/type_onepage')->saveShippingMethod($data);
                     break;
                 case 'payment':
-                    $result = Mage::getModel('checkout/type_onepage')->savePayment(array('method' => 'pay'));
+                    $result = Mage::getModel('checkout/type_onepage')->savePayment(array('method' => 'sezzle'));
                     break;
             }
 
