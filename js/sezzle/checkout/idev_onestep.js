@@ -12,7 +12,7 @@
     var original = form.submit;
 
     form.submit = function() {
-        if (payment.currentMethod == 'pay') {
+        if (payment.currentMethod == 'sezzlepay') {
             // prepare params
             var params = form.serialize(true);
 
