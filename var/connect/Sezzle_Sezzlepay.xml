@@ -1,6 +1,5 @@
 <_>
-   <form_key>vWDkzoG5pz3XvAAu</form_key>
-   <_create/>
+   <form_key>ydB18GPxlZfUxi1v</form_key>
    <name>Sezzle_Sezzlepay</name>
    <channel>community</channel>
    <version_ids>
@@ -10,15 +9,17 @@
    <description>Users will be able to checkout using Sezzle to &quot;buy now and pay later&quot;.
 
 Visit https://www.sezzle.com to know more about Sezzle.</description>
-   <license>MIT</license>
+   <license>Apache 2.0</license>
    <license_uri/>
-   <version>2.0.4</version>
+   <version>3.0.0</version>
    <stability>stable</stability>
    <notes>In this version here are the highlights:
-1. Change payment type to quote based instead of order based. So user&apos;s cart doesn&apos;t get empty when coming back from Sezzle pay if they wish to not pay using Sezzle.
-2. Any failed sezzle payment is out of payment list.
-3. Refunds can be made online.
-4. Support for onestepcheckout.</notes>
+1. Changed the payment method type from just &quot;pay&quot; to &quot;sezzlepay&quot;.  
+
+Required Upgrade Changes from 2.x.x:
+Updating to this version will require that you re-enter your configuration.  File paths have moved from sezzle/pay to sezzle/sezzlepay to facilitate this change, so a full uninstall and re-install will be required.
+
+</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -53,7 +54,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                                   </files>
+            <files>                                      </files>
          </files>
       </package>
       <extension>
