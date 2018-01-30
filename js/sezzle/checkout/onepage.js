@@ -16,7 +16,7 @@
         var reviewSave = target.prototype.save;
         target.prototype.save = function () {
             // check payment method
-            if (payment.currentMethod == 'pay') {
+            if (payment.currentMethod == 'sezzlepay') {
                 this.saveUrl = window.Sezzlepay.saveUrl;
                 this.onComplete = function (transport) {
                     var response = {};

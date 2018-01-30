@@ -8,7 +8,7 @@ jQuery( document ).ready( function() {
     //hacks the form to prevent override by other plugins
     jQuery(".btn-checkout").on("click", function(e) {
     
-	if (payment.currentMethod == 'pay') {
+	if (payment.currentMethod == 'sezzlepay') {
     
     		e.preventDefault();
     		e.stopPropagation();

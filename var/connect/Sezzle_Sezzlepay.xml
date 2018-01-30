@@ -1,0 +1,114 @@
+<_>
+   <form_key>ydB18GPxlZfUxi1v</form_key>
+   <name>Sezzle_Sezzlepay</name>
+   <channel>community</channel>
+   <version_ids>
+      <version_ids>2</version_ids>
+   </version_ids>
+   <summary>This extension helps magento merchants have Sezzle as a payment option</summary>
+   <description>Users will be able to checkout using Sezzle to &quot;buy now and pay later&quot;.
+
+Visit https://www.sezzle.com to know more about Sezzle.</description>
+   <license>Apache 2.0</license>
+   <license_uri/>
+   <version>3.0.0</version>
+   <stability>stable</stability>
+   <notes>In this version here are the highlights:
+1. Changed the payment method type from just &quot;pay&quot; to &quot;sezzlepay&quot;.  
+
+Required Upgrade Changes from 2.x.x:
+Updating to this version will require that you re-enter your configuration.  File paths have moved from sezzle/pay to sezzle/sezzlepay to facilitate this change, so a full uninstall and re-install will be required.
+
+</notes>
+   <authors>
+      <name>
+         <name>Rishi Mukherjee</name>
+         <name>Charlie Youakim</name>
+         <name>Killian Brackey</name>
+      </name>
+      <user>
+         <user>rishimukherjee</user>
+         <user>charlieyouakim</user>
+         <user>killianbrackey</user>
+      </user>
+      <email>
+         <email>rishi.mukherjee@sezzle.com</email>
+         <email>charlie.youakim@sezzle.com</email>
+         <email>killian.brackey@sezzle.com</email>
+      </email>
+   </authors>
+   <depends_php_min>5.4.0</depends_php_min>
+   <depends_php_max>7.0.0</depends_php_max>
+   <depends>
+      <package>
+         <name>
+            <name/>
+         </name>
+         <channel>
+            <channel/>
+         </channel>
+         <min>
+            <min/>
+         </min>
+         <max>
+            <max/>
+         </max>
+         <files>
+            <files>                                      </files>
+         </files>
+      </package>
+      <extension>
+         <name>
+            <name>Core</name>
+         </name>
+         <min>
+            <min/>
+         </min>
+         <max>
+            <max/>
+         </max>
+      </extension>
+   </depends>
+   <contents>
+      <target>
+         <target>magelocal</target>
+         <target>magecommunity</target>
+         <target>mageetc</target>
+         <target>magedesign</target>
+         <target>magedesign</target>
+         <target>mageweb</target>
+      </target>
+      <path>
+         <path/>
+         <path>Sezzle/Sezzlepay/</path>
+         <path>modules/Sezzle_Sezzlepay.xml</path>
+         <path>frontend/base/default/template/sezzlepay/</path>
+         <path>frontend/base/default/layout/sezzle_sezzlepay.xml</path>
+         <path>js/sezzle/</path>
+      </path>
+      <type>
+         <type>file</type>
+         <type>dir</type>
+         <type>file</type>
+         <type>dir</type>
+         <type>file</type>
+         <type>dir</type>
+      </type>
+      <include>
+         <include/>
+         <include/>
+         <include/>
+         <include/>
+         <include/>
+         <include/>
+      </include>
+      <ignore>
+         <ignore/>
+         <ignore/>
+         <ignore/>
+         <ignore/>
+         <ignore/>
+         <ignore/>
+      </ignore>
+   </contents>
+</_>
