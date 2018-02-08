@@ -248,7 +248,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
             //ensure the order amount due is 0
             $order->setTotalDue(0);
             $order->save();
-                        
+
             if (!$order->getEmailSent()) {
                 $order->sendNewOrderEmail();
             }
@@ -287,7 +287,8 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
     protected function createCheckoutRequestBody($quote, $reference, $cancelUrl, $completeUrl) 
     {
         $requestBody = array();
-        $requestBody["amount_in_cents"] = $quote->getGrandTotal() * 100;
+        $amountInCents = $quote-> getGrandTotal() * 100;
+        $requestBody["amount_in_cents"] = (int) $amountInCents;
         $requestBody["currency_code"] = Mage::app()->getStore()->getCurrentCurrencyCode();
         $requestBody["order_description"] = $reference;
         $requestBody["order_reference_id"] = $reference;
@@ -329,7 +330,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
                 "sku" => $productSKU,
                 "quantity" => $productQuantity,
                 "price" => array(
-                    "amount_in_cents" => $productPrice,
+                    "amount_in_cents" => (int) $productPrice,
                     "currency" => $requestBody["currency_code"]
                 )
             );
