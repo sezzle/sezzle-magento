@@ -86,7 +86,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                     ), Zend_Log::ERR
                 );
             }
-            
+
             // Adding error for redirect and JSON
             $message = Mage::helper('sezzle_sezzlepay')->__('There was an error processing your order. %s', $e->getMessage());
 
@@ -148,11 +148,13 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
 
     public function completeAction() 
     {
-        $this->_capture();
+        $this->_sezzleCapture();
     }
 
-    protected function _capture() 
+    protected function _sezzleCapture() 
     {
+        $message = Mage::helper('sezzle_sezzlepay')->__('Sezzle Capture start...');
+
         try {
             $orderId = $this->getRequest()->getParam('id');
 

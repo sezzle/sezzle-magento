@@ -9,7 +9,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
     protected $_isGateway                  = true;
     protected $_canOrder                   = true;
     protected $_canAuthorize               = true;
-    protected $_canCapture                 = true;
+    protected $_canCapture                 = false;
     protected $_canCapturePartial          = false;
     protected $_canCaptureOnce             = false;
     protected $_canRefund                  = true;
@@ -190,7 +190,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
         return $this;
     }
 
-    public function capture(Varien_Object $payment, $amount)
+    public function sezzleCapture(Varien_Object $payment)
     {
         $reference = $payment->getData('sezzle_reference_id');
 
@@ -266,6 +266,11 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
 
             //clear the checkout session
             $session->getQuote()->setIsActive(0)->save();
+
+            $order->getPayment()->capture(null);
+
+            $this->sezzleCapture($order->getPayment());
+
             return true;
         }
 
