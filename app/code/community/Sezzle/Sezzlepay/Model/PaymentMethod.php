@@ -265,14 +265,18 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
             $session->setLastOrderId($order->getId())
                 ->setLastRealOrderId($order->getIncrementId());
 
-            //clear the checkout session
-            $session->getQuote()->setIsActive(0)->save();
-
             // $order->getPayment()->capture(null);
-            
-            $this->sezzleCapture($order->getPayment());
-
-            return true;
+            try {
+                $this->sezzleCapture($order->getPayment());
+                // clear the cart only if capture successful
+                $session->getQuote()->setIsActive(0)->save();
+                return true;
+            } catch (Sezzle_Sezzlepay_Exception $e) {
+                $this->helper()->log('Sezzle capture error: ' . $e->getMessage(), Zend_Log::DEBUG);
+                // cart is not cleared
+                // rollback order creation
+                return false;
+            }
         }
 
         return false; 

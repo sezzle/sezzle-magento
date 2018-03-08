@@ -210,13 +210,17 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             }
 
             $placeOrder = Mage::getModel('sezzle_sezzlepay/PaymentMethod')->place($this->_quote, $reference);
-            
-            if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
-                $this->helper()->storeCreditPlaceOrder();
-                $this->helper()->giftCardsPlaceOrder();
+            if ($placeOrder) {
+                if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
+                    $this->helper()->storeCreditPlaceOrder();
+                    $this->helper()->giftCardsPlaceOrder();
+                }
+                $this->_redirect('checkout/onepage/success');
+            } else {
+                Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Sezzle checkout failed. Please select an alternative payment method.'));
+                $this->_redirect(Mage::helper('checkout/url')->getCheckoutUrl());
             }
 
-            $this->_redirect('checkout/onepage/success');
         } catch (Exception $e) {
             // Debug log
             $this->_getSession()->addError($e->getMessage());
