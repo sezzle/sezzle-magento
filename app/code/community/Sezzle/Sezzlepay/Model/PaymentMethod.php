@@ -9,7 +9,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
     protected $_isGateway                  = true;
     protected $_canOrder                   = true;
     protected $_canAuthorize               = true;
-    protected $_canCapture                 = false;
+    protected $_canCapture                 = true;
     protected $_canCapturePartial          = false;
     protected $_canCaptureOnce             = false;
     protected $_canRefund                  = true;
@@ -190,10 +190,16 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
         return $this;
     }
 
+    public function capture(Varien_Object $payment, $amount)
+    {
+        $reference = $payment->getData('sezzle_reference_id');
+        $payment->setTransactionId($reference)->save();
+        return $this;
+    }
+
     public function sezzleCapture(Varien_Object $payment)
     {
         $reference = $payment->getData('sezzle_reference_id');
-
         // Charge
         $result = $this->_sendApiRequest(
             $this->getApiRouter()->checkoutCompleteUrl($reference),
@@ -207,9 +213,6 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
                 __('Sezzle Pay API Error: %s', $result->getMessage())
             );
         }
-
-        $payment->setTransactionId($reference)->save();
-
         return $this;
     }
 
@@ -218,10 +221,9 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
     {
         // Converting quote to order
         $service = Mage::getModel('sales/service_quote', $quote);
-        
         $service->submitAll();
         $order = $service->getOrder();
-    
+
         // ensure that Grand Total is not doubled
         $order->setBaseGrandTotal($quote->getBaseGrandTotal());
         $order->setGrandTotal($quote->getGrandTotal());
@@ -230,7 +232,6 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
         $order->setExternalReferenceId($reference);
         
         $order->save();
-
         $session = $this->_getSession();
 
         if ($order->getId()) {
@@ -267,8 +268,8 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
             //clear the checkout session
             $session->getQuote()->setIsActive(0)->save();
 
-            $order->getPayment()->capture(null);
-
+            // $order->getPayment()->capture(null);
+            
             $this->sezzleCapture($order->getPayment());
 
             return true;
