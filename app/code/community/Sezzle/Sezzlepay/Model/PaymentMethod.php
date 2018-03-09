@@ -249,10 +249,6 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
             //ensure the order amount due is 0
             $order->setTotalDue(0);
             $order->save();
-                        
-            if (!$order->getEmailSent()) {
-                $order->sendNewOrderEmail();
-            }
 
             // prepare session to success or cancellation page clear current session
             $session->clearHelperData();
@@ -268,6 +264,9 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
             // $order->getPayment()->capture(null);
             try {
                 $this->sezzleCapture($order->getPayment());
+                if (!$order->getEmailSent()) {
+                    $order->sendNewOrderEmail();
+                }
                 // clear the cart only if capture successful
                 $session->getQuote()->setIsActive(0)->save();
                 return true;
@@ -275,11 +274,58 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
                 $this->helper()->log('Sezzle capture error: ' . $e->getMessage(), Zend_Log::DEBUG);
                 // cart is not cleared
                 // rollback order creation
+                Mage::register('isSecureArea', true);
+                $this->_rollbackOrderCreation($order);
+                Mage::unregister('isSecureArea');
                 return false;
             }
         }
 
         return false; 
+    }
+
+    // rollback order creation
+    protected function _rollbackOrderCreation($order) {
+        $invoices = $order->getInvoiceCollection();
+        foreach ($invoices as $invoice){
+            //delete all invoice items
+            $items = $invoice->getAllItems(); 
+            foreach ($items as $item) {
+                $item->delete();
+            }
+            //delete invoice
+            $invoice->delete();
+        }
+        $creditnotes = $order->getCreditmemosCollection();
+        foreach ($creditnotes as $creditnote){
+            //delete all creditnote items
+            $items = $creditnote->getAllItems(); 
+            foreach ($items as $item) {
+                $item->delete();
+            }
+            //delete credit note
+            $creditnote->delete();
+        }
+        $shipments = $order->getShipmentsCollection();
+        foreach ($shipments as $shipment){
+            //delete all shipment items
+            $items = $shipment->getAllItems(); 
+            foreach ($items as $item) {
+                $item->delete();
+            }
+            //delete shipment
+            $shipment->delete();
+        }
+        //delete all order items
+        $items = $order->getAllItems(); 
+        foreach ($items as $item) {
+            $item->delete();
+        }
+        //delete payment
+        $order->getPayment()->delete();
+
+        //delete order
+        $order->delete();
     }
 
     protected function _getSession()
