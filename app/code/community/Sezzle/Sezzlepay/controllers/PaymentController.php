@@ -13,11 +13,6 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
     // Entrypoint: Redirect user to Sezzle
     public function startAction() 
     {
-        $now = Mage::getModel('core/date')->gmtDate('Y-m-d H:i:s');
-        $this->helper()->log(
-            '================START: ' . $this->getSessionID() . ' ================',
-            Zend_Log::DEBUG
-        );
         $this->helper()->log(
             'Session : ' . $this->getSessionID() . ' Starting sezzle payment',
             Zend_Log::DEBUG
@@ -133,7 +128,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
     public function userProcessing($quote, $request)
     {
         $this->helper()->log(
-            'Session : ' . $this->getSessionID() . 'userProcessing called',
+            'Session : ' . $this->getSessionID() . ' userProcessing called',
             Zend_Log::DEBUG
         );
         $logged_in = Mage::getSingleton('customer/session')->isLoggedIn();
@@ -177,7 +172,93 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
 
     public function logAction()
     {
-        $this->helper()->log('Session : ' . $this->getSessionID() . " Log Action received.", Zend_Log::DEBUG);
+        $marker = "======== Sezzle ========";
+        // read file from end and get the last log upload time
+        $this->helper()->log("logAction called", Zend_Log::DEBUG);
+        $fp = fopen('var/log/sezzle-pay.log', 'r');
+        $currentLine = '';
+        for($x_pos = 0; fseek($fp, $x_pos, SEEK_END) !== -1; $x_pos--) {
+            $char = fgetc($fp);
+            if ($char === PHP_EOL) {
+                $currentLine = '';
+            } else {
+                $currentLine = $char . $currentLine;
+            }
+            // Look for our marker
+            if (strrpos($currentLine, $marker) !== false) {
+                break;
+            }
+        }
+        fclose($fp);
+
+        if ($currentLine === '' || (strrpos($currentLine, $marker) === false)) {
+            // does not find the marker. Upload everything
+        } else {
+            // found the marker send all the lines after the marker
+            
+            // check if we want to send or not
+            $pos = strrpos($currentLine, $marker) + strlen($marker);
+            $time_string = substr($currentLine, $pos + 1);
+            $time = strtotime($time_string);
+            $now = time();
+            $diff = $now - $time;
+            // Get the time difference between last upload and now.
+            // If it is more than an hour, send the log to sezzle
+            if ($diff >= 60 * 60) {
+                // send the logs
+                $this->helper()->log("Sending logs to Sezzle", Zend_Log::DEBUG);
+            } else {
+                return;
+            }
+        }
+    }
+
+    private function tail($filename, $lines = 10, $buffer = 4096)
+    {
+        // Open the file
+        $f = fopen($filename, "rb");
+
+        // Jump to last character
+        fseek($f, -1, SEEK_END);
+
+        // Read it and adjust line number if necessary
+        // (Otherwise the result would be wrong if file doesn't end with a blank line)
+        if(fread($f, 1) != "\n") $lines -= 1;
+
+        // Start reading
+        $output = '';
+        $chunk = '';
+
+        // While we would like more
+        while(ftell($f) > 0 && $lines >= 0)
+        {
+            // Figure out how far back we should jump
+            $seek = min(ftell($f), $buffer);
+
+            // Do the jump (backwards, relative to where we are)
+            fseek($f, -$seek, SEEK_CUR);
+
+            // Read a chunk and prepend it to our output
+            $output = ($chunk = fread($f, $seek)).$output;
+
+            // Jump back to where we started reading
+            fseek($f, -mb_strlen($chunk, '8bit'), SEEK_CUR);
+
+            // Decrease our line counter
+            $lines -= substr_count($chunk, "\n");
+        }
+
+        // While we have too many lines
+        // (Because of buffer size we might have read too many)
+        while($lines++ < 0)
+        {
+            // Find first newline and remove all text before that
+            $output = substr($output, strpos($output, "\n") + 1);
+        }
+
+        // Close file and return
+        fclose($f); 
+        return $output; 
     }
 
     public function completeAction() 
@@ -253,10 +334,6 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                     $this->helper()->storeCreditPlaceOrder();
                     $this->helper()->giftCardsPlaceOrder();
                 }
-                $this->helper()->log(
-                    '================END: ' . $this->getSessionID() . ' ================',
-                    Zend_Log::DEBUG
-                );
                 $this->_redirect('checkout/onepage/success');
             } else {
                 $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $this->_quote->getReservedOrderId() . ': Order failed. Redirecting to checkout.', Zend_Log::DEBUG);
