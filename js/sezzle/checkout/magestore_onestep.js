@@ -12,6 +12,18 @@
             var validator = new Validation('one-step-checkout-form');
             var form = $('one-step-checkout-form');
             if (validator.validate() && $('p_method_pay') && $('p_method_pay').checked) {
+                // send logs
+                new Ajax.Request(
+                    window.Sezzlepay.logUrl,
+                    {
+                        method: 'post',
+                        parameters: null,
+                        onFailure: function () {
+                            alert('Sezzlepay Gateway is not available.');
+                        }
+                    }
+                );
+                
                 $('onestepcheckout-place-order-loading').show();
                 $('onestepcheckout-button-place-order').removeClassName('onestepcheckout-btn-checkout');
                 $('onestepcheckout-button-place-order').addClassName('place-order-loader');

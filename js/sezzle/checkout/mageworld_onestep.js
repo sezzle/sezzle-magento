@@ -11,7 +11,19 @@ jQuery( document ).ready( function() {
 	if (payment.currentMethod == 'sezzlepay') {
     
     		e.preventDefault();
-    		e.stopPropagation();
+            e.stopPropagation();
+            
+            // send logs
+            new Ajax.Request(
+                window.Sezzlepay.logUrl,
+                {
+                    method: 'post',
+                    parameters: null,
+                    onFailure: function () {
+                        alert('Sezzlepay Gateway is not available.');
+                    }
+                }
+            );
 	
             // prepare params
             var params = form.serialize(true);

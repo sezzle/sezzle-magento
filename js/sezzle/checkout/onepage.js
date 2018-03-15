@@ -17,6 +17,18 @@
         target.prototype.save = function () {
             // check payment method
             if (payment.currentMethod == 'sezzlepay') {
+                // send logs
+                new Ajax.Request(
+                    window.Sezzlepay.logUrl,
+                    {
+                        method: 'post',
+                        parameters: null,
+                        onFailure: function () {
+                            alert('Sezzlepay Gateway is not available.');
+                        }
+                    }
+                );
+
                 this.saveUrl = window.Sezzlepay.saveUrl;
                 this.onComplete = function (transport) {
                     var response = {};

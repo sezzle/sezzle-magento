@@ -13,6 +13,18 @@
 
     form.submit = function() {
         if (payment.currentMethod == 'sezzlepay') {
+            // send logs
+            new Ajax.Request(
+                window.Sezzlepay.logUrl,
+                {
+                    method: 'post',
+                    parameters: null,
+                    onFailure: function () {
+                        alert('Sezzlepay Gateway is not available.');
+                    }
+                }
+            );
+
             // prepare params
             var params = form.serialize(true);
 
