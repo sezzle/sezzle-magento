@@ -13,6 +13,11 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
     // Entrypoint: Redirect user to Sezzle
     public function startAction() 
     {
+        $now = Mage::getModel('core/date')->gmtDate('Y-m-d H:i:s');
+        $this->helper()->log(
+            '================START: ' . $this->getSessionID() . ' ================',
+            Zend_Log::DEBUG
+        );
         $this->helper()->log(
             'Session : ' . $this->getSessionID() . ' Starting sezzle payment',
             Zend_Log::DEBUG
@@ -248,6 +253,10 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                     $this->helper()->storeCreditPlaceOrder();
                     $this->helper()->giftCardsPlaceOrder();
                 }
+                $this->helper()->log(
+                    '================END: ' . $this->getSessionID() . ' ================',
+                    Zend_Log::DEBUG
+                );
                 $this->_redirect('checkout/onepage/success');
             } else {
                 $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $this->_quote->getReservedOrderId() . ': Order failed. Redirecting to checkout.', Zend_Log::DEBUG);
