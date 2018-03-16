@@ -208,7 +208,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             // Get the time difference between last upload and now.
             // If it is more than an hour, send the log to sezzle
             if ($diff < 60 * 60) {
-                // return;
+                return;
             }            
         }
         $this->helper()->log($marker . ' ' .  date('Y-m-d H:i:s', time()));
