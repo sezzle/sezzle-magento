@@ -32,6 +32,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
     const API_PRIVATE_KEY_CONFIG_PATH = 'payment/sezzlepay/private_key';
     const API_MODE_CONFIG_FIELD = 'api_mode';
     const API_BASE_URL_CONFIG_FIELD = 'base_url';
+    const MERCHANT_ID_CONFIG_FIELD = 'merchant_id';
 
     /**
     * @return Mage_Checkout_Model_Session

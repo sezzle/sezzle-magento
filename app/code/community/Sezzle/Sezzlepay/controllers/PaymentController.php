@@ -177,15 +177,18 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         $this->helper()->log("logAction called", Zend_Log::DEBUG);
         $fp = fopen('var/log/sezzle-pay.log', 'r');
         $currentLine = '';
+        $line_store = '';
         for($x_pos = 0; fseek($fp, $x_pos, SEEK_END) !== -1; $x_pos--) {
             $char = fgetc($fp);
             if ($char === PHP_EOL) {
+                $line_store .= $char . $currentLine;
                 $currentLine = '';
             } else {
                 $currentLine = $char . $currentLine;
             }
             // Look for our marker
             if (strrpos($currentLine, $marker) !== false) {
+                $line_store .= $currentLine . PHP_EOL;
                 break;
             }
         }
@@ -193,9 +196,9 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
 
         if ($currentLine === '' || (strrpos($currentLine, $marker) === false)) {
             // does not find the marker. Upload everything
+            $this->helper()->log($marker . date('Y-m-d H:i:s', time()));
+            return;
         } else {
-            // found the marker send all the lines after the marker
-            
             // check if we want to send or not
             $pos = strrpos($currentLine, $marker) + strlen($marker);
             $time_string = substr($currentLine, $pos + 1);
@@ -204,61 +207,38 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             $diff = $now - $time;
             // Get the time difference between last upload and now.
             // If it is more than an hour, send the log to sezzle
-            if ($diff >= 60 * 60) {
-                // send the logs
-                $this->helper()->log("Sending logs to Sezzle", Zend_Log::DEBUG);
-            } else {
-                return;
-            }
+            if ($diff < 60 * 60) {
+                // return;
+            }            
+        }
+        $this->helper()->log($marker . ' ' .  date('Y-m-d H:i:s', time()));
+        $merchant_id = Mage::getStoreConfig('sezzle_sezzlepay/product_widget/merchant_id');
+        $this->helper()->log("merchant id => ", $merchant_id);
+        $url = $this->getApiRouter()->getSendLogsUrl($merchant_id);
+        $body = array(
+            'start_time' => date('Y-m-d H:i:s', $time),
+            'end_time' => date('Y-m-d H:i:s', time()),
+            'log' => $line_store
+        );
+
+        $result = $this->getSezzleBaseModel()->_sendApiRequest(
+            $url,
+            $body,
+            true,
+            Varien_Http_Client::POST
+        );
+        if ($result->isError()) {
+            $this->helper()->log("Could not send log to Sezzle");
         }
     }
 
-    private function tail($filename, $lines = 10, $buffer = 4096)
+    private function getSezzleBaseModel() {
+        return Mage::getModel('sezzle_sezzlepay/PaymentMethod');
+    }
+
+    protected function getApiRouter() 
     {
-        // Open the file
-        $f = fopen($filename, "rb");
-
-        // Jump to last character
-        fseek($f, -1, SEEK_END);
-
-        // Read it and adjust line number if necessary
-        // (Otherwise the result would be wrong if file doesn't end with a blank line)
-        if(fread($f, 1) != "\n") $lines -= 1;
-
-        // Start reading
-        $output = '';
-        $chunk = '';
-
-        // While we would like more
-        while(ftell($f) > 0 && $lines >= 0)
-        {
-            // Figure out how far back we should jump
-            $seek = min(ftell($f), $buffer);
-
-            // Do the jump (backwards, relative to where we are)
-            fseek($f, -$seek, SEEK_CUR);
-
-            // Read a chunk and prepend it to our output
-            $output = ($chunk = fread($f, $seek)).$output;
-
-            // Jump back to where we started reading
-            fseek($f, -mb_strlen($chunk, '8bit'), SEEK_CUR);
-
-            // Decrease our line counter
-            $lines -= substr_count($chunk, "\n");
-        }
-
-        // While we have too many lines
-        // (Because of buffer size we might have read too many)
-        while($lines++ < 0)
-        {
-            // Find first newline and remove all text before that
-            $output = substr($output, strpos($output, "\n") + 1);
-        }
-
-        // Close file and return
-        fclose($f); 
-        return $output; 
+        return Mage::getModel('sezzle_sezzlepay/api_router');
     }
 
     public function completeAction() 
