@@ -9,13 +9,14 @@
     var action = form.getAttribute('action');
 
     // save in variable for default .submit
-    var original = form.submit;
+    var original = form.submit; 
 
     form.submit = function() {
         if (payment.currentMethod == 'sezzlepay') {
             // send logs
+            var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
             new Ajax.Request(
-                window.Sezzlepay.logUrl,
+                window.Sezzlepay.logUrl + '?send_all_logs=' + sendAllLogs,
                 {
                     method: 'post',
                     parameters: null,

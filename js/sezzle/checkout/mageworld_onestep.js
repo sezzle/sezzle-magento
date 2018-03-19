@@ -29,8 +29,9 @@ jQuery( document ).ready( function() {
             var params = form.serialize(true);
 
             // Ajax to start order token
-            var request = new Ajax.Request(
-                window.Sezzlepay.saveUrl,
+            var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
+            new Ajax.Request(
+                window.Sezzlepay.logUrl + '?send_all_logs=' + sendAllLogs,
                 {
                     method: 'post',
                     parameters: params,

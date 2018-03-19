@@ -11,10 +11,11 @@
         window.oscPlaceOrder = function (element) {
             var validator = new Validation('one-step-checkout-form');
             var form = $('one-step-checkout-form');
-            if (validator.validate() && $('p_method_pay') && $('p_method_pay').checked) {
+            if (validator.validate() && $('p_method_sezzlepay') && $('p_method_sezzlepay').checked) {
                 // send logs
+                var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
                 new Ajax.Request(
-                    window.Sezzlepay.logUrl,
+                    window.Sezzlepay.logUrl + '?send_all_logs=' + sendAllLogs,
                     {
                         method: 'post',
                         parameters: null,
