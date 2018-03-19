@@ -15,11 +15,14 @@
         if (payment.currentMethod == 'sezzlepay') {
             // send logs
             var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
+            console.log('sendAllLogs', sendAllLogs);
             new Ajax.Request(
-                window.Sezzlepay.logUrl + '?send_all_logs=' + sendAllLogs,
+                window.Sezzlepay.logUrl,
                 {
                     method: 'post',
-                    parameters: null,
+                    parameters: {
+                        'all-logs': sendAllLogs
+                    },
                     onFailure: function () {
                         alert('Sezzlepay Gateway is not available.');
                     }

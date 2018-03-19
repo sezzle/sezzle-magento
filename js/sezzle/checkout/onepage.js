@@ -20,10 +20,12 @@
                 // send logs
                 var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
                 new Ajax.Request(
-                    window.Sezzlepay.logUrl + '?send_all_logs=' + sendAllLogs,
+                    window.Sezzlepay.logUrl,
                     {
                         method: 'post',
-                        parameters: null,
+                        parameters: {
+                            'all-logs': sendAllLogs
+                        },
                         onFailure: function () {
                             alert('Sezzlepay Gateway is not available.');
                         }

@@ -12,13 +12,15 @@ jQuery( document ).ready( function() {
     
     		e.preventDefault();
             e.stopPropagation();
-            
+            var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
             // send logs
             new Ajax.Request(
                 window.Sezzlepay.logUrl,
                 {
                     method: 'post',
-                    parameters: null,
+                    parameters: {
+                        'all-logs': sendAllLogs
+                    },
                     onFailure: function () {
                         alert('Sezzlepay Gateway is not available.');
                     }
@@ -29,9 +31,8 @@ jQuery( document ).ready( function() {
             var params = form.serialize(true);
 
             // Ajax to start order token
-            var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
             new Ajax.Request(
-                window.Sezzlepay.logUrl + '?send_all_logs=' + sendAllLogs,
+                window.Sezzlepay.saveUrl,
                 {
                     method: 'post',
                     parameters: params,

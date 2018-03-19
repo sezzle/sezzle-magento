@@ -172,9 +172,10 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
 
     public function logAction()
     {
+        $sendAllLogs = $this->getRequest()->getParam('all-logs');
         $marker = "======== Sezzle ========";
         // read file from end and get the last log upload time
-        $this->helper()->log("logAction called", Zend_Log::DEBUG);
+        $this->helper()->log("logAction called with param sendAllLogs=$sendAllLogs", Zend_Log::DEBUG);
         $fp = fopen('var/log/sezzle-pay.log', 'r');
         $currentLine = '';
         $line_store = '';
@@ -187,18 +188,18 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                 $currentLine = $char . $currentLine;
             }
             // Look for our marker
-            if (strrpos($currentLine, $marker) !== false) {
+            if (strrpos($currentLine, $marker) !== false && (int)$sendAllLogs === 0) {
                 $line_store .= $currentLine . PHP_EOL;
                 break;
             }
         }
         fclose($fp);
-
-        if ($currentLine === '' || (strrpos($currentLine, $marker) === false)) {
+        $this->helper()->log("currentLine  = $currentLine");
+        if ((int)$sendAllLogs === 0 && ($currentLine === '' || (strrpos($currentLine, $marker) === false))) {
             // does not find the marker. Upload everything
             $this->helper()->log($marker . date('Y-m-d H:i:s', time()));
             return;
-        } else {
+        } else if ((int)$sendAllLogs === 0) {
             // check if we want to send or not
             $pos = strrpos($currentLine, $marker) + strlen($marker);
             $time_string = substr($currentLine, $pos + 1);
@@ -209,11 +210,13 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             // If it is more than an hour, send the log to sezzle
             if ($diff < 60 * 60) {
                 return;
-            }            
+            }
+        }
+        if ((int)$sendAllLogs === 1) {
+            $time = time();
         }
         $this->helper()->log($marker . ' ' .  date('Y-m-d H:i:s', time()));
         $merchant_id = Mage::getStoreConfig('sezzle_sezzlepay/product_widget/merchant_id');
-        $this->helper()->log("merchant id => ", $merchant_id);
         $url = $this->getApiRouter()->getSendLogsUrl($merchant_id);
         $body = array(
             'start_time' => date('Y-m-d H:i:s', $time),
