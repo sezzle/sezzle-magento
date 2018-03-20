@@ -172,65 +172,78 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
 
     public function logAction()
     {
-        $sendAllLogs = $this->getRequest()->getParam('all-logs');
-        $marker = "======== Sezzle ========";
-        // read file from end and get the last log upload time
-        $this->helper()->log("logAction called with param sendAllLogs=$sendAllLogs", Zend_Log::DEBUG);
-        $fp = fopen('var/log/sezzle-pay.log', 'r');
-        $currentLine = '';
-        $line_store = '';
-        for($x_pos = 0; fseek($fp, $x_pos, SEEK_END) !== -1; $x_pos--) {
-            $char = fgetc($fp);
-            if ($char === PHP_EOL) {
-                $line_store .= $char . $currentLine;
-                $currentLine = '';
-            } else {
-                $currentLine = $char . $currentLine;
+        try {
+            $sendAllLogs = $this->getRequest()->getParam('all-logs');
+            $marker = "======== Sezzle ========";
+            // read file from end and get the last log upload time
+            $this->helper()->log("logAction called with param sendAllLogs=$sendAllLogs", Zend_Log::DEBUG);
+            if (!file_exists('var/log/sezzle-pay.log') ) {
+                throw new Exception('File not found.');
             }
-            // Look for our marker
-            if (strrpos($currentLine, $marker) !== false && (int)$sendAllLogs === 0) {
-                $line_store .= $currentLine . PHP_EOL;
-                break;
+            $fp = fopen('var/log/sezzle-pay.log', 'r');
+            if ( !$fp ) {
+                throw new Exception('File open failed.');
+            }  
+            $currentLine = '';
+            $line_store = '';
+            for($x_pos = 0; fseek($fp, $x_pos, SEEK_END) !== -1; $x_pos--) {
+                $char = fgetc($fp);
+                if ($char === PHP_EOL) {
+                    $line_store .= $char . $currentLine;
+                    $currentLine = '';
+                } else {
+                    $currentLine = $char . $currentLine;
+                }
+                // Look for our marker
+                if (strrpos($currentLine, $marker) !== false && (int)$sendAllLogs === 0) {
+                    $line_store .= $currentLine . PHP_EOL;
+                    break;
+                }
             }
-        }
-        fclose($fp);
-        if ((int)$sendAllLogs === 0 && ($currentLine === '' || (strrpos($currentLine, $marker) === false))) {
-            // does not find the marker. Upload everything
-            $this->helper()->log($marker . date('Y-m-d H:i:s', time()));
-            return;
-        } else if ((int)$sendAllLogs === 0) {
-            // check if we want to send or not
-            $pos = strrpos($currentLine, $marker) + strlen($marker);
-            $time_string = substr($currentLine, $pos + 1);
-            $time = strtotime($time_string);
-            $now = time();
-            $diff = $now - $time;
-            // Get the time difference between last upload and now.
-            // If it is more than an hour, send the log to sezzle
-            if ($diff < 60 * 60) {
+            fclose($fp);
+            if ((int)$sendAllLogs === 0 && ($currentLine === '' || (strrpos($currentLine, $marker) === false))) {
+                // does not find the marker. Upload everything
+                $this->helper()->log($marker . date('Y-m-d H:i:s', time()));
                 return;
+            } else if ((int)$sendAllLogs === 0) {
+                // check if we want to send or not
+                $pos = strrpos($currentLine, $marker) + strlen($marker);
+                $time_string = substr($currentLine, $pos + 1);
+                $time = strtotime($time_string);
+                $now = time();
+                $diff = $now - $time;
+                // Get the time difference between last upload and now.
+                // If it is more than an hour, send the log to sezzle
+                if ($diff < 60 * 60) {
+                    return;
+                }
             }
-        }
-        if ((int)$sendAllLogs === 1) {
-            $time = time();
-        }
-        $this->helper()->log($marker . ' ' .  date('Y-m-d H:i:s', time()));
-        $merchant_id = Mage::getStoreConfig('sezzle_sezzlepay/product_widget/merchant_id');
-        $url = $this->getApiRouter()->getSendLogsUrl($merchant_id);
-        $body = array(
-            'start_time' => date('Y-m-d H:i:s', $time),
-            'end_time' => date('Y-m-d H:i:s', time()),
-            'log' => $line_store
-        );
+            if ((int)$sendAllLogs === 1) {
+                $time = time();
+            }
+            $this->helper()->log($marker . ' ' .  date('Y-m-d H:i:s', time()));
+            $merchant_id = Mage::getStoreConfig('sezzle_sezzlepay/product_widget/merchant_id');
+            $url = $this->getApiRouter()->getSendLogsUrl($merchant_id);
+            $body = array(
+                'start_time' => date('Y-m-d H:i:s', $time),
+                'end_time' => date('Y-m-d H:i:s', time()),
+                'log' => $line_store
+            );
 
-        $result = $this->getSezzleBaseModel()->_sendApiRequest(
-            $url,
-            $body,
-            true,
-            Varien_Http_Client::POST
-        );
-        if ($result->isError()) {
-            $this->helper()->log("Could not send log to Sezzle");
+            $result = $this->getSezzleBaseModel()->_sendApiRequest(
+                $url,
+                $body,
+                true,
+                Varien_Http_Client::POST
+            );
+            if ($result->isError()) {
+                $this->helper()->log("Could not send log to Sezzle");
+            }
+        } catch (Exception $e) {
+            $this->helper()->log("Logging failed");
+            if($fp) {
+                fclose($fp);
+            }
         }
     }
 
