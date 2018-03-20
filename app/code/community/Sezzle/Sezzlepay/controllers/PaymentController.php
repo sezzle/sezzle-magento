@@ -194,7 +194,6 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             }
         }
         fclose($fp);
-        $this->helper()->log("currentLine  = $currentLine");
         if ((int)$sendAllLogs === 0 && ($currentLine === '' || (strrpos($currentLine, $marker) === false))) {
             // does not find the marker. Upload everything
             $this->helper()->log($marker . date('Y-m-d H:i:s', time()));
