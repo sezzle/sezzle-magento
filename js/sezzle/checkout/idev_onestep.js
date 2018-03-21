@@ -9,10 +9,26 @@
     var action = form.getAttribute('action');
 
     // save in variable for default .submit
-    var original = form.submit;
+    var original = form.submit; 
 
     form.submit = function() {
         if (payment.currentMethod == 'sezzlepay') {
+            // send logs
+            var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
+            console.log('sendAllLogs', sendAllLogs);
+            new Ajax.Request(
+                window.Sezzlepay.logUrl,
+                {
+                    method: 'post',
+                    parameters: {
+                        'all-logs': sendAllLogs
+                    },
+                    onFailure: function () {
+                        alert('Sezzlepay Gateway is not available.');
+                    }
+                }
+            );
+
             // prepare params
             var params = form.serialize(true);
 

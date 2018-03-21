@@ -11,13 +11,27 @@ jQuery( document ).ready( function() {
 	if (payment.currentMethod == 'sezzlepay') {
     
     		e.preventDefault();
-    		e.stopPropagation();
+            e.stopPropagation();
+            var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
+            // send logs
+            new Ajax.Request(
+                window.Sezzlepay.logUrl,
+                {
+                    method: 'post',
+                    parameters: {
+                        'all-logs': sendAllLogs
+                    },
+                    onFailure: function () {
+                        alert('Sezzlepay Gateway is not available.');
+                    }
+                }
+            );
 	
             // prepare params
             var params = form.serialize(true);
 
             // Ajax to start order token
-            var request = new Ajax.Request(
+            new Ajax.Request(
                 window.Sezzlepay.saveUrl,
                 {
                     method: 'post',
