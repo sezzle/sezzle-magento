@@ -6,10 +6,10 @@
 
 1. Download the .zip or tar.gz file from Sezzle's github repository.
 2. Unzip the file and follow the following instructions.
-3. Copy all files in the extracted folder's: `/app/etc/modules/` to: `[MAGENTO]/app/etc/modules`
-4. Copy all files in the extracted folder's: `/app/design/frontend/base/default/template/` to: `[MAGENTO]/app/design/frontend/base/default/template`
-5. Copy all files in the extracted folder's: `/app/design/frontend/base/default/layout/` to: `[MAGENTO]/app/design/frontend/base/default/layout`
-6. Copy all files in the extracted folder's: `/app/code/community/Sezzle/` to: `[MAGENTO]/app/code/community/Sezzle`
+3. Copy all files in the extracted folder's: `/app/code/community/` to: `[MAGENTO]/app/code/community`
+4. Copy all files in the extracted folder's `/app/design/frontend/base/default/layout/` to: `[MAGENTO]/app/design/frontend/base/default/layout`
+5. Copy all files in the extracted folder's `/app/design/frontend/base/default/template/` to: `[MAGENTO]/app/design/frontend/base/default/template`
+6. Copy all files in the extracted folder's: `/app/etc/` to: `[MAGENTO]/app/etc`
 7. Copy all files in the extracted folder's: `/js` to: `[MAGENTO]/js`
 8. Login to Magento Admin and navigate to System/Cache Management.
 9. Flush the cache storage by selecting Flush Cache Storage.
@@ -35,3 +35,31 @@
 8. Flush the cache storage by selecting Flush Cache Storage.
 
 ### Your store is now ready to accept payments through Sezzle.
+
+### Updating Sezzle Magento Plugin
+The process of upgrading the this plugin involves the complete removal of Sezzle Magento plugin files, followed by copying the new files.
+1. Download the .zip or tar.gz file from Sezzle's github repository.
+2. Unzip the file and follow the following instructions.
+3. Remove all files in: 
+[MAGENTO]/app/code/community/Sezzle
+4. Copy new files to: 
+[MAGENTO]/app/code/community/Sezzle
+5. Remove file: 
+[MAGENTO]/app/design/frontend/base/default/layout/sezzle_sezzlepay.xml
+6. Copy file to: 
+[MAGENTO]/app/design/frontend/base/default/layout/sezzle_sezzlepay.xml
+7. Remove all files in: 
+[MAGENTO]/app/design/frontend/base/default/template/sezzlepay
+8. Copy new files to:
+[MAGENTO]/app/design/frontend/base/default/template/sezzlepay
+9. Remove file: 
+[MAGENTO]/app/etc/modules/Sezzle_Sezzlepay.xml
+10. Copy file to:
+[MAGENTO]/app/etc/modules/Sezzle_Sezzlepay.xml
+11. Remove all files in: 
+[MAGENTO]/js/sezzle
+12. Copy new files to: 
+[MAGENTO]/js/sezzle
+13. Login to Magento Admin and navigate to System/Cache Management
+14. Flush the cache storage by selecting Flush Cache Storage
+15. Flush the js/css cache.
