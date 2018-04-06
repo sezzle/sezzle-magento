@@ -1,5 +1,5 @@
 <_>
-   <form_key>ydB18GPxlZfUxi1v</form_key>
+   <form_key>4Nmx7IiTYGq6NVhf</form_key>
    <name>Sezzle_Sezzlepay</name>
    <channel>community</channel>
    <version_ids>
@@ -11,15 +11,13 @@
 Visit https://www.sezzle.com to know more about Sezzle.</description>
    <license>Apache 2.0</license>
    <license_uri/>
-   <version>3.0.0</version>
+   <version>3.1.0</version>
    <stability>stable</stability>
-   <notes>In this version here are the highlights:
-1. Changed the payment method type from just &quot;pay&quot; to &quot;sezzlepay&quot;.  
+   <notes>The following are the highlights of this version:
 
-Required Upgrade Changes from 2.x.x:
-Updating to this version will require that you re-enter your configuration.  File paths have moved from sezzle/pay to sezzle/sezzlepay to facilitate this change, so a full uninstall and re-install will be required.
-
-</notes>
+1. We now capture only after order is created.
+2. Fail the order creation if capture is not possible.
+3. Sezzle will receive logs without the merchant having to give it so we can debug without you having peace of mind.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -54,7 +52,7 @@ Updating to this version will require that you re-enter your configuration.  Fil
             <max/>
          </max>
          <files>
-            <files>                                      </files>
+            <files>                                       </files>
          </files>
       </package>
       <extension>
@@ -111,4 +109,8 @@ Updating to this version will require that you re-enter your configuration.  Fil
          <ignore/>
       </ignore>
    </contents>
+   <page>1</page>
+   <limit>200</limit>
+   <folder/>
+   <package/>
 </_>
