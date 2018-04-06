@@ -17,7 +17,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
 
 1. We now capture only after order is created.
 2. Fail the order creation if capture is not possible.
-3. Sezzle will receive logs without the merchant having to give it so we can debug without you having peace of mind.</notes>
+3. Sezzle related logs are now submitted to us to enable proactive debugging.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -52,7 +52,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                                       </files>
+            <files>                                        </files>
          </files>
       </package>
       <extension>
@@ -109,8 +109,4 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
          <ignore/>
       </ignore>
    </contents>
-   <page>1</page>
-   <limit>200</limit>
-   <folder/>
-   <package/>
 </_>
