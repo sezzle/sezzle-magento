@@ -4,7 +4,7 @@
 /**
  * Override function for MageStore checkout when submit order
  */
-(function() {
+(function () {
     if (typeof window.oscPlaceOrder !== 'undefined') {
         var original = window.oscPlaceOrder;
 
@@ -43,21 +43,27 @@
                 if ($('giftmessage-type') && $('giftmessage-type').value != '') {
                     parameters[$('giftmessage-type').name] = $('giftmessage-type').value;
                 }
+
                 if ($('create_account_checkbox_id') && $('create_account_checkbox_id').checked) {
                     parameters['create_account_checkbox'] = 1;
                 }
+
                 if ($('gift-message-whole-from') && $('gift-message-whole-from').value != '') {
                     parameters[$('gift-message-whole-from').name] = $('gift-message-whole-from').value;
                 }
+
                 if ($('gift-message-whole-to') && $('gift-message-whole-to').value != '') {
                     parameters[$('gift-message-whole-to').name] = $('gift-message-whole-to').value;
                 }
+
                 if ($('gift-message-whole-message') && $('gift-message-whole-message').value != '') {
                     parameters[$('gift-message-whole-message').name] = $('gift-message-whole-message').value;
                 }
+
                 if ($('billing-address-select') && $('billing-address-select').value != '') {
                     parameters[$('billing-address-select').name] = $('billing-address-select').value;
                 }
+
                 if ($('shipping-address-select') && $('shipping-address-select').value != '') {
                     parameters[$('shipping-address-select').name] = $('shipping-address-select').value;
                 }
