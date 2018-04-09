@@ -111,6 +111,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
                 )
             );
         }
+
         $quote->reserveOrderId()->save();
         $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Reserved an order ID for this quote.', Zend_Log::DEBUG);
         // use reserved merchant order id as reference id
@@ -154,6 +155,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
                 'Sezzle Pay API Error: Cannot get checkout Url'
             );
         }
+
         $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Received URL from Sezzle succesfully. URL : ' . $checkoutUrl, Zend_Log::DEBUG);
         return $checkoutUrl;
     }
@@ -163,12 +165,13 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
         return Mage::helper('sezzle_sezzlepay');
     }
 
-    public function refund(Varien_Object $payment, $amount) {
+    public function refund(Varien_Object $payment, $amount) 
+    {
         $reference = $payment->getData('sezzle_reference_id');
         $currency = $payment->getOrder()->getOrderCurrencyCode();
         $this->helper()->log('Session : ' . $this->getSessionID() . ' Refunding order reference: ' . $reference . ' amount: ' . $amount, Zend_Log::DEBUG);
         
-        if( $amount == 0 ) {
+        if($amount == 0) {
             $this->helper()->log('Session : ' . $this->getSessionID() . " Zero amount refund is detected", Zend_Log::ERR);
             return $this;
         }
@@ -191,6 +194,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
                 __('Sezzle Pay API Error: %s', $result->getMessage())
             );
         }
+
         $this->helper()->log('Session : ' . $this->getSessionID() . ' Refund with sezzle successful' . $amount, Zend_Log::DEBUG);
         return $this;
     }
@@ -218,6 +222,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
                 __('Sezzle Pay API Error: %s', $result->getMessage())
             );
         }
+
         return $this;
     }
 
@@ -254,6 +259,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
 
                 $session->setLastRecurringProfileIds($ids);
             }
+
             $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Ensuring amount due is 0.', Zend_Log::DEBUG);
             //ensure the order amount due is 0
             $order->setTotalDue(0);
@@ -280,6 +286,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
                 if (!$order->getEmailSent()) {
                     $order->sendNewOrderEmail();
                 }
+
                 // clear the cart only if capture successful
                 $session->getQuote()->setIsActive(0)->save();
                 $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Cleared cart.', Zend_Log::DEBUG);
@@ -293,7 +300,8 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
         return false; 
     }
 
-    protected function _cancelOrder($order) {
+    protected function _cancelOrder($order) 
+    {
         $this->helper()->log('Session : ' . $this->getSessionID() . ' Cancelling order.', Zend_Log::DEBUG);
         $order->setState(Mage_Sales_Model_Order::STATE_CANCELED, true, 'Cancelling sezzle payment.');
         $order->save();
@@ -301,7 +309,8 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
     }
 
     // rollback order creation
-    protected function _rollbackOrderCreation($order) {
+    protected function _rollbackOrderCreation($order) 
+    {
         $invoices = $order->getInvoiceCollection();
         foreach ($invoices as $invoice){
             //delete all invoice items
@@ -309,9 +318,11 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
             foreach ($items as $item) {
                 $item->delete();
             }
+
             //delete invoice
             $invoice->delete();
         }
+
         $creditnotes = $order->getCreditmemosCollection();
         foreach ($creditnotes as $creditnote){
             //delete all creditnote items
@@ -319,9 +330,11 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
             foreach ($items as $item) {
                 $item->delete();
             }
+
             //delete credit note
             $creditnote->delete();
         }
+
         $shipments = $order->getShipmentsCollection();
         foreach ($shipments as $shipment){
             //delete all shipment items
@@ -329,14 +342,17 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
             foreach ($items as $item) {
                 $item->delete();
             }
+
             //delete shipment
             $shipment->delete();
         }
+
         //delete all order items
         $items = $order->getAllItems(); 
         foreach ($items as $item) {
             $item->delete();
         }
+
         //delete payment
         $order->getPayment()->delete();
 
@@ -439,7 +455,8 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
         return $response;
     }
 
-    public function getSessionID() {
+    public function getSessionID() 
+    {
         $session = Mage::getSingleton('core/session');
         $SID = $session->getEncryptedSessionId();
         return $SID;

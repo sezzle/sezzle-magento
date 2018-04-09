@@ -1,4 +1,5 @@
-jQuery( document ).ready( function() {
+jQuery(document).ready(
+    function () {
     var form = document.getElementById('onestep_form');
     var action = form.getAttribute('action');
 
@@ -6,11 +7,11 @@ jQuery( document ).ready( function() {
     var original = form.submit;
     
     //hacks the form to prevent override by other plugins
-    jQuery(".btn-checkout").on("click", function(e) {
+    jQuery(".btn-checkout").on(
+        "click", function (e) {
     
-	if (payment.currentMethod == 'sezzlepay') {
-    
-    		e.preventDefault();
+        if (payment.currentMethod == 'sezzlepay') {
+            e.preventDefault();
             e.stopPropagation();
             var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
             // send logs
@@ -26,7 +27,7 @@ jQuery( document ).ready( function() {
                     }
                 }
             );
-	
+    
             // prepare params
             var params = form.serialize(true);
 
@@ -44,6 +45,7 @@ jQuery( document ).ready( function() {
                         catch (e) {
                             response = {};
                         }
+
                         if (response.redirect) {
                             location.href = response.redirect
                         }
@@ -55,6 +57,8 @@ jQuery( document ).ready( function() {
             );
         } else {
             original.apply(form, arguments);
-        }		
-    });
-});
+        }        
+        }
+    );
+    }
+);

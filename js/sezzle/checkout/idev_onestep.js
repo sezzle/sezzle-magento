@@ -4,14 +4,14 @@
 /**
  * Function specifically for Idev OneStepCheckout. The class especially for it
  */
-(function() {
+(function () {
     var form = $('onestepcheckout-form');
     var action = form.getAttribute('action');
 
     // save in variable for default .submit
     var original = form.submit; 
 
-    form.submit = function() {
+    form.submit = function () {
         if (payment.currentMethod == 'sezzlepay') {
             // send logs
             var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
@@ -34,13 +34,12 @@
 
             var customer_password = jQuery('#billing\\:customer_password').val();
 
-            if( typeof customer_password !== 'undefined' && customer_password.length ) {
+            if(typeof customer_password !== 'undefined' && customer_password.length) {
                 params.create_account = 1;
             }
 
             doSezzlepayAPICall(window.Sezzlepay.saveUrl, params);
             return false;
-
         } else {
             original.apply(this, arguments);
         }
@@ -48,7 +47,8 @@
 })();
 
 
-function doSezzlepayAPICall(saveURL, params) {
+function doSezzlepayAPICall(saveURL, params) 
+{
     // Ajax to start order token
     var request = new Ajax.Request(
         saveURL,

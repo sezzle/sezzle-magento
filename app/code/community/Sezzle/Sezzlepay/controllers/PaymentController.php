@@ -133,17 +133,16 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         );
         $logged_in = Mage::getSingleton('customer/session')->isLoggedIn();
         $create_account = $request->getParam("create_account");
-	
-	    if( !is_null($quote->getCheckoutMethod()) && (empty($create_account))) {
+    
+        if(!is_null($quote->getCheckoutMethod()) && (empty($create_account))) {
             return;
         }
 
         try {
-
-            if( $create_account ) {
+            if($create_account) {
                 $quote->setCheckoutMethod(Mage_Checkout_Model_Type_Onepage::METHOD_REGISTER);
             }
-            else if( !$create_account && !$logged_in ) {
+            else if(!$create_account && !$logged_in) {
                 $quote->setCheckoutMethod(Mage_Checkout_Model_Type_Onepage::METHOD_GUEST);
             }
             else {
@@ -151,7 +150,6 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             }
 
             $quote->save();
-	      
         }
         catch (Exception $e) {
             // Add error message
@@ -177,13 +175,15 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             $marker = "======== Sezzle ========";
             // read file from end and get the last log upload time
             $this->helper()->log("logAction called with param sendAllLogs=$sendAllLogs", Zend_Log::DEBUG);
-            if (!file_exists('var/log/sezzle-pay.log') ) {
+            if (!file_exists('var/log/sezzle-pay.log')) {
                 throw new Exception('File not found.');
             }
+
             $fp = fopen('var/log/sezzle-pay.log', 'r');
-            if ( !$fp ) {
+            if (!$fp) {
                 throw new Exception('File open failed.');
-            }  
+            }
+  
             $currentLine = '';
             $line_store = '';
             for($x_pos = 0; fseek($fp, $x_pos, SEEK_END) !== -1; $x_pos--) {
@@ -194,12 +194,14 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                 } else {
                     $currentLine = $char . $currentLine;
                 }
+
                 // Look for our marker
                 if (strrpos($currentLine, $marker) !== false && (int)$sendAllLogs === 0) {
                     $line_store .= $currentLine . PHP_EOL;
                     break;
                 }
             }
+
             fclose($fp);
             if ((int)$sendAllLogs === 0 && ($currentLine === '' || (strrpos($currentLine, $marker) === false))) {
                 // does not find the marker. Upload everything
@@ -218,9 +220,11 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                     return;
                 }
             }
+
             if ((int)$sendAllLogs === 1) {
                 $time = time();
             }
+
             $this->helper()->log($marker . ' ' .  date('Y-m-d H:i:s', time()));
             $merchant_id = Mage::getStoreConfig('sezzle_sezzlepay/product_widget/merchant_id');
             $url = $this->getApiRouter()->getSendLogsUrl($merchant_id);
@@ -247,7 +251,8 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         }
     }
 
-    private function getSezzleBaseModel() {
+    private function getSezzleBaseModel() 
+    {
         return Mage::getModel('sezzle_sezzlepay/PaymentMethod');
     }
 
@@ -321,6 +326,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             } else {
                 $this->_prepareSezzleCustomerQuote();
             }
+
             $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $this->_quote->getReservedOrderId() . ': Placing order.', Zend_Log::DEBUG);
             $placeOrder = Mage::getModel('sezzle_sezzlepay/PaymentMethod')->place($this->_quote, $reference);
             if ($placeOrder) {
@@ -329,13 +335,13 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                     $this->helper()->storeCreditPlaceOrder();
                     $this->helper()->giftCardsPlaceOrder();
                 }
+
                 $this->_redirect('checkout/onepage/success');
             } else {
                 $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $this->_quote->getReservedOrderId() . ': Order failed. Redirecting to checkout.', Zend_Log::DEBUG);
                 Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Sezzle checkout failed. Please select an alternative payment method.'));
                 $this->_redirect(Mage::helper('checkout/url')->getCheckoutUrl());
             }
-
         } catch (Exception $e) {
             // Debug log
             $this->_getSession()->addError($e->getMessage());
@@ -384,6 +390,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         } elseif ($shipping && isset($customerShipping) && !$customer->getDefaultShipping()) {
             $customerShipping->setIsDefaultShipping(true);
         }
+
         $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Setting customer on quote.', Zend_Log::DEBUG);
         $quote->setCustomer($customer)->setCustomerIsGuest(false);
     }
@@ -402,6 +409,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             $session = Mage::getSingleton('customer/session')->setCustomerAsLoggedIn($customer);
             return $this->_prepareSezzleCustomerQuote();
         }
+
         $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Prepare the new customer.', Zend_Log::DEBUG);
         $customer = $quote->getCustomer();
         $customerBilling = $billing->exportCustomerAddress();
@@ -428,6 +436,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         if ($quote->getCustomerGender() && !$billing->getCustomerGender()) {
             $billing->setCustomerGender($quote->getCustomerGender());
         }
+
         $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Copying fields from billing customer to customer for quote.', Zend_Log::DEBUG);
         Mage::helper('core')->copyFieldset('checkout_onepage_billing', 'to_customer', $billing, $customer);
 
@@ -553,7 +562,8 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         }
     }
 
-    public function getSessionID() {
+    public function getSessionID() 
+    {
         $session = Mage::getSingleton('core/session');
         $SID = $session->getEncryptedSessionId();
         return $SID;
