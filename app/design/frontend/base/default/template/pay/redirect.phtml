@@ -8,7 +8,9 @@
 <form name="sezzle" method="post" action="<?php echo $url; ?>">
     <?php
         foreach($data as $key => $value) {
-            echo "<input type='hidden' name='$key' value='$value'>";
+            $encode_value = htmlspecialchars($value, ENT_QUOTES | ENT_HTML401);
+            $encode_key = htmlspecialchars($key, ENT_QUOTES | ENT_HTML401);
+            echo "<input type='hidden' name='$encode_key' value='$encode_value'>";
         }
     ?>
 </form>
