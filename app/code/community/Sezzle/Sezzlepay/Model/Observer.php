@@ -1,10 +1,10 @@
 <?php
 class Sezzle_Sezzlepay_Model_Observer
 {
-    public function sendDailyData(Mage_Cron_Model_Schedule $schedule) 
+    public function sendDailyData() 
     {
         $this->sendOrdersToSezzle();
-        $this->sendHeartbeat();
+        // $this->sendHeartbeat();
     }
 
     protected function helper()
@@ -12,8 +12,9 @@ class Sezzle_Sezzlepay_Model_Observer
         return Mage::helper('sezzle_sezzlepay');
     }
 
-    protected function sendHeartbeat() 
+    public function sendHeartbeat() 
     {
+        $this->helper()->log('Starting to send Heartbeat to Sezzle');
         $is_public_key_entered = strlen(Mage::getStoreConfig('payment/sezzlepay/public_key')) > 0 ? true : false;
         $is_private_key_entered = strlen(Mage::getStoreConfig('payment/sezzlepay/private_key')) > 0 ? true : false;
         $is_widget_configured = strlen(explode('|', Mage::getStoreConfig('sezzle_sezzlepay/product_widget/xpath'))[0]) > 0 ? true : false;
@@ -52,6 +53,7 @@ class Sezzle_Sezzlepay_Model_Observer
 
     protected function sendOrdersToSezzle() 
     {
+        // $this->helper()->log('Started sending Orders to Sezzle');
         $today = date("Y-m-d H:i:s");
         $yesterday = date("Y-m-d H:i:s", strtotime("-1 days"));
 

@@ -251,6 +251,23 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         }
     }
 
+    public function heartbeatAction()
+    {
+        try {
+            $sendAllLogs = $this->getRequest()->getParam('all-logs');
+            $marker = "======== Sezzle ========";
+            $this->helper()->log("heartbeatAction3 called with param sendAllLogs=$sendAllLogs", Zend_Log::DEBUG);
+            $merchant_id = Mage::getStoreConfig('sezzle_sezzlepay/product_widget/merchant_id');
+            Mage::getModel('sezzle_sezzlepay/observer')->sendHeartBeat();
+            $this->helper()->log("heartbeatAction4 called with param sendAllLogs=$sendAllLogs", Zend_Log::DEBUG);
+        } catch (Exception $e) {
+            $this->helper()->log("Logging failed");
+            if($fp) {
+                fclose($fp);
+            }
+        }
+    }
+
     private function getSezzleBaseModel() 
     {
         return Mage::getModel('sezzle_sezzlepay/PaymentMethod');
@@ -352,8 +369,8 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
 
     protected function _prepareSezzleGuestQuote()
     {
-        $quote = $this->_quote;
         $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Preparing sezzle guest quote.', Zend_Log::DEBUG);
+        $quote = $this->_quote;
         $quote->setCustomerId(null)
             ->setCustomerEmail($quote->getBillingAddress()->getEmail())
             ->setCustomerIsGuest(true)
@@ -568,4 +585,5 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         $SID = $session->getEncryptedSessionId();
         return $SID;
     }
+
 } 
