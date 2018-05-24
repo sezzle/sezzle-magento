@@ -440,6 +440,10 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
     {
         $this->helper()->log('Session : ' . $this->getSessionID() . " Sending Request $url");
         $client = new Varien_Http_Client($url);
+        $client->setConfig(array(
+            'timeout'   => 80
+        ));
+
         if ($body !== false) {
             $client->setRawData(Mage::helper('core')->jsonEncode($body), 'application/json');
         }
