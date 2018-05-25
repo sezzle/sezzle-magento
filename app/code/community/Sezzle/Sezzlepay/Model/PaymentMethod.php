@@ -443,12 +443,13 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
         if ($body !== false) {
             $client->setRawData(Mage::helper('core')->jsonEncode($body), 'application/json');
         }
-
+        $this->helper()->log('Magento Version : ' . Mage::getVersion(), Zend_Log::DEBUG);
         if ($isAuth) {
             // Get the auth token
             $token = $this->getSezzleAuthToken();
             // set auth header
             $client->setHeaders('Authorization', "Bearer $token");
+            $client->setHeaders('Version', Mage::getVersion());
         }
 
         $response = $client->request($method);
