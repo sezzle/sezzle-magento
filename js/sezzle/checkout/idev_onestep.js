@@ -64,9 +64,100 @@ function doSezzlepayAPICall(saveURL, params)
                 catch (e) {
                     response = {};
                 }
-                
                 if (response.redirect) {
-                    location.href = response.redirect
+                    // location.href = response.redirect
+                    var modal = (function(){
+                        var 
+                        method = {},
+                        $overlay,
+                        $modal,
+                        $content,
+                        $close;
+                      
+                        // Append the HTML
+                      
+                        // Center the modal in the viewport
+                        method.center = function () {};
+                      
+                        // Open the modal
+                        method.open = function (settings) {};
+                      
+                        // Close the modal
+                        method.close = function () {};
+                      
+                        return method;
+                    }());
+                    $overlay = jQuery('<div id="overlay"></div>');
+                    $modal = jQuery('<div id="modal"></div>');
+                    $content = jQuery('<div id="content"></div>');
+                    $modal.append($content);
+
+                    $overlay.css({
+                        "position": "fixed",
+                        "top": "0",
+                        "left": "0",
+                        "width": "100%",
+                        "height": "100%",
+                        "background": "#000",
+                        "opacity": "0.5",
+                        "filter": "alpha(opacity=50)",
+                    });
+
+                    $modal.css({
+                        "position": "absolute",
+                        "background": "url(tint20.png) 0 0 repeat",
+                        "background": "rgba(0,0,0,0.2)",
+                        "border-radius": "14px",
+                        "padding": "8px",
+                    });
+
+                    $content.css({
+                        "border-radius": "8px",
+                        "background": "#fff"
+                    });
+
+                    jQuery('body').append($overlay, $modal);
+
+                    modal.center = function () {
+                        var top, left;
+                      
+                        top = Math.max(jQuery(window).height() - $modal.outerHeight(), 0) / 2;
+                        left = Math.max(jQuery(window).width() - $modal.outerWidth(), 0) / 2;
+                      
+                        $modal.css({
+                          top:top + jQuery(window).scrollTop(), 
+                          left:left + jQuery(window).scrollLeft()
+                        });
+                    };
+
+                    modal.center = function () {
+                        var top, left;
+                      
+                        top = Math.max(jQuery(window).height() - $modal.outerHeight(), 0) / 2;
+                        left = Math.max(jQuery(window).width() - $modal.outerWidth(), 0) / 2;
+                      
+                        $modal.css({
+                          top:top + jQuery(window).scrollTop(), 
+                          left:left + jQuery(window).scrollLeft()
+                        });
+                    };
+
+                    modal.open = function (settings) {
+                        $content.empty().append(settings.content);
+                        $modal.css({
+                          width: settings.width || 'auto', 
+                          height: settings.height || 'auto'
+                        })
+                      
+                        modal.center();
+                      
+                        jQuery(window).bind('resize.modal', modal.center);
+                      
+                        $modal.show();
+                        $overlay.show();
+                    };
+
+                    modal.open({content: "<iframe height='610px' src=" + response.redirect + "></iframe>"});
                 }
 
             }.bind(this),
