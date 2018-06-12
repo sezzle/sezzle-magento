@@ -374,6 +374,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
     // Create checkout data for sezzle API from quote
     protected function createCheckoutRequestBody($quote, $reference, $cancelUrl, $completeUrl) 
     {
+        $precision = 2 //precision to which the price needs to be rounded off
         $requestBody = array();
         $requestBody["amount_in_cents"] = round($quote->getGrandTotal(), $precision) * 100;
         $requestBody["currency_code"] = Mage::app()->getStore()->getCurrentCurrencyCode();
@@ -409,7 +410,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
         $requestBody["items"] = array();
         foreach ($quote->getAllVisibleItems() as $item) {
             $productName = $item->getProduct()->getName();
-            $productPrice = $item->getProduct()->getPrice() * 100;
+            $productPrice = $item->getProduct()->getPrice();
             $productSKU = $item->getProduct()->getSku();
             $productQuantity = $item->getQty();
             $itemData = array(
