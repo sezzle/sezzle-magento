@@ -417,7 +417,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
                 "sku" => $productSKU,
                 "quantity" => $productQuantity,
                 "price" => array(
-                    "amount_in_cents" => $productPrice,
+                    "amount_in_cents" => round($productPrice, $precision) * 100,
                     "currency" => $requestBody["currency_code"]
                 )
             );
