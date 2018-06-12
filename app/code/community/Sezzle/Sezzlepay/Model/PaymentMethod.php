@@ -375,7 +375,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
     protected function createCheckoutRequestBody($quote, $reference, $cancelUrl, $completeUrl) 
     {
         $requestBody = array();
-        $requestBody["amount_in_cents"] = $quote->getGrandTotal() * 100;
+        $requestBody["amount_in_cents"] = round($quote->getGrandTotal(), $precision) * 100;
         $requestBody["currency_code"] = Mage::app()->getStore()->getCurrentCurrencyCode();
         $requestBody["order_description"] = $reference;
         $requestBody["order_reference_id"] = $reference;
