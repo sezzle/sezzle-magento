@@ -30,7 +30,7 @@ jQuery(document).ready(
     
             // prepare params
             var params = form.serialize(true);
-
+            Sezzle.initialize();
             // Ajax to start order token
             new Ajax.Request(
                 window.Sezzlepay.saveUrl,
@@ -47,7 +47,7 @@ jQuery(document).ready(
                         }
 
                         if (response.redirect) {
-                            location.href = response.redirect
+                            Sezzle.show(response.redirect);
                         }
                     }.bind(this),
                     onFailure: function () {

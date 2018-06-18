@@ -47,6 +47,10 @@ class Sezzle_Sezzlepay_Model_Api_Router
         return $this->getBaseApiUrl() . '/v1/logs/' . $merchant_id;
     }
 
+    public function getCheckoutJsUrl() {
+        return $this->getBaseApiUrl() . '/scripts/sezzlepay.js';
+    }
+
     // Returns base api url
     protected function getBaseApiUrl() 
     {

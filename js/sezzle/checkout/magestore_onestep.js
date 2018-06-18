@@ -67,7 +67,7 @@
                 if ($('shipping-address-select') && $('shipping-address-select').value != '') {
                     parameters[$('shipping-address-select').name] = $('shipping-address-select').value;
                 }
-
+                Sezzle.initialize();
                 /**
                  * Perform ajax to Afterpay to get order token
                  */
@@ -88,7 +88,8 @@
                             }
 
                             if (response.redirect) {
-                                location.href = response.redirect
+                                
+                                Sezzle.show(response.redirect);
                             }
 
                         }.bind(this),

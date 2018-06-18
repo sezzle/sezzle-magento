@@ -15,7 +15,6 @@
         if (payment.currentMethod == 'sezzlepay') {
             // send logs
             var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
-            console.log('sendAllLogs', sendAllLogs);
             new Ajax.Request(
                 window.Sezzlepay.logUrl,
                 {
@@ -49,6 +48,7 @@
 
 function doSezzlepayAPICall(saveURL, params) 
 {
+    Sezzle.initialize();
     // Ajax to start order token
     var request = new Ajax.Request(
         saveURL,
@@ -66,7 +66,8 @@ function doSezzlepayAPICall(saveURL, params)
                 }
                 
                 if (response.redirect) {
-                    location.href = response.redirect
+                    // location.href = response.redirect
+                    Sezzle.show(response.redirect);
                 }
 
             }.bind(this),
