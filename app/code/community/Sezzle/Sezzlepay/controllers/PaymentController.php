@@ -534,18 +534,22 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
 
     protected function _saveCart($array)
     {
-        $skipShipping = false;
         $request = Mage::app()->getRequest();
         foreach ($array as $type => $data) {
             $result = array();
             switch ($type) {
                 case 'billing':
                     $result = Mage::getModel('checkout/type_onepage')->saveBilling($data, $request->getPost('billing_address_id', false));
-                    $skipShipping = array_key_exists('use_for_shipping', $data) && $data['use_for_shipping'] ? true : false;
+                    $useBillingForShipping = array_key_exists('use_for_shipping', $data) && $data['use_for_shipping'] ? true : false;
+                    if ($useBillingForShipping) {
+                        $result = Mage::getModel('checkout/type_onepage')->saveShipping($data, $request->getPost('billing_address_id', false));
+                    }
                     break;
                 case 'shipping':
-                    if (!$skipShipping) {
-                        $result = Mage::getModel('checkout/type_onepage')->saveShipping($data, $request->getPost('shipping_address_id', false));
+                    $result = Mage::getModel('checkout/type_onepage')->saveShipping($data, $request->getPost('shipping_address_id', false));
+                    $useShippingForBilling = array_key_exists('use_for_billing', $data) && $data['use_for_billing'] ? true : false;
+                    if ($useShippingForBilling) {
+                        $result = Mage::getModel('checkout/type_onepage')->saveBilling($data, $request->getPost('shipping_address_id', false));
                     }
                     break;
                 case 'shipping_method':
@@ -556,9 +560,9 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                     break;
             }
 
-            if (array_key_exists('error', $result) && $result['error'] == 1) {
-                Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('%s', json_encode($result['message'])));
-            }
+            // if (array_key_exists('error', $result) && $result['error'] == 1) {
+            //     Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('%s', json_encode($result['message'])));
+            // }
         }
     }
 
