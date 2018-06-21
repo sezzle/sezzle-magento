@@ -1,5 +1,6 @@
 <script>
     window.Sezzlepay = window.Sezzlepay || {};
+    window.Sezzlepay.redirectMode = "<?php echo $this->getMode() ?>";
     window.Sezzlepay.saveUrl = "<?php echo $this->getUrl('sezzlepay/payment/start', array('form_key' => Mage::getSingleton('core/session')->getFormKey())) ?>";
     window.Sezzlepay.logUrl = "<?php echo $this->getUrl('sezzlepay/payment/log', array('form_key' => Mage::getSingleton('core/session')->getFormKey())) ?>";
 </script>

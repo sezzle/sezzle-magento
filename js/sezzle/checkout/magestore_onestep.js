@@ -67,7 +67,9 @@
                 if ($('shipping-address-select') && $('shipping-address-select').value != '') {
                     parameters[$('shipping-address-select').name] = $('shipping-address-select').value;
                 }
-                Sezzle.initialize();
+                Sezzle.initialize({
+                    mode: window.Sezzlepay.redirectMode
+                });
                 /**
                  * Perform ajax to Afterpay to get order token
                  */
@@ -88,8 +90,12 @@
                             }
 
                             if (response.redirect) {
-                                
-                                Sezzle.show(response.redirect);
+                                // location.href = response.redirect
+                                if (window.Sezzlepay.redirectMode === 'window') {
+                                    Sezzle.show(response.redirect);
+                                } else {
+                                    Sezzle.redirect(response.redirect);
+                                }
                             }
 
                         }.bind(this),

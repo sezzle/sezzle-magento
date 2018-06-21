@@ -18,7 +18,9 @@
             // check payment method
             if (payment.currentMethod == 'sezzlepay') {
                 // send logs
-                Sezzle.initialize();
+                Sezzle.initialize({
+                    mode: window.Sezzlepay.redirectMode
+                });
                 var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
                 new Ajax.Request(
                     window.Sezzlepay.logUrl,
@@ -46,7 +48,11 @@
 
                     if (response.redirect) {
                         // location.href = response.redirect
-                        Sezzle.show(response.redirect);
+                        if (window.Sezzlepay.redirectMode === 'window') {
+                            Sezzle.show(response.redirect);
+                        } else {
+                            Sezzle.redirect(response.redirect);
+                        }
                     }
                 };
             }

@@ -48,7 +48,9 @@
 
 function doSezzlepayAPICall(saveURL, params) 
 {
-    Sezzle.initialize();
+    Sezzle.initialize({
+        mode: window.Sezzlepay.redirectMode
+    });
     // Ajax to start order token
     var request = new Ajax.Request(
         saveURL,
@@ -67,7 +69,11 @@ function doSezzlepayAPICall(saveURL, params)
                 
                 if (response.redirect) {
                     // location.href = response.redirect
-                    Sezzle.show(response.redirect);
+                    if (window.Sezzlepay.redirectMode === 'window') {
+                        Sezzle.show(response.redirect);
+                    } else {
+                        Sezzle.redirect(response.redirect);
+                    }
                 }
 
             }.bind(this),
