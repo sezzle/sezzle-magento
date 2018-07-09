@@ -55,6 +55,9 @@
                         }
                     }
                 };
+                if (window.Sezzlepay.redirectMode === 'window') {
+                    this.onSave = function(){};
+                }
             }
 
             reviewSave.apply(this, arguments);
