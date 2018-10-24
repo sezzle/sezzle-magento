@@ -29,4 +29,12 @@
             <block type="sezzle_sezzlepay/redirect" name="sezzlepay.checkout.magestore.info" after="-" template="sezzlepay/checkout/onestep.phtml"/>
         </reference>
     </onestepcheckout_index_index>
+    <firecheckout_index_index>
+        <reference name="head">
+            <block type="sezzle_sezzlepay/config" name="sezzle_sezzlepay.checkout.onestep.config" template="sezzlepay/checkout/config.phtml" />
+        </reference>
+        <reference name="before_body_end">
+            <block type="sezzle_sezzlepay/redirect" name="sezzlepay.checkout.magestore.info" after="-" template="sezzlepay/checkout/firecheckout.phtml"/>
+        </reference>
+    </firecheckout_index_index>
 </layout>
