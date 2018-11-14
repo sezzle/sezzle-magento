@@ -63,3 +63,7 @@ The process of upgrading the this plugin involves the complete removal of Sezzle
 13. Login to Magento Admin and navigate to System/Cache Management
 14. Flush the cache storage by selecting Flush Cache Storage
 15. Flush the js/css cache.
+
+
+## Sezzle documentation and testing
+All information about testing can be found in `https://docs.sezzle.com/`
