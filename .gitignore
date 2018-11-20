@@ -25,6 +25,9 @@
 !/phpunit.xml*
 !/phpdox.xml*
 
+# Don't ignore readme files
+!/*.md
+
 # Allow shell scripts for kount ext
 /shell/*
 !/shell/bv_*.php

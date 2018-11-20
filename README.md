@@ -67,3 +67,6 @@ The process of upgrading the this plugin involves the complete removal of Sezzle
 
 ## Sezzle documentation and testing
 All information about testing can be found in `https://docs.sezzle.com/`
+
+## Troubleshooting
+1. [a Invalid header line detected](Troubleshooting.md#invalid-header-line-detected)
