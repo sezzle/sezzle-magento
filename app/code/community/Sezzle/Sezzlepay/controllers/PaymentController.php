@@ -327,6 +327,9 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                 $this->_prepareSezzleCustomerQuote();
             }
 
+            // set the reference id to the payment
+            $this->_quote->getPayment()->setData('sezzle_reference_id', $reference)->save();
+
             $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $this->_quote->getReservedOrderId() . ': Placing order.', Zend_Log::DEBUG);
             $placeOrder = Mage::getModel('sezzle_sezzlepay/PaymentMethod')->place($this->_quote, $reference);
             if ($placeOrder) {
