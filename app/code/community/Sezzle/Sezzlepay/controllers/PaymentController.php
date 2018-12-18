@@ -348,6 +348,17 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             }
         } catch (Exception $e) {
             // Debug log
+            $this->helper()->log(
+                $this->__(
+                    'Order creation failed. %s. SezzleOrderID=%s QuoteID=%s ReservedOrderID=%s Stack Trace=%s',
+                    $e->getMessage(),
+                    $this->getRequest()->getParam('magento_sezzle_id'),
+                    $this->_quote->getId(),
+                    $this->_quote->getReservedOrderId(),
+		            $e->getTraceAsString()
+                ),
+                Zend_Log::ERR
+            );
             $this->_getSession()->addError($e->getMessage());
 
             $this->_redirect('checkout/cart');
