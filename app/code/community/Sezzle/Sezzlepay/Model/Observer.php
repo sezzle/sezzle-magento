@@ -121,7 +121,7 @@ class Sezzle_Sezzlepay_Model_Observer
 
     private function getSezzleBaseModel() 
     {
-        return Mage::getModel('sezzle_sezzlepay/PaymentMethod');
+        return Mage::getModel('sezzle_sezzlepay/paymentmethod');
     }
 
     protected function getApiRouter() 

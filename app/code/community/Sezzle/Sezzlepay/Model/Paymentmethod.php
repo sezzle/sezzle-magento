@@ -1,5 +1,5 @@
 <?php
-class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abstract
+class Sezzle_Sezzlepay_Model_Paymentmethod extends Mage_Payment_Model_Method_Abstract
 {
     /**
      * Availability options

@@ -1,8 +1,20 @@
 <?php
 
+/**
+ * Sezzlepay product config block
+ *
+ * @category   Sezzle
+ * @package    Sezzle_Sezzlepay
+ * @author     Sezzle Team
+ */
 class Sezzle_Sezzlepay_Block_ProductConfig extends Mage_Core_Block_Template
 {
-    public function getJsConfig() 
+    /**
+     * Create JS configurations for Sezzle widget
+     *
+     * @return array
+     */
+    public function getJsConfig()
     {
         $targetXPath = explode('|', Mage::getStoreConfig('sezzle_sezzlepay/product_widget/xpath'));
         $renderToPath = explode('|', Mage::getStoreConfig('sezzle_sezzlepay/product_widget/renderXPath'));
@@ -17,20 +29,20 @@ class Sezzle_Sezzlepay_Block_ProductConfig extends Mage_Core_Block_Template
         $maxPrice = Mage::getStoreConfig('sezzle_sezzlepay/product_widget/maxPrice');
 
         return array(
-            'targetXPath'          => $targetXPath,
-            'renderToPath'         => $renderToPath,
-            'forcedShow'           => $forcedShow,
-            'alignment'            => $alignment,
-            'merchantID'           => $merchantID,
-            'theme'                => $theme,
-            'widthType'            => $widthType,
-            'widgetType'           => 'product-page',
-            'minPrice'             => 0,
-            'maxPrice'             => 100000,
-            'imageUrl'             => $imageUrl,
-            'minPrice'             => $minPrice,
-            'maxPrice'             => $maxPrice,
-            'hideClasses'          => $hideClasses,
+            'targetXPath' => $targetXPath,
+            'renderToPath' => $renderToPath,
+            'forcedShow' => $forcedShow,
+            'alignment' => $alignment,
+            'merchantID' => $merchantID,
+            'theme' => $theme,
+            'widthType' => $widthType,
+            'widgetType' => 'product-page',
+            'minPrice' => 0,
+            'maxPrice' => 100000,
+            'imageUrl' => $imageUrl,
+            'minPrice' => $minPrice,
+            'maxPrice' => $maxPrice,
+            'hideClasses' => $hideClasses,
         );
     }
 }
