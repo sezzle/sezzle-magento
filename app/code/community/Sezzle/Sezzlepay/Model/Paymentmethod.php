@@ -178,7 +178,7 @@ class Sezzle_Sezzlepay_Model_Paymentmethod extends Mage_Payment_Model_Method_Abs
 
         // Refund
         $result = $this->_sendApiRequest(
-            $this->getApiRouter()->checkoutRefundUrl($reference),
+            $this->getApiRouter()->getCheckoutRefundUrl($reference),
             array(
                 "amount" => array(
                     "amount_in_cents" => $amount * 100,
@@ -211,7 +211,7 @@ class Sezzle_Sezzlepay_Model_Paymentmethod extends Mage_Payment_Model_Method_Abs
         $reference = $payment->getData('sezzle_reference_id');
         // Charge
         $result = $this->_sendApiRequest(
-            $this->getApiRouter()->checkoutCompleteUrl($reference),
+            $this->getApiRouter()->getCheckoutCompleteUrl($reference),
             null,
             true,
             Varien_Http_Client::POST

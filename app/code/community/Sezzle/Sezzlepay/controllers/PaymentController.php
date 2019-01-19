@@ -16,6 +16,8 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
 
     /**
      * Redirect user to Sezzle
+     *
+     * @throws Mage_Core_Exception
      */
     public function startAction()
     {
@@ -76,8 +78,8 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                     'Session : ' . $this->getSessionID() . ' Store is enterprise edition.',
                     Zend_Log::DEBUG
                 );
-                $this->_quote = Mage::helper('sezzle_sezzlepay')->storeCreditSessionSet($this->_quote);
-                $this->_quote = Mage::helper('sezzle_sezzlepay')->giftCardsSessionSet($this->_quote);
+                $this->_quote = Mage::helper('sezzle_sezzlepay')->setStoreCreditSession($this->_quote);
+                $this->_quote = Mage::helper('sezzle_sezzlepay')->setGiftCardsSession($this->_quote);
                 Mage::log(
                     'Session : ' . $this->getSessionID() . ' Set credit and card session.',
                     Zend_Log::DEBUG
@@ -133,6 +135,8 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
     }
 
     /**
+     * Save the cart
+     *
      * @param $array
      */
     protected function _saveCart($array)
@@ -303,8 +307,8 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
     public function cancelAction()
     {
         if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
-            Mage::helper('sezzle_sezzlepay')->storeCreditSessionUnset();
-            Mage::helper('sezzle_sezzlepay')->giftCardsSessionUnset();
+            Mage::helper('sezzle_sezzlepay')->unsetStoreCreditSession();
+            Mage::helper('sezzle_sezzlepay')->unsetGiftCardsSession();
         }
         $this->_redirect('checkout/cart');
     }
@@ -479,6 +483,8 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
 
     /**
      * Place order action
+     *
+     * @throws Mage_Core_Exception
      */
     public function placeOrderAction()
     {

@@ -1,7 +1,20 @@
 <?php
-class Sezzle_Sezzlepay_Model_ApiMode
+
+/**
+ * Sezzlepay Apimode model
+ *
+ * @category   Sezzle
+ * @package    Sezzle_Sezzlepay
+ * @author     Sezzle Team
+ */
+class Sezzle_Sezzlepay_Model_Apimode
 {
-    public function toOptionArray() 
+    /**
+     * Return API mode
+     *
+     * @return array
+     */
+    public function toOptionArray()
     {
         return array(
             array(

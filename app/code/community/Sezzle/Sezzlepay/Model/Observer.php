@@ -1,7 +1,8 @@
 <?php
+
 class Sezzle_Sezzlepay_Model_Observer
 {
-    public function sendDailyData(Mage_Cron_Model_Schedule $schedule) 
+    public function sendDailyData(Mage_Cron_Model_Schedule $schedule)
     {
         $this->sendOrdersToSezzle();
         $this->sendHeartbeat();
@@ -12,7 +13,7 @@ class Sezzle_Sezzlepay_Model_Observer
         return Mage::helper('sezzle_sezzlepay');
     }
 
-    protected function sendHeartbeat() 
+    protected function sendHeartbeat()
     {
         $is_public_key_entered = strlen(Mage::getStoreConfig('payment/sezzlepay/public_key')) > 0 ? true : false;
         $is_private_key_entered = strlen(Mage::getStoreConfig('payment/sezzlepay/private_key')) > 0 ? true : false;
@@ -50,7 +51,7 @@ class Sezzle_Sezzlepay_Model_Observer
         }
     }
 
-    protected function sendOrdersToSezzle() 
+    protected function sendOrdersToSezzle()
     {
         $today = date("Y-m-d H:i:s");
         $yesterday = date("Y-m-d H:i:s", strtotime("-1 days"));
@@ -119,14 +120,14 @@ class Sezzle_Sezzlepay_Model_Observer
         $this->helper()->log('Order data sent to sezzle succefully');
     }
 
-    private function getSezzleBaseModel() 
-    {
-        return Mage::getModel('sezzle_sezzlepay/paymentmethod');
-    }
-
-    protected function getApiRouter() 
+    protected function getApiRouter()
     {
         return Mage::getModel('sezzle_sezzlepay/api_router');
+    }
+
+    private function getSezzleBaseModel()
+    {
+        return Mage::getModel('sezzle_sezzlepay/paymentmethod');
     }
 
 }

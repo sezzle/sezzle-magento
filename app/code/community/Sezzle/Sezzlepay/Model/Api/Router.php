@@ -1,56 +1,101 @@
 <?php
 
 /**
- * Used for creating routes based on selected config
+ * Sezzlepay gift card model
+ *
+ * @category   Sezzle
+ * @package    Sezzle_Sezzlepay
+ * @author     Sezzle Team
  */
 class Sezzle_Sezzlepay_Model_Api_Router
 {
 
     const API_MODE_STAGING = 'staging';
-    const API_MODE_LOCAL   = 'local';
+    const API_MODE_LOCAL = 'local';
     const API_MODE_LIVE = 'live';
     const API_MODE_SANDBOX = 'sandbox';
 
-    // Returns the authentication token url
-    public function getAuthTokenUrl() 
+    /**
+     * Get auth token url
+     *
+     * @return string
+     */
+    public function getAuthTokenUrl()
     {
         return $this->getBaseApiUrl() . '/v1/authentication';
     }
 
-    public function checkoutRefundUrl($reference) 
+    /**
+     * Get checkout refund url
+     *
+     * @param $reference
+     * @return string
+     */
+    public function getCheckoutRefundUrl($reference)
     {
         return $this->getBaseApiUrl() . '/v1/orders' . '/' . $reference . '/refund';
     }
 
-    public function checkoutCompleteUrl($reference) 
+    /**
+     * Get checkout complete url
+     *
+     * @param $reference
+     * @return string
+     */
+    public function getCheckoutCompleteUrl($reference)
     {
         return $this->getBaseApiUrl() . '/v1/checkouts' . '/' . $reference . '/complete';
     }
 
-    public function getSubmitCheckoutDetailsAndGetRedirectUrl() 
+    /**
+     * Get submit checkout details and get redirecturl
+     *
+     * @return string
+     */
+    public function getSubmitCheckoutDetailsAndGetRedirectUrl()
     {
         return $this->getBaseApiUrl() . '/v1/checkouts';
     }
 
+    /**
+     * Get orders submit url
+     *
+     * @return string
+     */
     public function getOrdersSubmitUrl()
     {
         return $this->getBaseApiUrl() . '/v1/merchant_data' . '/magento/merchant_orders';
     }
 
+    /**
+     * Get heartbeat url
+     *
+     * @return string
+     */
     public function getHeartbeatUrl()
     {
         return $this->getBaseApiUrl() . '/v1/merchant_data' . '/magento/heartbeat';
     }
 
-    public function getSendLogsUrl($merchant_id) 
+    /**
+     * Get send log url
+     *
+     * @param $merchant_id
+     * @return string
+     */
+    public function getSendLogsUrl($merchantId)
     {
-        return $this->getBaseApiUrl() . '/v1/logs/' . $merchant_id;
+        return $this->getBaseApiUrl() . '/v1/logs/' . $merchantId;
     }
 
-    // Returns base api url
-    protected function getBaseApiUrl() 
+    /**
+     * Get base api url
+     *
+     * @return bool|string
+     */
+    protected function getBaseApiUrl()
     {
-        $apiMode      = Mage::getStoreConfig(
+        $apiMode = Mage::getStoreConfig(
             'payment/sezzlepay/' . Sezzle_Sezzlepay_Model_Paymentmethod::API_MODE_CONFIG_FIELD
         );
         $overrideBaseUrl = Mage::getStoreConfig(
@@ -59,28 +104,31 @@ class Sezzle_Sezzlepay_Model_Api_Router
         if ($overrideBaseUrl) {
             return $this->removeSlashFromUrl($overrideBaseUrl);
         }
-
         switch ($apiMode) {
             case self::API_MODE_STAGING:
                 return 'https://staging.gateway.sezzle.com';
             case self::API_MODE_SANDBOX:
                 return 'https://sandbox.gateway.sezzle.com';
-            case self:API_MODE_LOCAL:
+            case self::API_MODE_LOCAL:
                 return 'http://127.0.0.1:9002';
-            case self:API_MODE_LIVE:
+            case self::API_MODE_LIVE:
                 return 'https://gateway.sezzle.com';
             default:
                 return 'https://gateway.sezzle.com';
         }
     }
 
-    // Removes / from end of url if present
-    protected function removeSlashFromUrl($url) 
+    /**
+     * Removal of slash from url
+     *
+     * @param $url
+     * @return bool|string
+     */
+    protected function removeSlashFromUrl($url)
     {
         if (substr($url, -1) == '/') {
-            $url = substr($string, 0, -1);
+            $url = substr($url, 0, -1);
         }
-
         return $url;
     }
 }
