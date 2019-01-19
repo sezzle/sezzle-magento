@@ -142,7 +142,7 @@ class Sezzle_Sezzlepay_Helper_Data extends Mage_Core_Helper_Abstract
             if ($quote->getSubtotal() == $subtotal) {
                 $quote->setGrandTotal($grandTotal)->save();
             }
-            Mage::log($this->__('Store Credit being used: ' . $balance . ", Grand Total: " . $grandTotal));
+            $this->log($this->__('Store Credit being used: ' . $balance . ", Grand Total: " . $grandTotal));
             return $quote;
         }
         return $quote;
@@ -211,7 +211,7 @@ class Sezzle_Sezzlepay_Helper_Data extends Mage_Core_Helper_Abstract
                 return $quote;
             }
         } catch (Exception $exception) {
-            Mage::log(
+            $this->log(
                 $this->__(
                     'Error capturing gift cards. %s.', $exception->getMessage(),
                     Zend_Log::ERR

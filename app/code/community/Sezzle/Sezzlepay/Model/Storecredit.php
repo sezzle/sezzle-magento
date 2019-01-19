@@ -75,6 +75,8 @@ class Sezzle_Sezzlepay_Model_Storecredit
         if (Mage::getSingleton('customer/session')->isLoggedIn() &&
             Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance')
         ) {
+            $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
+            $helper = $sezzlePaymentModel->helper();
             $grandTotal = Mage::getSingleton('checkout/session')->getData('sezzleGrandTotal');
             $subtotal = Mage::getSingleton('checkout/session')->getData('sezzleSubtotal');
             $balance = Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance');
@@ -84,7 +86,7 @@ class Sezzle_Sezzlepay_Model_Storecredit
             if ($quote->getSubtotal() == $subtotal) {
                 $quote->setGrandTotal($grandTotal)->save();
             }
-            Mage::log($this->__('Store Credit being used: ' . $balance . ", Grand Total: " . $grandTotal));
+            $helper->log($this->__('Store Credit being used: ' . $balance . ", Grand Total: " . $grandTotal));
             return $quote;
         }
         return $quote;
@@ -126,6 +128,8 @@ class Sezzle_Sezzlepay_Model_Storecredit
     {
         // Get the first customer in the store's ID
         $customerId = Mage::getSingleton('customer/session')->getId();
+        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
+        $helper = $sezzlePaymentModel->helper();
         $balance = Mage::getModel('enterprise_customerbalance/balance')
             ->setCustomerId($customerId)
             ->setWebsiteId(Mage::app()->getWebsite()->getId($orderId))
@@ -134,7 +138,7 @@ class Sezzle_Sezzlepay_Model_Storecredit
             //safeguard against a possibility of minus balance
             $balance->setAmountDelta(-1 * $balanceUsed)
                 ->setUpdatedActionAdditionalInfo("Order #" . $orderId);
-            $this->log(
+            $helper->log(
                 "Customer Balance deduction fallback engaged. Order: "
                 . $orderId
                 . " Balance Delta: "

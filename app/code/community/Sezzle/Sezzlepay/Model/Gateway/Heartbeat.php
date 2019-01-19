@@ -17,6 +17,8 @@ class Sezzle_Sezzlepay_Model_Gateway_Heartbeat
      */
     public function sendHeartbeat()
     {
+        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
+        $helper = $sezzlePaymentModel->helper();
         $isPublicKeyEntered = strlen(Mage::getStoreConfig('payment/sezzlepay/public_key')) > 0 ? true : false;
         $isPrivateKeyEntered = strlen(Mage::getStoreConfig('payment/sezzlepay/private_key')) > 0 ? true : false;
         $isWidgetConfigured = strlen(explode('|', Mage::getStoreConfig('sezzle_sezzlepay/product_widget/xpath'))[0]) > 0 ? true : false;
@@ -46,9 +48,9 @@ class Sezzle_Sezzlepay_Model_Gateway_Heartbeat
                     __('Sezzle Pay API Error: %s', $result->getMessage())
                 );
             }
-            $this->helper()->log('Heartbeat sent to Sezzle');
+            $helper->log('Heartbeat sent to Sezzle');
         } else {
-            $this->helper()->log('Could not send Heartbeat to Sezzle. Please set api keys.');
+            $helper->log('Could not send Heartbeat to Sezzle. Please set api keys.');
         }
     }
 }

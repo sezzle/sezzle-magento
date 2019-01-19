@@ -20,6 +20,8 @@ class Sezzle_Sezzlepay_Model_Gateway_Order
         $yesterday = date("Y-m-d H:i:s", strtotime("-1 days"));
         $yesterday = date('Y-m-d H:i:s', strtotime($yesterday));
         $today = date('Y-m-d H:i:s', strtotime($today));
+        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
+        $helper = $sezzlePaymentModel->helper();
         try {
             $ordersCollection = Mage::getModel('sales/order')->getCollection()
                 // Get only if status is complete or processing
@@ -39,7 +41,7 @@ class Sezzle_Sezzlepay_Model_Gateway_Order
                     )
                 )
                 ->addAttributeToSelect('increment_id');
-            $url = $this->getApiRouter()->getOrdersSubmitUrl();
+            $url = $sezzlePaymentModel->getApiRouter()->getOrdersSubmitUrl();
             $body = $this->_buildOrderPayload($ordersCollection);
             $result = $this->getSezzleBaseModel()->_sendApiRequest(
                 $url,
@@ -53,9 +55,9 @@ class Sezzle_Sezzlepay_Model_Gateway_Order
                     __('Sezzle Pay API Error: %s', $result->getMessage())
                 );
             }
-            $this->helper()->log('Order data sent to sezzle successfully');
+            $helper->log('Order data sent to sezzle successfully');
         } catch (Exception $e) {
-            $this->helper()->log('Error while sending order to Sezzle' . $e->getMessage());
+            $helper->log('Error while sending order to Sezzle' . $e->getMessage());
         }
     }
 

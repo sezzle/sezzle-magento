@@ -25,7 +25,7 @@ class Sezzle_Sezzlepay_Model_Api_Processor
     public function sendApiRequest($url, $body, $isAuth = true, $method = Varien_Http_Client::GET)
     {
         $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
-        Mage::log('Session : ' . $sezzlePaymentModel->getSessionID() . " Sending Request $url");
+        $this->helper()->log('Session : ' . $sezzlePaymentModel->getSessionID() . " Sending Request $url");
         $client = new Varien_Http_Client($url);
         $client->setConfig(array(
             'timeout' => 80
@@ -55,6 +55,7 @@ class Sezzle_Sezzlepay_Model_Api_Processor
     {
         try {
             $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
+            $helper = $sezzlePaymentModel->helper();
             $result = $this->_sendApiRequest(
                 $sezzlePaymentModel->getApiRouter()->getAuthTokenUrl(),
                 $this->_getSezzleAuthHeader(),
@@ -78,7 +79,7 @@ class Sezzle_Sezzlepay_Model_Api_Processor
             }
             return $token;
         } catch (Exception $e) {
-            Mage::log(
+            $helper->log(
                 'Session : ' . $sezzlePaymentModel->getSessionID() . $e->getMessage(),
                 Zend_Log::ERR
             );

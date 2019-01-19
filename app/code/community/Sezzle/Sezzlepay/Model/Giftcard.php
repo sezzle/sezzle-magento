@@ -47,6 +47,8 @@ class Sezzle_Sezzlepay_Model_Giftcard
     {
         $balance = Mage::getSingleton('checkout/session')->getData('sezzleGiftCardsAmount');
         $giftCards = Mage::getSingleton('checkout/session')->getData('sezzleGiftCards');
+        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
+        $helper = $sezzlePaymentModel->helper();
         try {
             if (!empty($balance) && $balance > 0) {
                 $quote->setGiftCardsAmountUsed($balance);
@@ -63,9 +65,9 @@ class Sezzle_Sezzlepay_Model_Giftcard
                         $giftCardsNewAmount = $balance;
                         $giftCardsAccount->charge($giftCardsNewAmount);
                         $giftCardsAccount->save();
-                        $this->log($this->__('Gift Cards used: ' . $giftCards . ' Amount being used: ' . $balance));
+                        $helper->log($this->__('Gift Cards used: ' . $giftCards . ' Amount being used: ' . $balance));
                     } else {
-                        $this->log($this->__('Gift Cards used: ' . $giftCards . ' Amount is deducted already'));
+                        $helper->log($this->__('Gift Cards used: ' . $giftCards . ' Amount is deducted already'));
                     }
                     Mage::getSingleton('checkout/session')->unsetData('sezzleGiftCards');
                     Mage::getSingleton('checkout/session')->unsetData('sezzleGiftCardsAmount');
@@ -73,7 +75,7 @@ class Sezzle_Sezzlepay_Model_Giftcard
                 return $quote;
             }
         } catch (Exception $exception) {
-            Mage::log(
+            $helper->log(
                 $this->__(
                     'Error capturing gift cards. %s.', $exception->getMessage(),
                     Zend_Log::ERR
