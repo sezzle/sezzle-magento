@@ -438,13 +438,13 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         $this->helper()->log(
             'Session : ' . $this->getSessionId() . " Received action from Sezzle. Starting capture process.",
             Zend_Log::DEBUG);
-        $this->_sezzleCapture();
+        $this->_initOrderPlace();
     }
 
     /**
      * Sezzle payment capture
      */
-    private function _sezzleCapture()
+    private function _initOrderPlace()
     {
         $this->helper()->log('Session : ' . $this->getSessionId() . " Entered _sezzleCapture function", Zend_Log::DEBUG);
         try {

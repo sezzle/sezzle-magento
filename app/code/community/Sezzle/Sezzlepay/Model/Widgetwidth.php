@@ -1,7 +1,18 @@
 <?php
-class Sezzle_Sezzlepay_Model_WidgetWidth
+
+/**
+ * Sezzlepay widget width model
+ *
+ * @category   Sezzle
+ * @package    Sezzle_Sezzlepay
+ * @author     Sezzle Team
+ */
+class Sezzle_Sezzlepay_Model_Widgetwidth
 {
-    public function toOptionArray() 
+    /**
+     * @return array
+     */
+    public function toOptionArray()
     {
         return array(
             array(

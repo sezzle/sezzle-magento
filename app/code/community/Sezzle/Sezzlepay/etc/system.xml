@@ -142,7 +142,7 @@
                             <label>Alignment</label>
                             <comment>Alignment of the widget in the div</comment>
                             <frontend_type>select</frontend_type>
-                            <source_model>sezzle_sezzlepay/WidgetAlignment</source_model>
+                            <source_model>sezzle_sezzlepay/widgetalignment</source_model>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -161,7 +161,7 @@
                             <label>Theme</label>
                             <comment>Select the theme depending on your site's background</comment>
                             <frontend_type>select</frontend_type>
-                            <source_model>sezzle_sezzlepay/WidgetTheme</source_model>
+                            <source_model>sezzle_sezzlepay/widgettheme</source_model>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -171,7 +171,7 @@
                             <label>Width Type</label>
                             <comment>Text width of the widget</comment>
                             <frontend_type>select</frontend_type>
-                            <source_model>sezzle_sezzlepay/WidgetWidth</source_model>
+                            <source_model>sezzle_sezzlepay/widgetwidth</source_model>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
