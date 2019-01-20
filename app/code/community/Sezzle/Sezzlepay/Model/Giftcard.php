@@ -47,7 +47,7 @@ class Sezzle_Sezzlepay_Model_Giftcard
     {
         $balance = Mage::getSingleton('checkout/session')->getData('sezzleGiftCardsAmount');
         $giftCards = Mage::getSingleton('checkout/session')->getData('sezzleGiftCards');
-        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
+        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
         $helper = $sezzlePaymentModel->helper();
         try {
             if (!empty($balance) && $balance > 0) {
@@ -92,18 +92,30 @@ class Sezzle_Sezzlepay_Model_Giftcard
      */
     public function giftCardsPlaceOrder()
     {
-        if (Mage::getSingleton('checkout/session')->getData('sezzleGiftCards')) {
-            $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
-            $order = Mage::getSingleton('sales/order')->loadByIncrementId($orderId);
-            $giftCards = Mage::getSingleton('checkout/session')->getData('sezzleGiftCards');
-            $balanceUsed = Mage::getSingleton('checkout/session')->getData('sezzleGiftCardsAmount');
-            $order->setGiftCards($giftCards);
-            $order->setGiftCardsAmount($balanceUsed);
-            $order->setGiftCardsInvoiced($balanceUsed);
-            $order->save();
-            Mage::getSingleton('checkout/session')->unsetData('sezzleGiftCards');
-            Mage::getSingleton('checkout/session')->unsetData('sezzleGiftCardsAmount');
+        try {
+            if (Mage::getSingleton('checkout/session')->getData('sezzleGiftCards')) {
+                $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
+                $helper = $sezzlePaymentModel->helper();
+                $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
+                $order = Mage::getSingleton('sales/order')->loadByIncrementId($orderId);
+                $giftCards = Mage::getSingleton('checkout/session')->getData('sezzleGiftCards');
+                $balanceUsed = Mage::getSingleton('checkout/session')->getData('sezzleGiftCardsAmount');
+                $order->setGiftCards($giftCards);
+                $order->setGiftCardsAmount($balanceUsed);
+                $order->setGiftCardsInvoiced($balanceUsed);
+                $order->save();
+                Mage::getSingleton('checkout/session')->unsetData('sezzleGiftCards');
+                Mage::getSingleton('checkout/session')->unsetData('sezzleGiftCardsAmount');
+            }
+            return true;
         }
-        return true;
+        catch (Exception $e) {
+            $helper->log(
+                $this->__(
+                    'Error in placing order with gift card. %s.', $e->getMessage(),
+                    Zend_Log::ERR
+                )
+            );
+        }
     }
 }

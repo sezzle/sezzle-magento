@@ -85,7 +85,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                     Zend_Log::DEBUG
                 );
             }
-            $redirectUrl = Mage::getModel('sezzle_sezzlepay/paymentmethod')->start($this->_quote);
+            $redirectUrl = Mage::getModel('sezzle_sezzlepay/order')->start($this->_quote);
             $response = array(
                 'success' => true,
                 'redirect' => $redirectUrl,
@@ -423,7 +423,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
     /**
      * Api Router
      *
-     * @return Sezzle_Sezzlepay_Model_Api_Router
+     * @return Sezzle_Sezzlepay_Model_Api_Processor
      */
     protected function getApiProcessor()
     {
@@ -515,7 +515,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             }
 
             $this->helper()->log('Session : ' . $this->getSessionId() . ' reference: ' . $this->_quote->getReservedOrderId() . ': Placing order.', Zend_Log::DEBUG);
-            $isOrderPlaced = Mage::getModel('sezzle_sezzlepay/paymentmethod')->place($this->_quote, $magentoSezzleId);
+            $isOrderPlaced = Mage::getModel('sezzle_sezzlepay/order')->place($this->_quote, $magentoSezzleId);
             if ($isOrderPlaced) {
                 $this->helper()->log('Session : ' . $this->getSessionId() . ' reference: ' . $this->_quote->getReservedOrderId() . ': Placed order. Redirecting to success.', Zend_Log::DEBUG);
                 if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
@@ -704,12 +704,12 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
     }
 
     /**
-     * Sezzle Paymentmethod model
+     * Sezzle order model
      *
-     * @return Sezzle_Sezzlepay_Model_Paymentmethod
+     * @return Sezzle_Sezzlepay_Model_Order
      */
     private function getSezzleBaseModel()
     {
-        return Mage::getModel('sezzle_sezzlepay/paymentmethod');
+        return Mage::getModel('sezzle_sezzlepay/order');
     }
 } 

@@ -42,7 +42,7 @@
             <sezzlepay>
                 <title>Sezzle Pay PayLater 0% Interest</title>
                 <active>1</active>
-                <model>sezzle_sezzlepay/paymentmethod</model>
+                <model>sezzle_sezzlepay/order</model>
                 <order_status>processing</order_status>
                 <payment_action>authorize_capture</payment_action>
             </sezzlepay>

@@ -7,7 +7,7 @@
  * @package    Sezzle_Sezzlepay
  * @author     Sezzle Team
  */
-class Sezzle_Sezzlepay_Model_Widgetalignment
+class Sezzle_Sezzlepay_Model_System_Config_Source_Widgetalignment
 {
     /**
      * @return array

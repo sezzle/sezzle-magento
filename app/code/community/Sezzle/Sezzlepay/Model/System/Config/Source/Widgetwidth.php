@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Sezzlepay widget theme model
+ * Sezzlepay widget width model
  *
  * @category   Sezzle
  * @package    Sezzle_Sezzlepay
  * @author     Sezzle Team
  */
-class Sezzle_Sezzlepay_Model_Widgettheme
+class Sezzle_Sezzlepay_Model_System_Config_Source_Widgetwidth
 {
     /**
      * @return array
@@ -16,12 +16,12 @@ class Sezzle_Sezzlepay_Model_Widgettheme
     {
         return array(
             array(
-                'value' => 'light',
-                'label' => 'Light',
+                'value' => 'thin',
+                'label' => 'Thin',
             ),
             array(
-                'value' => 'dark',
-                'label' => 'Dark',
+                'value' => 'thick',
+                'label' => 'Thick',
             ),
         );
     }

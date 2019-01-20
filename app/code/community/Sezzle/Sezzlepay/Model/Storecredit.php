@@ -18,34 +18,46 @@ class Sezzle_Sezzlepay_Model_Storecredit
      */
     public function setStoreCreditSession($quote)
     {
-        $params = Mage::app()->getRequest()->getParams();
-        $isLoggedIn = Mage::getSingleton('customer/session')->isLoggedIn();
-        if ($isLoggedIn && $quote->getCustomerBalanceAmountUsed()) {
-            Mage::getSingleton('checkout/session')
-                ->setData('sezzleCustomerBalance', $quote->getCustomerBalanceAmountUsed());
-        } else if ($isLoggedIn &&
-            !empty($params) &&
-            !empty($params["payment"]) &&
-            isset($params["payment"]["use_customer_balance"]) &&
-            $params["payment"]["use_customer_balance"]
-        ) {
-            // Handler for Default One Page Checkout
-            $customerId = Mage::getSingleton('customer/session')->getId();
-            $websiteId = Mage::app()->getStore()->getWebsiteId();
-            $balance = Mage::getModel('enterprise_customerbalance/balance')
-                ->setCustomerId($customerId)
-                ->setWebsiteId($websiteId)
-                ->loadByCustomer();
-            $quote->setUseCustomerBalance(1);
-            $quote->setCustomerBalanceAmountUsed($balance->getAmount());
-            $grandTotal = $quote->getGrandTotal();
-            $quote->setGrandTotal($grandTotal - $balance->getAmount());
-            $quote->save();
-            Mage::getSingleton('checkout/session')->setData('sezzleCustomerBalance', $balance->getAmount());
+        try {
+            $params = Mage::app()->getRequest()->getParams();
+            $isLoggedIn = Mage::getSingleton('customer/session')->isLoggedIn();
+            $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
+            $helper = $sezzlePaymentModel->helper();
+            if ($isLoggedIn && $quote->getCustomerBalanceAmountUsed()) {
+                Mage::getSingleton('checkout/session')
+                    ->setData('sezzleCustomerBalance', $quote->getCustomerBalanceAmountUsed());
+            } else if ($isLoggedIn &&
+                !empty($params) &&
+                !empty($params["payment"]) &&
+                isset($params["payment"]["use_customer_balance"]) &&
+                $params["payment"]["use_customer_balance"]
+            ) {
+                // Handler for Default One Page Checkout
+                $customerId = Mage::getSingleton('customer/session')->getId();
+                $websiteId = Mage::app()->getStore()->getWebsiteId();
+                $balance = Mage::getModel('enterprise_customerbalance/balance')
+                    ->setCustomerId($customerId)
+                    ->setWebsiteId($websiteId)
+                    ->loadByCustomer();
+                $quote->setUseCustomerBalance(1);
+                $quote->setCustomerBalanceAmountUsed($balance->getAmount());
+                $grandTotal = $quote->getGrandTotal();
+                $quote->setGrandTotal($grandTotal - $balance->getAmount());
+                $quote->save();
+                Mage::getSingleton('checkout/session')->setData('sezzleCustomerBalance', $balance->getAmount());
+            }
+            Mage::getSingleton('checkout/session')->setData('sezzleGrandTotal', $quote->getGrandTotal());
+            Mage::getSingleton('checkout/session')->setData('sezzleSubtotal', $quote->getSubtotal());
+            return $quote;
         }
-        Mage::getSingleton('checkout/session')->setData('sezzleGrandTotal', $quote->getGrandTotal());
-        Mage::getSingleton('checkout/session')->setData('sezzleSubtotal', $quote->getSubtotal());
-        return $quote;
+        catch (Exception $e) {
+            $helper->log(
+                $this->__(
+                    'Error in storing credit data in session. %s.', $e->getMessage(),
+                    Zend_Log::ERR
+                )
+            );
+        }
     }
 
     /**
@@ -72,22 +84,32 @@ class Sezzle_Sezzlepay_Model_Storecredit
      */
     public function storeCreditCapture($quote)
     {
-        if (Mage::getSingleton('customer/session')->isLoggedIn() &&
-            Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance')
-        ) {
-            $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
-            $helper = $sezzlePaymentModel->helper();
-            $grandTotal = Mage::getSingleton('checkout/session')->getData('sezzleGrandTotal');
-            $subtotal = Mage::getSingleton('checkout/session')->getData('sezzleSubtotal');
-            $balance = Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance');
-            $quote->setUseCustomerBalance(1);
-            $quote->setCustomerBalanceAmountUsed($balance);
-            $quote->setBaseCustomerBalanceAmountUsed($balance);
-            if ($quote->getSubtotal() == $subtotal) {
-                $quote->setGrandTotal($grandTotal)->save();
+        try {
+            if (Mage::getSingleton('customer/session')->isLoggedIn() &&
+                Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance')
+            ) {
+                $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
+                $helper = $sezzlePaymentModel->helper();
+                $grandTotal = Mage::getSingleton('checkout/session')->getData('sezzleGrandTotal');
+                $subtotal = Mage::getSingleton('checkout/session')->getData('sezzleSubtotal');
+                $balance = Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance');
+                $quote->setUseCustomerBalance(1);
+                $quote->setCustomerBalanceAmountUsed($balance);
+                $quote->setBaseCustomerBalanceAmountUsed($balance);
+                if ($quote->getSubtotal() == $subtotal) {
+                    $quote->setGrandTotal($grandTotal)->save();
+                }
+                $helper->log($this->__('Store Credit being used: ' . $balance . ", Grand Total: " . $grandTotal));
+                return $quote;
             }
-            $helper->log($this->__('Store Credit being used: ' . $balance . ", Grand Total: " . $grandTotal));
-            return $quote;
+        }
+        catch (Exception $e) {
+            $helper->log(
+                $this->__(
+                    'Error in capturing payment with store credit. %s.', $e->getMessage(),
+                    Zend_Log::ERR
+                )
+            );
         }
         return $quote;
     }
@@ -99,22 +121,34 @@ class Sezzle_Sezzlepay_Model_Storecredit
      */
     public function storeCreditPlaceOrder()
     {
-        if (Mage::getSingleton('customer/session')->isLoggedIn()
-            && Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance')
-        ) {
-            $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
-            $order = Mage::getSingleton('sales/order')->loadByIncrementId($orderId);
-            $balanceUsed = Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance');
-            $order->setCustomerBalanceAmount($balanceUsed);
-            $order->setBaseCustomerBalanceAmount($balanceUsed);
-            $order->setCustomerBalanceInvoiced($balanceUsed);
-            $order->setBaseCustomerBalanceInvoiced($balanceUsed);
-            $order->setTotalPaid($order->getGrandTotal());
-            $order->save();
-            $this->_customerBalanceDeductionFallback($orderId, $balanceUsed);
-            Mage::getSingleton('checkout/session')->unsetData('sezzleCustomerBalance');
+        try {
+            if (Mage::getSingleton('customer/session')->isLoggedIn()
+                && Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance')
+            ) {
+                $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
+                $helper = $sezzlePaymentModel->helper();
+                $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
+                $order = Mage::getSingleton('sales/order')->loadByIncrementId($orderId);
+                $balanceUsed = Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance');
+                $order->setCustomerBalanceAmount($balanceUsed);
+                $order->setBaseCustomerBalanceAmount($balanceUsed);
+                $order->setCustomerBalanceInvoiced($balanceUsed);
+                $order->setBaseCustomerBalanceInvoiced($balanceUsed);
+                $order->setTotalPaid($order->getGrandTotal());
+                $order->save();
+                $this->_customerBalanceDeductionFallback($orderId, $balanceUsed);
+                Mage::getSingleton('checkout/session')->unsetData('sezzleCustomerBalance');
+            }
+            return true;
         }
-        return true;
+        catch (Exception $e) {
+            $helper->log(
+                $this->__(
+                    'Error in placing order with store credit. %s.', $e->getMessage(),
+                    Zend_Log::ERR
+                )
+            );
+        }
     }
 
     /**
@@ -128,7 +162,7 @@ class Sezzle_Sezzlepay_Model_Storecredit
     {
         // Get the first customer in the store's ID
         $customerId = Mage::getSingleton('customer/session')->getId();
-        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
+        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
         $helper = $sezzlePaymentModel->helper();
         $balance = Mage::getModel('enterprise_customerbalance/balance')
             ->setCustomerId($customerId)

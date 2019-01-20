@@ -17,7 +17,7 @@ class Sezzle_Sezzlepay_Model_Gateway_Heartbeat
      */
     public function sendHeartbeat()
     {
-        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
+        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
         $helper = $sezzlePaymentModel->helper();
         $isPublicKeyEntered = strlen(Mage::getStoreConfig('payment/sezzlepay/public_key')) > 0 ? true : false;
         $isPrivateKeyEntered = strlen(Mage::getStoreConfig('payment/sezzlepay/private_key')) > 0 ? true : false;
@@ -32,25 +32,41 @@ class Sezzle_Sezzlepay_Model_Gateway_Heartbeat
             'is_merchant_id_entered' => $isMerchantIdEntered,
             'merchant_id' => $merchantId
         );
-        if ($isPublicKeyEntered
-            && $isPrivateKeyEntered
-            && $isMerchantIdEntered) {
-            $url = $this->getApiRouter()->getHeartbeatUrl();
-            $result = $this->getSezzleBaseModel()->_sendApiRequest(
-                $url,
-                $body,
-                true,
-                Varien_Http_Client::POST
-            );
-            if ($result->isError()) {
-                throw Mage::exception(
-                    'Sezzle_Sezzlepay',
-                    __('Sezzle Pay API Error: %s', $result->getMessage())
+        try {
+            if ($isPublicKeyEntered
+                && $isPrivateKeyEntered
+                && $isMerchantIdEntered) {
+                $url = $this->getApiRouter()->getHeartbeatUrl();
+                $result = $this->getApiProcessor()->sendApiRequest(
+                    $url,
+                    $body,
+                    true,
+                    Varien_Http_Client::POST
                 );
+                if ($result->isError()) {
+                    throw Mage::exception(
+                        'Sezzle_Sezzlepay',
+                        __('Sezzle Pay API Error: %s', $result->getMessage())
+                    );
+                }
+                $helper->log('Heartbeat sent to Sezzle');
+            } else {
+                $helper->log('Could not send Heartbeat to Sezzle. Please set api keys.');
             }
-            $helper->log('Heartbeat sent to Sezzle');
-        } else {
-            $helper->log('Could not send Heartbeat to Sezzle. Please set api keys.');
         }
+        catch (Exception $e) {
+            $helper->log(
+                'Session Id: .'.$sezzlePaymentModel->getSessionId()."error while sending heartbeat to Sezzle".$e->getMessage(), Zend_Log::ERR);
+        }
+    }
+
+    /**
+     * Api Processor
+     *
+     * @return Sezzle_Sezzlepay_Model_Api_Processor
+     */
+    protected function getApiProcessor()
+    {
+        return Mage::getModel('sezzle_sezzlepay/api_processor');
     }
 }

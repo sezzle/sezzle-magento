@@ -24,8 +24,8 @@ class Sezzle_Sezzlepay_Model_Api_Processor
      */
     public function sendApiRequest($url, $body, $isAuth = true, $method = Varien_Http_Client::GET)
     {
-        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
-        $this->helper()->log('Session : ' . $sezzlePaymentModel->getSessionID() . " Sending Request $url");
+        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
+        $sezzlePaymentModel->helper()->log('Session : ' . $sezzlePaymentModel->getSessionID() . " Sending Request $url");
         $client = new Varien_Http_Client($url);
         $client->setConfig(array(
             'timeout' => 80
@@ -37,9 +37,9 @@ class Sezzle_Sezzlepay_Model_Api_Processor
         }
         if ($isAuth) {
             // Get the auth token
-            $token = $this->getSezzleAuthToken();
+            $authToken = $this->getSezzleAuthToken();
             // set auth header
-            $client->setHeaders('Authorization', "Bearer $token");
+            $client->setHeaders('Authorization', "Bearer $authToken");
         }
         $response = $client->request($method);
         return $response;
@@ -54,9 +54,9 @@ class Sezzle_Sezzlepay_Model_Api_Processor
     protected function getSezzleAuthToken()
     {
         try {
-            $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
+            $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
             $helper = $sezzlePaymentModel->helper();
-            $result = $this->_sendApiRequest(
+            $result = $this->sendApiRequest(
                 $sezzlePaymentModel->getApiRouter()->getAuthTokenUrl(),
                 $this->_getSezzleAuthHeader(),
                 false,

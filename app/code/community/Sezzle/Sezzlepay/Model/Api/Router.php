@@ -96,10 +96,10 @@ class Sezzle_Sezzlepay_Model_Api_Router
     protected function getBaseApiUrl()
     {
         $apiMode = Mage::getStoreConfig(
-            'payment/sezzlepay/' . Sezzle_Sezzlepay_Model_Paymentmethod::API_MODE_CONFIG_FIELD
+            'payment/sezzlepay/' . Sezzle_Sezzlepay_Model_Order::API_MODE_CONFIG_FIELD
         );
         $overrideBaseUrl = Mage::getStoreConfig(
-            'payment/sezzlepay/' . Sezzle_Sezzlepay_Model_Paymentmethod::API_BASE_URL_CONFIG_FIELD
+            'payment/sezzlepay/' . Sezzle_Sezzlepay_Model_Order::API_BASE_URL_CONFIG_FIELD
         );
         if ($overrideBaseUrl) {
             return $this->removeSlashFromUrl($overrideBaseUrl);

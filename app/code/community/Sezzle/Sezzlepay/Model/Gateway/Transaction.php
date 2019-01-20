@@ -7,7 +7,7 @@
  * @package    Sezzle_Sezzlepay
  * @author     Sezzle Team
  */
-class Sezzle_Sezzlepay_Model_Gateway_Order
+class Sezzle_Sezzlepay_Model_Gateway_Transaction
 {
     /**
      * Send orders to Sezzle
@@ -20,7 +20,7 @@ class Sezzle_Sezzlepay_Model_Gateway_Order
         $yesterday = date("Y-m-d H:i:s", strtotime("-1 days"));
         $yesterday = date('Y-m-d H:i:s', strtotime($yesterday));
         $today = date('Y-m-d H:i:s', strtotime($today));
-        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/paymentmethod');
+        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
         $helper = $sezzlePaymentModel->helper();
         try {
             $ordersCollection = Mage::getModel('sales/order')->getCollection()
@@ -43,7 +43,7 @@ class Sezzle_Sezzlepay_Model_Gateway_Order
                 ->addAttributeToSelect('increment_id');
             $url = $sezzlePaymentModel->getApiRouter()->getOrdersSubmitUrl();
             $body = $this->_buildOrderPayload($ordersCollection);
-            $result = $this->getSezzleBaseModel()->_sendApiRequest(
+            $result = $this->getApiProcessor()->sendApiRequest(
                 $url,
                 $body,
                 true,
@@ -97,5 +97,15 @@ class Sezzle_Sezzlepay_Model_Gateway_Order
             }
             return $body;
         }
+    }
+	
+	/**
+     * Api Processor
+     *
+     * @return Sezzle_Sezzlepay_Model_Api_Processor
+     */
+    protected function getApiProcessor()
+    {
+        return Mage::getModel('sezzle_sezzlepay/api_processor');
     }
 }

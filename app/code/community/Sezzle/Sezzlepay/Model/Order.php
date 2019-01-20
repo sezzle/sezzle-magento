@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Sezzlepay payment method model
+ * Sezzlepay order model
  *
  * @category   Sezzle
  * @package    Sezzle_Sezzlepay
  * @author     Sezzle Team
  */
-class Sezzle_Sezzlepay_Model_Paymentmethod extends Mage_Payment_Model_Method_Abstract
+class Sezzle_Sezzlepay_Model_Order extends Mage_Payment_Model_Method_Abstract
 {
     /**
      * Constants
@@ -156,7 +156,7 @@ class Sezzle_Sezzlepay_Model_Paymentmethod extends Mage_Payment_Model_Method_Abs
             $url = $this->getApiRouter()->getSubmitCheckoutDetailsAndGetRedirectUrl();
             $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Posting to sezzle to get the checkout redirect url: ' . $url, Zend_Log::DEBUG);
             // Send request
-            $result = $this->_sendApiRequest(
+            $result = $this->getApiProcessor()->sendApiRequest(
                 $this->getApiRouter()->getSubmitCheckoutDetailsAndGetRedirectUrl(),
                 $requestBody,
                 true,
@@ -180,8 +180,7 @@ class Sezzle_Sezzlepay_Model_Paymentmethod extends Mage_Payment_Model_Method_Abs
             }
             $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Received URL from Sezzle succesfully. URL : ' . $checkoutUrl, Zend_Log::DEBUG);
             return $checkoutUrl;
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Sezzle Pay API Error : Received empty checkout URL from Sezzle.', Zend_Log::ERR);
         }
     }
@@ -294,83 +293,13 @@ class Sezzle_Sezzlepay_Model_Paymentmethod extends Mage_Payment_Model_Method_Abs
     }
 
     /**
-     * @param $url
-     * @param $body
-     * @param bool $isAuth
-     * @param string $method
-     * @return Zend_Http_Response
-     * @throws Mage_Core_Exception
-     * @throws Zend_Http_Client_Exception
+     * Api Router
+     *
+     * @return Sezzle_Sezzlepay_Model_Api_Processor
      */
-    public function _sendApiRequest($url, $body, $isAuth = true, $method = Varien_Http_Client::GET)
+    protected function getApiProcessor()
     {
-        $this->helper()->log('Session : ' . $this->getSessionId() . " Sending Request $url");
-        $client = new Varien_Http_Client($url);
-        $client->setConfig(array(
-            'timeout' => 80
-        ));
-
-        if ($body !== false) {
-            $client->setRawData(Mage::helper('core')->jsonEncode($body), 'application/json');
-        }
-
-        if ($isAuth) {
-            // Get the auth token
-            $token = $this->getSezzleAuthToken();
-            // set auth header
-            $client->setHeaders('Authorization', "Bearer $token");
-        }
-
-        $response = $client->request($method);
-        return $response;
-    }
-
-    /**
-     * @return mixed
-     * @throws Mage_Core_Exception
-     */
-    protected function getSezzleAuthToken()
-    {
-        $result = $this->_sendApiRequest(
-            $this->getApiRouter()->getAuthTokenUrl(),
-            $this->getSezzleAuthHeader(),
-            false,
-            Varien_Http_Client::POST
-        );
-        if ($result->isError()) {
-            throw Mage::exception(
-                'Sezzle_Sezzlepay',
-                __('Sezzle Pay API Error: %s', $result->getMessage())
-            );
-        }
-
-        $resultJson = $result->getBody();
-        $resultObject = json_decode($resultJson, true);
-        $token = $resultObject['token'];
-        if (empty($token)) {
-            throw Mage::exception(
-                'Sezzle_Sezzlepay',
-                "Sezzle Pay API Error: Cannot get auth token."
-            );
-        }
-
-        return $token;
-    }
-
-    // Place order using quote
-
-    /**
-     * @return array
-     */
-    protected function getSezzleAuthHeader()
-    {
-        $merchantPublicKey = trim(Mage::getStoreConfig(self::API_PUBLIC_KEY_CONFIG_PATH));
-        $merchantPrivateKey = trim(Mage::getStoreConfig(self::API_PRIVATE_KEY_CONFIG_PATH));
-
-        return array(
-            "public_key" => $merchantPublicKey,
-            "private_key" => $merchantPrivateKey
-        );
+        return Mage::getModel('sezzle_sezzlepay/api_processor');
     }
 
     /**
@@ -391,7 +320,7 @@ class Sezzle_Sezzlepay_Model_Paymentmethod extends Mage_Payment_Model_Method_Abs
             return $this;
         }
         // Refund
-        $result = $this->_sendApiRequest(
+        $result = $this->getApiProcessor()->sendApiRequest(
             $this->getApiRouter()->getCheckoutRefundUrl($reference),
             array(
                 "amount" => array(
@@ -503,7 +432,7 @@ class Sezzle_Sezzlepay_Model_Paymentmethod extends Mage_Payment_Model_Method_Abs
     {
         $reference = $payment->getData('sezzle_reference_id');
         // Charge
-        $result = $this->_sendApiRequest(
+        $result = $this->getApiProcessor()->sendApiRequest(
             $this->getApiRouter()->getCheckoutCompleteUrl($reference),
             null,
             true,
