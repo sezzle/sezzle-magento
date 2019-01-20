@@ -7,7 +7,7 @@
  * @package    Sezzle_Sezzlepay
  * @author     Sezzle Team
  */
-class Sezzle_Sezzlepay_Block_ProductConfig extends Mage_Core_Block_Template
+class Sezzle_Sezzlepay_Block_Productconfig extends Mage_Core_Block_Template
 {
     /**
      * Create JS configurations for Sezzle widget

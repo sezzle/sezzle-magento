@@ -1,4 +1,11 @@
 <?xml version="1.0"?>
+<!--/**
+* Sezzlepay config
+*
+* @category   Sezzle
+* @package    Sezzle_Sezzlepay
+* @author     Sezzle Team
+*/-->
 <config>
     <modules>
         <Sezzle_Sezzlepay>
@@ -52,7 +59,7 @@
         <layout>
             <updates>
                 <sezzlepay>
-                    <file>sezzle_sezzlepay.xml</file>
+                    <file>sezzlepay.xml</file>
                 </sezzlepay>
             </updates>
         </layout>
