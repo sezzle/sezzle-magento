@@ -1,5 +1,5 @@
 <script>
     window.Sezzlepay = window.Sezzlepay || {};
-    window.Sezzlepay.saveUrl = "<?php echo $block->getUrl('sezzlepay/payment/start', array('form_key' => Mage::getSingleton('core/session')->getFormKey(), '_secure' => true)) ?>";
-    window.Sezzlepay.logUrl = "<?php echo $block->getUrl('sezzlepay/payment/log', array('form_key' => Mage::getSingleton('core/session')->getFormKey(), '_secure' => true)) ?>";
+    window.Sezzlepay.saveUrl = "<?php echo $this->getUrl('sezzlepay/payment/start', array('form_key' => Mage::getSingleton('core/session')->getFormKey(), '_secure' => true)) ?>";
+    window.Sezzlepay.logUrl = "<?php echo $this->getUrl('sezzlepay/payment/log', array('form_key' => Mage::getSingleton('core/session')->getFormKey(), '_secure' => true)) ?>";
 </script>

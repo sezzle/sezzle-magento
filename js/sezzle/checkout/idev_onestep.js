@@ -1,9 +1,3 @@
-// Using Afterpay's idea of overriding payment flow using JS
-// Check code here: https://github.com/afterpay/afterpay-magento/blob/master/src/js/Afterpay/checkout/idev_onestep.js
-
-/**
- * Function specifically for Idev OneStepCheckout. The class especially for it
- */
 (function () {
     var form = $('onestepcheckout-form');
     var action = form.getAttribute('action');
@@ -31,13 +25,10 @@
 
             // prepare params
             var params = form.serialize(true);
-
-            var customer_password = jQuery('#billing\\:customer_password').val();
-
-            if(typeof customer_password !== 'undefined' && customer_password.length) {
+            var customerPassword = jQuery('#billing\\:customerPassword').val();
+            if(typeof customerPassword !== 'undefined' && customerPassword.length) {
                 params.create_account = 1;
             }
-
             doSezzlepayAPICall(window.Sezzlepay.saveUrl, params);
             return false;
         } else {
