@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Sezzlepay gift card model
+ * Sezzlepay api router
  *
  * @category   Sezzle
  * @package    Sezzle_Sezzlepay

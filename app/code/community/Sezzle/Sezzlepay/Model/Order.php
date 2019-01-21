@@ -190,7 +190,7 @@ class Sezzle_Sezzlepay_Model_Order extends Mage_Payment_Model_Method_Abstract
      *
      * @return Mage_Core_Helper_Abstract
      */
-    protected function helper()
+    public function helper()
     {
         return Mage::helper('sezzle_sezzlepay');
     }
@@ -287,7 +287,7 @@ class Sezzle_Sezzlepay_Model_Order extends Mage_Payment_Model_Method_Abstract
      *
      * @return false|Mage_Core_Model_Abstract
      */
-    protected function getApiRouter()
+    public function getApiRouter()
     {
         return Mage::getModel('sezzle_sezzlepay/api_router');
     }
@@ -297,7 +297,7 @@ class Sezzle_Sezzlepay_Model_Order extends Mage_Payment_Model_Method_Abstract
      *
      * @return Sezzle_Sezzlepay_Model_Api_Processor
      */
-    protected function getApiProcessor()
+    public function getApiProcessor()
     {
         return Mage::getModel('sezzle_sezzlepay/api_processor');
     }

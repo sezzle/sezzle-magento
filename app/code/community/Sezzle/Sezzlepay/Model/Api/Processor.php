@@ -69,7 +69,7 @@ class Sezzle_Sezzlepay_Model_Api_Processor
                 );
             }
             $resultJson = $result->getBody();
-            $resultObject = Mage::helper('core')->jsonEncode($resultJson);
+            $resultObject = Mage::helper('core')->jsonDecode($resultJson);
             $token = $resultObject['token'];
             if (empty($token)) {
                 throw Mage::exception(
