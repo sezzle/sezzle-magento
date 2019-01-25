@@ -376,7 +376,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
     {
         $precision = 2; //precision to which the price needs to be rounded off
         $requestBody = array();
-        $requestBody["amount_in_cents"] = round($quote->getGrandTotal(), $precision) * 100;
+        $requestBody["amount_in_cents"] = (int)(round($quote->getGrandTotal() * 100, $precision));
         $requestBody["currency_code"] = Mage::app()->getStore()->getCurrentCurrencyCode();
         $requestBody["order_description"] = $reference;
         $requestBody["order_reference_id"] = $reference;
@@ -418,7 +418,7 @@ class Sezzle_Sezzlepay_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
                 "sku" => $productSKU,
                 "quantity" => $productQuantity,
                 "price" => array(
-                    "amount_in_cents" => round($productPrice, $precision) * 100,
+                    "amount_in_cents" => (int)(round($productPrice * 100, $precision)),
                     "currency" => $requestBody["currency_code"]
                 )
             );
