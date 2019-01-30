@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Sezzlepay order model
+ * Sezzlepay payment method model
  *
  * @category   Sezzle
  * @package    Sezzle_Sezzlepay
  * @author     Sezzle Team
  */
-class Sezzle_Sezzlepay_Model_Order extends Mage_Payment_Model_Method_Abstract
+class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstract
 {
     /**
      * Constants

@@ -47,7 +47,7 @@ class Sezzle_Sezzlepay_Model_Giftcard
     {
         $balance = Mage::getSingleton('checkout/session')->getData('sezzleGiftCardsAmount');
         $giftCards = Mage::getSingleton('checkout/session')->getData('sezzleGiftCards');
-        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
+        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/sezzlepay');
         $helper = $sezzlePaymentModel->helper();
         try {
             if (!empty($balance) && $balance > 0) {
@@ -94,7 +94,7 @@ class Sezzle_Sezzlepay_Model_Giftcard
     {
         try {
             if (Mage::getSingleton('checkout/session')->getData('sezzleGiftCards')) {
-                $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
+                $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/sezzlepay');
                 $helper = $sezzlePaymentModel->helper();
                 $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
                 $order = Mage::getSingleton('sales/order')->loadByIncrementId($orderId);

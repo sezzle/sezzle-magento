@@ -17,7 +17,7 @@ class Sezzle_Sezzlepay_Model_Gateway_Heartbeat
      */
     public function sendHeartbeat()
     {
-        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
+        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/sezzlepay');
         $helper = $sezzlePaymentModel->helper();
         $isPublicKeyEntered = strlen(Mage::getStoreConfig('payment/sezzlepay/public_key')) > 0 ? true : false;
         $isPrivateKeyEntered = strlen(Mage::getStoreConfig('payment/sezzlepay/private_key')) > 0 ? true : false;

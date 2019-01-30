@@ -21,7 +21,7 @@ class Sezzle_Sezzlepay_Model_Storecredit
         try {
             $params = Mage::app()->getRequest()->getParams();
             $isLoggedIn = Mage::getSingleton('customer/session')->isLoggedIn();
-            $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
+            $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/sezzlepay');
             $helper = $sezzlePaymentModel->helper();
             if ($isLoggedIn && $quote->getCustomerBalanceAmountUsed()) {
                 Mage::getSingleton('checkout/session')
@@ -88,7 +88,7 @@ class Sezzle_Sezzlepay_Model_Storecredit
             if (Mage::getSingleton('customer/session')->isLoggedIn() &&
                 Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance')
             ) {
-                $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
+                $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/sezzlepay');
                 $helper = $sezzlePaymentModel->helper();
                 $grandTotal = Mage::getSingleton('checkout/session')->getData('sezzleGrandTotal');
                 $subtotal = Mage::getSingleton('checkout/session')->getData('sezzleSubtotal');
@@ -125,7 +125,7 @@ class Sezzle_Sezzlepay_Model_Storecredit
             if (Mage::getSingleton('customer/session')->isLoggedIn()
                 && Mage::getSingleton('checkout/session')->getData('sezzleCustomerBalance')
             ) {
-                $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
+                $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/sezzlepay');
                 $helper = $sezzlePaymentModel->helper();
                 $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
                 $order = Mage::getSingleton('sales/order')->loadByIncrementId($orderId);
@@ -162,7 +162,7 @@ class Sezzle_Sezzlepay_Model_Storecredit
     {
         // Get the first customer in the store's ID
         $customerId = Mage::getSingleton('customer/session')->getId();
-        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
+        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/sezzlepay');
         $helper = $sezzlePaymentModel->helper();
         $balance = Mage::getModel('enterprise_customerbalance/balance')
             ->setCustomerId($customerId)

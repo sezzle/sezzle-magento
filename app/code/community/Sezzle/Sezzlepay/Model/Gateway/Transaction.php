@@ -20,7 +20,7 @@ class Sezzle_Sezzlepay_Model_Gateway_Transaction
         $yesterday = date("Y-m-d H:i:s", strtotime("-1 days"));
         $yesterday = date('Y-m-d H:i:s', strtotime($yesterday));
         $today = date('Y-m-d H:i:s', strtotime($today));
-        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/order');
+        $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/sezzlepay');
         $helper = $sezzlePaymentModel->helper();
         try {
             $ordersCollection = Mage::getModel('sales/order')->getCollection()
