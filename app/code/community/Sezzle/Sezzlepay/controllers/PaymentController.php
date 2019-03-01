@@ -18,6 +18,18 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             Zend_Log::DEBUG
         );
         try {
+
+            $requiredAgreements = Mage::helper('checkout')->getRequiredAgreementIds();
+
+            if ($requiredAgreements) {
+                $postedAgreements = array_keys($this->getRequest()->getPost('agreement', array()));
+                $diff = array_diff($requiredAgreements, $postedAgreements);
+                if ($diff) {
+                    Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Please agree to all the terms and conditions before placing the order.'));
+                    return;
+                }
+            }
+
             $params = Mage::app()->getRequest()->getParams();
             if ($params) {
                 $this->_saveCart($params);
