@@ -706,10 +706,10 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
     /**
      * Sezzle order model
      *
-     * @return Sezzle_Sezzlepay_Model_Order
+     * @return Sezzle_Sezzlepay_Model_Sezzlepay
      */
     private function getSezzleBaseModel()
     {
         return Mage::getModel('sezzle_sezzlepay/sezzlepay');
     }
-} 
+}
