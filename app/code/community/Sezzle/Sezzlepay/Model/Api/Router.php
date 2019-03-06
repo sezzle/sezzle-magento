@@ -22,6 +22,11 @@ class Sezzle_Sezzlepay_Model_Api_Router
         return $this->getBaseApiUrl() . '/v1/orders' . '/' . $reference . '/refund';
     }
 
+    public function checkoutDetailsUrl($reference) 
+    {
+        return $this->getBaseApiUrl() . '/v1/orders' . '/' . $reference;
+    }
+
     public function checkoutCompleteUrl($reference) 
     {
         return $this->getBaseApiUrl() . '/v1/checkouts' . '/' . $reference . '/complete';
