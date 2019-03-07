@@ -43,10 +43,11 @@ class Sezzle_Sezzlepay_Model_Gateway_Heartbeat
                     true,
                     Varien_Http_Client::POST
                 );
-                if ($result->isError()) {
+                $result = Mage::helper('core')->jsonDecode($result);
+                if (isset($result['status']) && $result['status'] == Sezzle_Sezzlepay_Model_Api_Processor::BAD_REQUEST) {
                     throw Mage::exception(
                         'Sezzle_Sezzlepay',
-                        __('Sezzle Pay API Error: %s', $result->getMessage())
+                        __('Sezzle Pay API Error: %s', $result['message'])
                     );
                 }
                 $helper->log('Heartbeat sent to Sezzle');

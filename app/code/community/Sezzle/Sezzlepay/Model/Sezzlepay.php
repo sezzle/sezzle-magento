@@ -162,14 +162,15 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 true,
                 Varien_Http_Client::POST
             );
-            if ($result->isError()) {
+            $resultObject = Mage::helper('core')->jsonDecode($result);
+            if (isset($result['status']) && $result['status'] == Sezzle_Sezzlepay_Model_Api_Processor::BAD_REQUEST) {
                 $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Sezzle Pay API Error : Error receiving complete URL from Sezzle.', Zend_Log::DEBUG);
                 throw Mage::exception(
                     'Sezzle_Sezzlepay',
-                    __('Sezzle Pay API Error: %s', $result->getMessage())
+                    __('Sezzle Pay API Error: %s', $resultObject['message'])
                 );
             }
-            $resultObject = json_decode($result->getBody(), true);
+
             $checkoutUrl = $resultObject['checkout_url'];
             if (empty($checkoutUrl)) {
                 $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Sezzle Pay API Error : Received empty checkout URL from Sezzle.', Zend_Log::DEBUG);
@@ -331,10 +332,11 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             true,
             Varien_Http_Client::POST
         );
-        if ($result->isError()) {
+        $result = Mage::helper('core')->jsonDecode($result);
+        if (isset($result['status']) && $result['status'] == Sezzle_Sezzlepay_Model_Api_Processor::BAD_REQUEST) {
             throw Mage::exception(
                 'Sezzle_Sezzlepay',
-                __('Sezzle Pay API Error: %s', $result->getMessage())
+                __('Sezzle Pay API Error: %s', $result['message'])
             );
         }
         $this->helper()->log('Session : ' . $this->getSessionId() . ' Refund with sezzle successful' . $amount, Zend_Log::DEBUG);
@@ -438,10 +440,11 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             true,
             Varien_Http_Client::POST
         );
-        if ($result->isError()) {
+        $result = Mage::helper('core')->jsonDecode($result);
+        if (isset($result['status']) && $result['status'] == Sezzle_Sezzlepay_Model_Api_Processor::BAD_REQUEST) {
             throw Mage::exception(
                 'Sezzle_Sezzlepay',
-                __('Sezzle Pay API Error: %s', $result->getMessage())
+                __('Sezzle Pay API Error: %s', $result['message'])
             );
         }
         return $this;
