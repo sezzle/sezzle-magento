@@ -11,6 +11,8 @@ class Sezzle_Sezzlepay_Model_Api_Processor
 {
     const API_PUBLIC_KEY_CONFIG_PATH = 'payment/sezzlepay/public_key';
     const API_PRIVATE_KEY_CONFIG_PATH = 'payment/sezzlepay/private_key';
+    const CONTENT_TYPE_JSON = 'Content-Type:application/json';
+    const BAD_REQUEST = 400;
 
     /**
      * Api call to sezzle
@@ -20,29 +22,42 @@ class Sezzle_Sezzlepay_Model_Api_Processor
      * @param bool $isAuth
      * @param string $method
      * @return Zend_Http_Response
-     * @throws Zend_Http_Client_Exception
+     * @throws Mage_Core_Exception
      */
     public function sendApiRequest($url, $body, $isAuth = true, $method = Varien_Http_Client::GET)
     {
         $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/sezzlepay');
         $sezzlePaymentModel->helper()->log('Session : ' . $sezzlePaymentModel->getSessionID() . " Sending Request $url");
-        $client = new Varien_Http_Client($url);
-        $client->setConfig(array(
-            'timeout' => 80
-        ));
-        if ($body !== false) {
-            $client->setRawData(
-                Mage::helper('core')->jsonEncode($body),
-                'application/json');
+        try {
+            $http = new Varien_Http_Adapter_Curl();
+            $config = array(
+                'timeout' => 80
+            );
+            $headers = array(self::CONTENT_TYPE_JSON);
+            if ($isAuth) {
+                // Get the auth token
+                $authToken = $this->getSezzleAuthToken();
+                // set auth header
+                $headers[] = "Authorization:Bearer $authToken";
+            }
+            $http->setConfig($config);
+            $http->write(
+                $method,
+                $url,
+                '1.1',
+                $headers,
+                Mage::helper('core')->jsonEncode($body)
+            );
+            $response = $http->read();
+            $response = preg_split('/^\r?$/m', $response, 2);
+            $response = trim($response[1]);
+            return $response;
+        } catch (Exception $e) {
+            throw Mage::exception(
+                'Sezzle_Sezzlepay',
+                "Sezzle Pay API Error: " . $e->getMessage()
+            );
         }
-        if ($isAuth) {
-            // Get the auth token
-            $authToken = $this->getSezzleAuthToken();
-            // set auth header
-            $client->setHeaders('Authorization', "Bearer $authToken");
-        }
-        $response = $client->request($method);
-        return $response;
     }
 
     /**
@@ -62,15 +77,14 @@ class Sezzle_Sezzlepay_Model_Api_Processor
                 false,
                 Varien_Http_Client::POST
             );
-            if ($result->isError()) {
+            $resultObject = Mage::helper('core')->jsonDecode($result);
+            if (isset($result['status']) && $result['status'] == self::BAD_REQUEST) {
                 throw Mage::exception(
                     'Sezzle_Sezzlepay',
-                    __('Sezzle Pay API Error: %s', $result->getMessage())
+                    __('Sezzle Pay API Error: %s', $result['message'])
                 );
             }
-            $resultJson = $result->getBody();
-            $resultObject = Mage::helper('core')->jsonDecode($resultJson);
-            $token = $resultObject['token'];
+            $token = isset($resultObject['token']) ? $resultObject['token'] : '';
             if (empty($token)) {
                 throw Mage::exception(
                     'Sezzle_Sezzlepay',
