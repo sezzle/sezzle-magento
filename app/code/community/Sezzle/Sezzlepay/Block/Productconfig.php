@@ -9,6 +9,9 @@
  */
 class Sezzle_Sezzlepay_Block_Productconfig extends Mage_Core_Block_Template
 {
+
+    const WIDGET_TYPE = 'product-page';
+
     /**
      * Create JS configurations for Sezzle widget
      *
@@ -36,12 +39,10 @@ class Sezzle_Sezzlepay_Block_Productconfig extends Mage_Core_Block_Template
             'merchantID' => $merchantID,
             'theme' => $theme,
             'widthType' => $widthType,
-            'widgetType' => 'product-page',
-            'minPrice' => 0,
-            'maxPrice' => 100000,
-            'imageUrl' => $imageUrl,
+            'widgetType' => self::WIDGET_TYPE,
             'minPrice' => $minPrice,
             'maxPrice' => $maxPrice,
+            'imageUrl' => $imageUrl,
             'hideClasses' => $hideClasses,
         );
     }

@@ -120,7 +120,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         }
         $this->getResponse()
             ->setHeader('Content-type', 'application/json')
-            ->setBody(json_encode($response));
+            ->setBody(Mage::helper('core')->jsonEncode($response));
     }
 
     /**
