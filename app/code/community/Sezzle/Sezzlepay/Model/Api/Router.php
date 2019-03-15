@@ -37,6 +37,18 @@ class Sezzle_Sezzlepay_Model_Api_Router
     }
 
     /**
+     * Get checkout details url
+     *
+     * @param $reference
+     * @return string
+     */
+    public function getCheckoutDetailsUrl($reference)
+    {
+        return $this->getBaseApiUrl() . '/v1/orders' . '/' . $reference;
+    }
+
+
+    /**
      * Get checkout complete url
      *
      * @param $reference

@@ -24,7 +24,7 @@ class Sezzle_Sezzlepay_Model_Api_Processor
      * @return Zend_Http_Response
      * @throws Mage_Core_Exception
      */
-    public function sendApiRequest($url, $body, $isAuth = true, $method = Varien_Http_Client::GET)
+    public function sendApiRequest($url, $body = false, $isAuth = true, $method = Varien_Http_Client::GET)
     {
         $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/sezzlepay');
         $sezzlePaymentModel->helper()->log('Session : ' . $sezzlePaymentModel->getSessionID() . " Sending Request $url");

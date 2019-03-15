@@ -100,18 +100,6 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     protected $_formBlockType = 'sezzle_sezzlepay/form_paylater';
 
     /**
-     * Get order place redirect url
-     *
-     * @return string
-     */
-    public function getOrderPlaceRedirectUrl()
-    {
-        $redirectUrl = Mage::getUrl('sezzlepay/payment/redirect');
-        Mage::Log("Step 2 Process: Getting the redirect URL: $redirectUrl", Zend_Log::DEBUG, $this->_logFileName);
-        return $redirectUrl;
-    }
-
-    /**
      * Start the payment process
      *
      * @param $quote
@@ -215,6 +203,50 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     protected function createUniqueReferenceId($referenceId)
     {
         return uniqid() . "-" . $referenceId;
+    }
+
+    /**
+     * @param Varien_Object $payment
+     * @param float $amount
+     * @return $this|Mage_Payment_Model_Abstract
+     * @throws Mage_Core_Exception
+     */
+    public function capture(Varien_Object $payment, $amount)
+    {
+        $reference = $payment->getData('sezzle_reference_id');
+
+        $this->helper()->log('Checking if checkout is valid', Zend_Log::DEBUG);
+        // check if transaction id is valid
+        $result = $this->getApiProcessor()->sendApiRequest(
+            $this->getApiRouter()->getCheckoutDetailsUrl($reference)
+        );
+        $result = Mage::helper('core')->jsonDecode($result);
+        if (isset($result['status']) && $result['status'] == Sezzle_Sezzlepay_Model_Api_Processor::BAD_REQUEST) {
+            $this->helper()->log('Checkout is invalid', Zend_Log::DEBUG);
+            Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Invalid checkout. Please retry again.'));
+            return $this;
+        }
+
+        $this->helper()->log(array(
+            "response" => $result
+        ), Zend_Log::DEBUG);
+
+        $captureExpiration = (isset($result['capture_expiration']) && $result['capture_expiration']) ? $result['capture_expiration'] : null;
+        if ($captureExpiration === null) {
+            Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Not authorized on Sezzle. Please try again.'));
+            return $this;
+        }
+        $captureExpirationTimestamp = Mage::getModel('core/date')->timestamp($captureExpiration);
+        $currentTimestamp = Mage::getModel('core/date')->timestamp("now");
+        if ($captureExpirationTimestamp >= $currentTimestamp) {
+            $this->helper()->log('Valid checkout', Zend_Log::DEBUG);
+            $payment->setTransactionId($reference)->setIsTransactionClosed(false);
+            return $this;
+        }
+
+        // invalid checkout
+        Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Invalid checkout. Please retry again.'));
+        return $this;
     }
 
     /**
