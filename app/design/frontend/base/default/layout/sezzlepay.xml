@@ -2,8 +2,8 @@
 <layout>
     <catalog_product_view>
         <reference name="before_body_end">
-            <block type="sezzle_sezzlepay/ProductConfig" name="sezzlepay.product_widget"
-                   template="sezzlepay/productConfig.phtml" data-type="product_list">
+            <block type="sezzle_sezzlepay/productconfig" name="sezzlepay.product_widget"
+                   template="sezzlepay/product_config.phtml" data-type="product_list">
                 <action method="setPageType">
                     <pageType>product_page</pageType>
                 </action>
@@ -16,7 +16,7 @@
     <checkout_onepage_index>
         <reference name="before_body_end">
             <block type="sezzle_sezzlepay/redirect" name="sezzlepay.checkout.default.info" after="checkout.onepage" template="sezzlepay/checkout/default.phtml" />
-	    </reference>
+        </reference>
         <reference name="head">
             <block type="sezzle_sezzlepay/config" name="sezzlepay.checkout.default.config" template="sezzlepay/checkout/config.phtml" />
         </reference>

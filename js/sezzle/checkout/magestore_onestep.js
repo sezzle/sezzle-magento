@@ -1,13 +1,6 @@
-// Using Afterpay's idea of overriding payment flow using JS
-// Check code here: https://github.com/afterpay/afterpay-magento/blob/master/src/js/Afterpay/checkout/magestore_onestore.js
-
-/**
- * Override function for MageStore checkout when submit order
- */
 (function () {
     if (typeof window.oscPlaceOrder !== 'undefined') {
         var original = window.oscPlaceOrder;
-
         window.oscPlaceOrder = function (element) {
             var validator = new Validation('one-step-checkout-form');
             var form = $('one-step-checkout-form');
@@ -69,7 +62,7 @@
                 }
 
                 /**
-                 * Perform ajax to Afterpay to get order token
+                 * Perform ajax to Sezzle to get order token
                  */
                 new Ajax.Request(
                     window.Sezzlepay.saveUrl,
