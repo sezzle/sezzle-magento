@@ -2,7 +2,9 @@
   Sezzle = {}
   Sezzle.render = function () {
     if (!document.sezzleConfig) {
-      console.warn('SezzlePay: document.sezzleConfig is not set, cannot render widget');
+      console.warn(
+          'SezzlePay: document.sezzleConfig is not set,' +
+          ' cannot render widget');
       return;
     }
   

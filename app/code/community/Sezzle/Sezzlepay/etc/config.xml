@@ -1,4 +1,11 @@
 <?xml version="1.0"?>
+<!--/**
+* Sezzlepay config
+*
+* @category   Sezzle
+* @package    Sezzle_Sezzlepay
+* @author     Sezzle Team
+*/-->
 <config>
     <modules>
         <Sezzle_Sezzlepay>
@@ -42,7 +49,8 @@
             <sezzlepay>
                 <title>Sezzle Pay PayLater 0% Interest</title>
                 <active>1</active>
-                <model>sezzle_sezzlepay/PaymentMethod</model>
+                <model>sezzle_sezzlepay/sezzlepay</model>
+                <order_status>processing</order_status>
                 <payment_action>authorize_capture</payment_action>
             </sezzlepay>
         </payment>
@@ -51,7 +59,7 @@
         <layout>
             <updates>
                 <sezzlepay>
-                    <file>sezzle_sezzlepay.xml</file>
+                    <file>sezzlepay.xml</file>
                 </sezzlepay>
             </updates>
         </layout>

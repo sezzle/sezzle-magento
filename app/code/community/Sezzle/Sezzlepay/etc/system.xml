@@ -1,4 +1,11 @@
 <?xml version="1.0"?>
+<!--/**
+* Sezzlepay system
+*
+* @category   Sezzle
+* @package    Sezzle_Sezzlepay
+* @author     Sezzle Team
+*/-->
 <config>
    <sections>
         <payment>
@@ -19,27 +26,36 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </active>
-                        <private_key translate="label">
-                            <label>Private Key</label>
+                        <merchant_id translate="label">
+                            <label>Merchant ID</label>
+                            <comment>Look for your ID in your Sezzle Dashboard</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>57</sort_order>
+                            <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </private_key>
+                        </merchant_id>
                         <public_key translate="label">
                             <label>Public Key</label>
                             <frontend_type>text</frontend_type>
-                            <sort_order>57</sort_order>
+                            <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </public_key>
+                        <private_key translate="label">
+                            <label>Private Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>4</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </private_key>
                         <api_mode translate="label">
                             <label>Api Mode</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>sezzle_sezzlepay/ApiMode</source_model>
-                            <sort_order>60</sort_order>
+                            <source_model>sezzle_sezzlepay/system_config_source_apimode</source_model>
+                            <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -48,7 +64,7 @@
                             <label>Sezzle API Base URL (Optional)</label>
                             <comment>WARNING: This overrides the Api Mode. Use it only when you know what you are doing. Else leave it empty.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>60</sort_order>
+                            <sort_order>6</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -56,7 +72,7 @@
                         <allowspecific>
                             <label>Payment from Applicable Countries</label>
                             <frontend_type>allowspecific</frontend_type>
-                            <sort_order>40</sort_order>
+                            <sort_order>7</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -66,7 +82,7 @@
                             <label>Payment from Specific
                             Countries</label>
                             <frontend_type>multiselect</frontend_type>
-                            <sort_order>45</sort_order>
+                            <sort_order>8</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -142,26 +158,17 @@
                             <label>Alignment</label>
                             <comment>Alignment of the widget in the div</comment>
                             <frontend_type>select</frontend_type>
-                            <source_model>sezzle_sezzlepay/WidgetAlignment</source_model>
+                            <source_model>sezzle_sezzlepay/system_config_source_widgetalignment</source_model>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </alignment>
-                        <merchant_id translate="label">
-                            <label>Merchant ID</label>
-                            <comment>Look for your ID in your Sezzle Dashboard</comment>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>60</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </merchant_id>
                         <theme translate="label">
                             <label>Theme</label>
                             <comment>Select the theme depending on your site's background</comment>
                             <frontend_type>select</frontend_type>
-                            <source_model>sezzle_sezzlepay/WidgetTheme</source_model>
+                            <source_model>sezzle_sezzlepay/system_config_source_widgettheme</source_model>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -171,7 +178,7 @@
                             <label>Width Type</label>
                             <comment>Text width of the widget</comment>
                             <frontend_type>select</frontend_type>
-                            <source_model>sezzle_sezzlepay/WidgetWidth</source_model>
+                            <source_model>sezzle_sezzlepay/system_config_source_widgetwidth</source_model>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -217,14 +224,14 @@
                             <label>Maximum Price</label>
                             <comment>
                                 Maximum product price to display widget on.
-                                Eg: 15000 for $150 
+                                Eg: 15000 for $150
                             </comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </maxPrice>                                           
+                        </maxPrice>
                     </fields>
                 </product_widget>
             </groups>

@@ -1,9 +1,7 @@
-// Using Afterpay's idea of overriding payment flow using JS
-// Check code here: https://github.com/afterpay/afterpay-magento/blob/master/src/js/Afterpay/checkout/firecheckout.js
 (function () {
         var reviewSave = window.FireCheckout.prototype.save;
         window.FireCheckout.prototype.save = function () {
-            // check payment method
+            // check if payment method is sezzlepay
             if (payment.currentMethod == 'sezzlepay') {
                 // send logs
                 var sendAllLogs = window.Sezzlepay.sendAllLogs ? 1 : 0;
@@ -30,13 +28,11 @@
                     } catch (e) {
                         response = {};
                     }
-
                     if (response.redirect) {
                         location.href = response.redirect
                     }
                 };
             }
-
             reviewSave.apply(this, arguments);
         };
 })();

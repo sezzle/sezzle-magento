@@ -1,4 +1,11 @@
 <?xml version="1.0"?>
+<!--/**
+* Sezzlepay adminhtml
+*
+* @category   Sezzle
+* @package    Sezzle_Sezzlepay
+* @author     Sezzle Team
+*/-->
 <config>
     <acl>
         <resources>
