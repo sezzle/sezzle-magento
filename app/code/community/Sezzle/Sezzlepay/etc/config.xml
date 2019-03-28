@@ -9,7 +9,7 @@
 <config>
     <modules>
         <Sezzle_Sezzlepay>
-            <version>3.1.0</version>
+            <version>4.0.1</version>
         </Sezzle_Sezzlepay>
     </modules>
     <global>
@@ -54,7 +54,7 @@
                 <payment_action>authorize_capture</payment_action>
             </sezzlepay>
         </payment>
-    </default>    
+    </default>
     <frontend>
         <layout>
             <updates>
@@ -71,8 +71,8 @@
                     <frontName>sezzlepay</frontName>
                 </args>
             </sezzlepay>
-        </routers>        
-    </frontend>    
+        </routers>
+    </frontend>
     <crontab>
         <jobs>
             <sezzle_sezzlepay_daily_send>
@@ -81,4 +81,4 @@
             </sezzle_sezzlepay_daily_send>
         </jobs>
     </crontab>
-</config> 
+</config>
