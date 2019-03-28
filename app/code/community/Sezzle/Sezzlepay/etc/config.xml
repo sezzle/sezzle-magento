@@ -9,7 +9,7 @@
 <config>
     <modules>
         <Sezzle_Sezzlepay>
-            <version>4.0.0</version>
+            <version>4.0.1</version>
         </Sezzle_Sezzlepay>
     </modules>
     <global>
