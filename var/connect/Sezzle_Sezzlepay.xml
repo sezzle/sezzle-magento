@@ -1,5 +1,5 @@
 <_>
-   <form_key>4Nmx7IiTYGq6NVhf</form_key>
+   <form_key>X7jdhFAFXNJwEpCo</form_key>
    <name>Sezzle_Sezzlepay</name>
    <channel>community</channel>
    <version_ids>
@@ -11,32 +11,34 @@
 Visit https://www.sezzle.com to know more about Sezzle.</description>
    <license>Apache 2.0</license>
    <license_uri/>
-   <version>3.1.0</version>
+   <version>4.0.2</version>
    <stability>stable</stability>
    <notes>The following are the highlights of this version:
 
-1. We now capture only after order is created.
-2. Fail the order creation if capture is not possible.
-3. Sezzle related logs are now submitted to us to enable proactive debugging.</notes>
+1. Curl support for integration.
+2. Quality improvements.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
          <name>Charlie Youakim</name>
          <name>Killian Brackey</name>
+         <name>Arijit De</name>
       </name>
       <user>
          <user>rishimukherjee</user>
          <user>charlieyouakim</user>
          <user>killianbrackey</user>
+         <user>arijitde</user>
       </user>
       <email>
          <email>rishi.mukherjee@sezzle.com</email>
          <email>charlie.youakim@sezzle.com</email>
          <email>killian.brackey@sezzle.com</email>
+         <email>arijit.de@sezzle.com</email>
       </email>
    </authors>
    <depends_php_min>5.4.0</depends_php_min>
-   <depends_php_max>7.0.0</depends_php_max>
+   <depends_php_max>7.1.0</depends_php_max>
    <depends>
       <package>
          <name>
@@ -52,7 +54,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                                        </files>
+            <files>                                             </files>
          </files>
       </package>
       <extension>
@@ -81,7 +83,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
          <path>Sezzle/Sezzlepay/</path>
          <path>modules/Sezzle_Sezzlepay.xml</path>
          <path>frontend/base/default/template/sezzlepay/</path>
-         <path>frontend/base/default/layout/sezzle_sezzlepay.xml</path>
+         <path>frontend/base/default/layout/sezzlepay.xml</path>
          <path>js/sezzle/</path>
       </path>
       <type>
