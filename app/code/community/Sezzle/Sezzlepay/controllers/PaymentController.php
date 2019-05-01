@@ -164,14 +164,18 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
     protected function _saveCart($array)
     {
         $request = Mage::app()->getRequest();
+        $useBillingForShipping = false;
+        $useShippingForBilling = false;
         foreach ($array as $type => $data) {
             switch ($type) {
                 case 'billing':
-                    Mage::getModel('checkout/type_onepage')
-                        ->saveBilling(
-                            $data,
-                            $request->getPost('billing_address_id',
-                                false));
+                    if (!$useShippingForBilling) {
+                        Mage::getModel('checkout/type_onepage')
+                            ->saveBilling(
+                                $data,
+                                $request->getPost('billing_address_id',
+                                    false));
+                    }
                     $useBillingForShipping = array_key_exists('use_for_shipping', $data) && $data['use_for_shipping'] ? true : false;
                     if ($useBillingForShipping) {
                         Mage::getModel('checkout/type_onepage')
@@ -182,11 +186,13 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                     }
                     break;
                 case 'shipping':
-                    Mage::getModel('checkout/type_onepage')
-                        ->saveShipping(
-                            $data,
-                            $request->getPost('shipping_address_id',
-                                false));
+                    if (!$useBillingForShipping) {
+                        Mage::getModel('checkout/type_onepage')
+                            ->saveShipping(
+                                $data,
+                                $request->getPost('shipping_address_id',
+                                    false));
+                    }
                     $useShippingForBilling = array_key_exists('use_for_billing', $data) && $data['use_for_billing'] ? true : false;
                     if ($useShippingForBilling) {
                         Mage::getModel('checkout/type_onepage')
