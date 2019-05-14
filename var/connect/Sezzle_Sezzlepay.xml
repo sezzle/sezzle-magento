@@ -1,5 +1,5 @@
 <_>
-   <form_key>X7jdhFAFXNJwEpCo</form_key>
+   <form_key>NpRHgdBy1bjS2vsG</form_key>
    <name>Sezzle_Sezzlepay</name>
    <channel>community</channel>
    <version_ids>
@@ -11,12 +11,11 @@
 Visit https://www.sezzle.com to know more about Sezzle.</description>
    <license>Apache 2.0</license>
    <license_uri/>
-   <version>4.0.2</version>
+   <version>4.0.4</version>
    <stability>stable</stability>
    <notes>The following are the highlights of this version:
 
-1. Curl support for integration.
-2. Quality improvements.</notes>
+1. Quality improvements.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -54,7 +53,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                                             </files>
+            <files>                                               </files>
          </files>
       </package>
       <extension>
