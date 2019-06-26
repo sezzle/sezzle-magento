@@ -62,14 +62,12 @@
                 Element.getElementsByTagName('html')[0].appendChild(modalNode);
 
                 // Event listenr for click in know more button
-                Array.from(Element.getElementsByClassName('sezzle-know-more'))
-                .forEach(function(el) {
-                    el.addEventListener('click', function() {
+                Element.getElementsByClassName('sezzle-know-more')[0]
+                    .addEventListener('click', function() {
                     // Show modal node
                     modalNode.style.display = 'block';
                     // Remove hidden class to show the item
                     modalNode.getElementsByClassName('sezzle-checkout-modal')[0].className = "sezzle-checkout-modal";
-                    })
                 });
                 // Event listenr for close in modal
                 Element.getElementsByClassName('close-sezzle-modal')[0]
