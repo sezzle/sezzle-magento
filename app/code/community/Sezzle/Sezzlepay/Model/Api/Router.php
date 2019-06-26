@@ -110,12 +110,6 @@ class Sezzle_Sezzlepay_Model_Api_Router
         $apiMode = Mage::getStoreConfig(
             'payment/sezzlepay/' . Sezzle_Sezzlepay_Model_Sezzlepay::API_MODE_CONFIG_FIELD
         );
-        $overrideBaseUrl = Mage::getStoreConfig(
-            'payment/sezzlepay/' . Sezzle_Sezzlepay_Model_Sezzlepay::API_BASE_URL_CONFIG_FIELD
-        );
-        if ($overrideBaseUrl) {
-            return $this->removeSlashFromUrl($overrideBaseUrl);
-        }
         switch ($apiMode) {
             case self::API_MODE_STAGING:
                 return 'https://staging.gateway.sezzle.com';
