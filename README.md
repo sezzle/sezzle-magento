@@ -18,18 +18,19 @@
 
 1. To configure your Magento Merchant Credentials in Magento Admin complete the following steps. Prerequisite for this section is to obtain a Private Key and Public Key from `Sezzle Merchant Dashboard`.
 
-2. Go to `System > configuration > Sales > Payment Methods > Sezzle Checkout`
+2. Go to `System > configuration > Sales > Payment Methods > Sezzle Pay`
 
 3. Configure the plugin as follows:
     * Set `Enabled` to `yes`.
+    * Set `Merchant Id`.
+    * Set `Api Mode` to either `Sandbox/Test` or `Live`.
     * Set `Payment from Applicable Countries` to `Specific Countries`.
     * Set `Payment from Specific Countries` to `United States`.
     * Set `Private Key` as received from `API Keys` section of `Sezzle Merchant Dashboard`.
     * Set `Public Key` as received from your `API Keys` section of `Sezzle Merchant Dashboard`.
-    * Set `Sezzle Base URL` to `https://gateway.sezzle.com`. Please add `/v1` at the end if you are using an older version.
 
 4. Save the configuration.
-5. Go to `System > configuration > Sales > Sezzle Pay > Product Page Widget Display Settings`
+5. Go to `System > configuration > General > Sezzle Widget`
 6. Set the widget display settings and save config.
 7. Navigate to System/Cache Management.
 8. Flush the cache storage by selecting Flush Cache Storage.
