@@ -1,0 +1,21 @@
+<layout>
+    <adminhtml_sales_order_view>
+        <reference name="order_info">
+            <action method="setTemplate">
+                <template>sezzlepay/sales/order/view/info.phtml</template>
+            </action>
+        </reference>
+    </adminhtml_sales_order_view>
+    <adminhtml_sales_order_invoice_new>
+        <reference name="order_info">
+            <action method="setTemplate">
+                <template>sezzlepay/sales/order/view/info.phtml</template>
+            </action>
+        </reference>
+        <reference name="order_items">
+            <action method="setTemplate">
+                <template>sezzlepay/sales/order/invoice/create/items.phtml</template>
+            </action>
+        </reference>
+    </adminhtml_sales_order_invoice_new>
+</layout>

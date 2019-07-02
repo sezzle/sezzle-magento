@@ -74,10 +74,12 @@
 /app/design/frontend/base/default/*
 !/app/design/frontend/base/default/layout/
 /app/design/frontend/base/default/layout/*
-!/app/design/frontend/base/default/layout/sezzle_sezzlepay.xml
+!/app/design/frontend/base/default/layout/sezzlepay.xml
+!/app/design/adminhtml/default/default/layout/sezzlepay.xml
 !/app/design/frontend/base/default/template/
 /app/design/frontend/base/default/template/*
 !/app/design/frontend/base/default/template/sezzlepay/
 !/app/design/frontend/base/default/template/sezzlepay/*
-
+!/app/design/adminhtml/default/default/template/sezzlepay/
+!/app/design/adminhtml/default/default/template/sezzlepay/*
 composer.json
