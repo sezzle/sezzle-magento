@@ -25,9 +25,10 @@
     * Set `Merchant Id`.
     * Set `Api Mode` to either `Sandbox/Test` or `Live`.
     * Set `Payment from Applicable Countries` to `Specific Countries`.
-    * Set `Payment from Specific Countries` to `United States`.
+    * Set `Payment from Specific Countries` to `United States` or `Canada`.
     * Set `Private Key` as received from `API Keys` section of `Sezzle Merchant Dashboard`.
     * Set `Public Key` as received from your `API Keys` section of `Sezzle Merchant Dashboard`.
+    * Set `Payment Action` as `Authorize only` for doing payment authorization only and           `Authorize and Capture` for doing authorization as well as payment capture.
 
 4. Save the configuration.
 5. Go to `System > configuration > General > Sezzle Widget`
