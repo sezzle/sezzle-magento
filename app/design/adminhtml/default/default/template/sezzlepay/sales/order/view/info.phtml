@@ -1,17 +1,22 @@
 <?php
 /**
+ * Sezzlepay
  *
- * @category    design
- * @package     default_default
- * @copyright   Copyright (c) 2006-2019 Magento, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * @category   design
+ * @package    default_default
+ * @author     Sezzle Team
  */
 ?>
 <?php $_order = $this->getOrder() ?>
 <?php
 $orderAdminDate = $this->formatDate($_order->getCreatedAtDate(), 'medium', true);
 $orderStoreDate = $this->formatDate($_order->getCreatedAtStoreDate(), 'medium', true);
-$sezzleCaptureExpiry = $this->formatDate($_order->getSezzleCaptureExpiry(), 'medium', true);
+$sezzleCaptureExpiry = $_order->getSezzleCaptureExpiry() ? 
+                    $this->formatDate($_order->getSezzleCaptureExpiry(), 'medium', true)
+                    : null;
+$captureInfo = ($_order->getGrandTotal() == $_order->getTotalDue()) 
+                ? Mage::helper('sales')->__('(Please capture before this)')
+                : Mage::helper('sales')->__('(Captured)');
 $paymentMethodCode = $_order->getPayment()->getMethodInstance()->getCode();
 ?>
 <div class="box-left">
@@ -92,7 +97,7 @@ $paymentMethodCode = $_order->getPayment()->getMethodInstance()->getCode();
                     <strong>
                         <?php echo $sezzleCaptureExpiry; ?> <br>
                     </strong>
-                    <?php echo "(Please capture before this)" ?>
+                    <?php echo $captureInfo; ?>
                 </td>
             </tr>
             <?php endif; ?>
@@ -144,7 +149,7 @@ $paymentMethodCode = $_order->getPayment()->getMethodInstance()->getCode();
 <div class="clear"></div>
 
 <div class="box-left">
-    <!--Billing Address-->
+    <!--Billing Address-->Please capture before this
     <div class="entry-edit">
         <div class="entry-edit-head">
             <h4 class="icon-head head-billing-address"><?php echo Mage::helper('sales')->__('Billing Address') ?></h4>

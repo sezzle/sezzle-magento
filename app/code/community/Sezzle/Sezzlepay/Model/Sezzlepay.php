@@ -207,6 +207,11 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
         return uniqid() . "-" . $referenceId;
     }
 
+    /**
+     * Get Sezzlepay Model
+     * 
+     * @return bool
+     */
     public function isOrderAmountMatched($magentoAmount, $sezzleAmount)
     {
        return (round($magentoAmount, 2) == round($sezzleAmount, 2)) ? true : false;
@@ -221,8 +226,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     public function capture(Varien_Object $payment, $amount)
     {
         $reference = $payment->getData('sezzle_reference_id');
-        $quote = $this->_getCheckoutSession()->getQuote();
-        $grandTotalInCents = round($quote->getGrandTotal(), $precision) * 100;
+        $grandTotalInCents = round($amount, $precision) * 100;
 
         $this->helper()->log('Checking if checkout is valid', Zend_Log::DEBUG);
         // check if transaction id is valid
@@ -235,7 +239,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
         if (isset($result['amount_in_cents']) 
             && !$this->isOrderAmountMatched($grandTotalInCents, $result['amount_in_cents']))
         {
-            Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Sezzle Pay gateway has rejected request. Invalid amount.'));
+            Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Sezzle Pay gateway has rejected request due to invalid order total.'));
         }
 
         $captureExpiration = (isset($result['capture_expiration']) && $result['capture_expiration']) ? $result['capture_expiration'] : null;
@@ -256,6 +260,12 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
         return $this;
     }
     
+    /**
+     * Get Sezzlepay Model
+     * 
+     * @param string $reference
+     * @return array
+     */
     public function getSezzleOrderInfo($reference)
     {
         $result = $this->getApiProcessor()->sendApiRequest(
@@ -477,6 +487,11 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
         return false;
     }
 
+    /**
+     * Get Sezzle Config Model
+     *
+     * @return Sezzle_Sezzlepay_Model_Config
+     */
     protected function getSezzleConfigModel()
     {
         return Mage::getModel('sezzle_sezzlepay/config');
@@ -514,7 +529,8 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 __('Sezzle Pay API Error: %s', $result['message'])
             );
         }
-        return isset($result['status'])?$result['status']:null;
+
+        return true;
     }
 
     /**
