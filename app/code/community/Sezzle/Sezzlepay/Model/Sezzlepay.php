@@ -19,6 +19,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     const AUTH = 'authorize';
     const AUTH_CAPTURE = 'authorize_capture';
     const PAYMENT_CODE = 'sezzlepay';
+    const PRECISION = 2;
 
     /**
      * Availability options
@@ -226,7 +227,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     public function capture(Varien_Object $payment, $amount)
     {
         $reference = $payment->getData('sezzle_reference_id');
-        $grandTotalInCents = round($amount, $precision) * 100;
+        $grandTotalInCents = round($amount, self::PRECISION) * 100;
 
         $this->helper()->log('Checking if checkout is valid', Zend_Log::DEBUG);
         // check if transaction id is valid
@@ -292,9 +293,8 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
      */
     protected function createCheckoutRequestBody($quote, $reference, $cancelUrl, $completeUrl)
     {
-        $precision = 2; //precision to which the price needs to be rounded off
         $requestBody = array();
-        $requestBody["amount_in_cents"] = round($quote->getGrandTotal(), $precision) * 100;
+        $requestBody["amount_in_cents"] = round($quote->getGrandTotal(), self::PRECISION) * 100;
         $requestBody["currency_code"] = Mage::app()->getStore()->getCurrentCurrencyCode();
         $requestBody["order_description"] = $reference;
         $requestBody["order_reference_id"] = $reference;
@@ -336,7 +336,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 "sku" => $productSKU,
                 "quantity" => $productQuantity,
                 "price" => array(
-                    "amount_in_cents" => round($productPrice, $precision) * 100,
+                    "amount_in_cents" => round($productPrice, self::PRECISION) * 100,
                     "currency" => $requestBody["currency_code"]
                 )
             );
