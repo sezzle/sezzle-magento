@@ -1,5 +1,5 @@
 <_>
-   <form_key>VEUjyA5LOpLkrRxD</form_key>
+   <form_key>ZlFwm3XCGw843qVH</form_key>
    <name>Sezzle_Sezzlepay</name>
    <channel>community</channel>
    <version_ids>
@@ -11,12 +11,11 @@
 Visit https://www.sezzle.com to know more about Sezzle.</description>
    <license>Apache 2.0</license>
    <license_uri/>
-   <version>4.0.7</version>
+   <version>4.0.8</version>
    <stability>stable</stability>
    <notes>The following are the highlights of this version:
 
-1. Payment Action(Auth only/Auth and Capture) feature has been added.
-2. Quality fixes.</notes>
+1. Quality fixes.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -54,7 +53,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                                                      </files>
+            <files>                                                        </files>
          </files>
       </package>
       <extension>
