@@ -6,7 +6,6 @@ class Sezzle_Sezzlepay_Adminhtml_Sales_Order_InvoiceController extends Mage_Admi
 {
 
     const SUCCESS_CODE = 200;
-    const SEZZLE_PAYMENT_CODE = 'sezzlepay';
     const CAPTURE_ONLINE = 'online';
 
     /**
@@ -40,7 +39,7 @@ class Sezzle_Sezzlepay_Adminhtml_Sales_Order_InvoiceController extends Mage_Admi
                     $order = Mage::getModel('sales/order')->load($orderId);
                     if ($order->getId() 
                         && $data['capture_case'] == self::CAPTURE_ONLINE
-                        && $order->getPayment()->getMethodInstance()->getCode() == self::SEZZLE_PAYMENT_CODE) {
+                        && $order->getPayment()->getMethodInstance()->getCode() == Sezzle_Sezzlepay_Model_Sezzlepay::PAYMENT_CODE) {
                         $captureExpirationTimestamp = Mage::getModel('core/date')->timestamp($order->getSezzleCaptureExpiry());
                         $currentTimestamp = Mage::getModel('core/date')->timestamp("now");
                         $grandTotal = round($order->getGrandTotal(), Sezzle_Sezzlepay_Model_Sezzlepay::PRECISION) * 100;

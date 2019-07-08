@@ -209,7 +209,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     }
 
     /**
-     * Get Sezzlepay Model
+     * Check if order total id matching
      * 
      * @return bool
      */
@@ -262,7 +262,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     }
     
     /**
-     * Get Sezzlepay Model
+     * Get order info from Sezzle
      * 
      * @param string $reference
      * @return array
@@ -388,7 +388,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             $this->getApiRouter()->getCheckoutRefundUrl($reference),
             array(
                 "amount" => array(
-                    "amount_in_cents" => $amount * 100,
+                    "amount_in_cents" => round($amount, self::PRECISION) * 100,
                     "currency" => $currency
                 )
             ),
