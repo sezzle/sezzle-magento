@@ -81,7 +81,7 @@ class Sezzle_Sezzlepay_Model_Gateway_Transaction
                 $orderForSezzle = array(
                     'order_number' => $orderIncrementId,
                     'payment_method' => $payment->getMethod() == 'sezzlepay' ? 'sezzlepay' : $payment->getMethod(),
-                    'amount' => $order->getGrandTotal() * 100,
+                    'amount' => round($order->getGrandTotal(), Sezzle_Sezzlepay_Model_Sezzlepay::PRECISION) * 100,
                     'currency' => $order->getOrderCurrencyCode(),
                     'sezzle_reference' => $payment->getData('sezzle_reference_id'),
                     'customer_email' => $billing->getEmail(),
