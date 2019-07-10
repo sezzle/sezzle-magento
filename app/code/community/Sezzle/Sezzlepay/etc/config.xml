@@ -94,12 +94,4 @@
             </updates>
         </layout>
         </adminhtml>
-    <crontab>
-        <jobs>
-            <sezzle_sezzlepay_daily_send>
-                <schedule><cron_expr>0 0 * * *</cron_expr></schedule>
-                <run><model>sezzle_sezzlepay/observer::sendDailyData</model></run>
-            </sezzle_sezzlepay_daily_send>
-        </jobs>
-    </crontab>
 </config>
