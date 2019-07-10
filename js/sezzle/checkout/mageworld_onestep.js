@@ -23,7 +23,7 @@ jQuery(document).ready(
                         'all-logs': sendAllLogs
                     },
                     onFailure: function () {
-                        alert('Sezzlepay Gateway is not available.');
+                        alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
                     }
                 }
             );
@@ -40,7 +40,7 @@ jQuery(document).ready(
                     onSuccess: function (transport) {
                         var response = {};
                         try {
-                            response = eval('(' + transport.responseText + ')');
+                            response = transport.responseJSON || transport.responseText.evalJSON(true) || {};
                         }
                         catch (e) {
                             response = {};
@@ -49,9 +49,12 @@ jQuery(document).ready(
                         if (response.redirect) {
                             location.href = response.redirect
                         }
+                        else {
+                            alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
+                        }
                     }.bind(this),
                     onFailure: function () {
-                        alert('Sezzlepay Gateway is not available.');
+                        alert('Unable to reach Sezzle Gateway.');alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
                     }
                 }
             );
