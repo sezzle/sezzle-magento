@@ -123,18 +123,4 @@ class Sezzle_Sezzlepay_Model_Api_Router
                 return 'https://gateway.sezzle.com';
         }
     }
-
-    /**
-     * Removal of slash from url
-     *
-     * @param $url
-     * @return bool|string
-     */
-    protected function removeSlashFromUrl($url)
-    {
-        if (substr($url, -1) == '/') {
-            $url = substr($url, 0, -1);
-        }
-        return $url;
-    }
 }

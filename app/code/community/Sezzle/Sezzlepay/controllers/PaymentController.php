@@ -408,7 +408,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             }
 
             $this->helper()->log($marker . ' ' . date('Y-m-d H:i:s', time()));
-            $merchantId = Mage::getStoreConfig('sezzle_sezzlepay/product_widget/merchant_id');
+            $merchantId = Mage::getStoreConfig(Sezzle_Sezzlepay_Model_Api_Processor::API_MERCHANT_ID_CONFIG_PATH);
             $url = $this->getApiRouter()->getSendLogsUrl($merchantId);
             $body = array(
                 'start_time' => date('Y-m-d H:i:s', $time),

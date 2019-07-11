@@ -13,7 +13,7 @@
                             'all-logs': sendAllLogs
                         },
                         onFailure: function () {
-                            alert('Sezzlepay Gateway is not available.');
+                            alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
                         }
                     }
                 );
@@ -22,14 +22,16 @@
                 this.setResponse = function (transport) {
                     var response = {};
 
-                    // Parse the response - lifted from original method
                     try {
-                        response = eval('(' + transport.responseText + ')');
+                        response = transport.responseJSON || transport.responseText.evalJSON(true) || {};
                     } catch (e) {
                         response = {};
                     }
                     if (response.redirect) {
-                        location.href = response.redirect
+                        location.href = encodeURI(response.redirect);
+                    }
+                    else {
+                        alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
                     }
                 };
             }

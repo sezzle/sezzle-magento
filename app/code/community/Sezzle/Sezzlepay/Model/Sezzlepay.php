@@ -22,10 +22,6 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     const PRECISION = 2;
 
     /**
-     * Availability options
-     */
-    protected $_logFileName = 'sezzle-pay.log';
-    /**
      * @var string
      */
     protected $_code = 'sezzlepay';
@@ -294,6 +290,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
      * Get order info from Sezzle
      * 
      * @param string $reference
+     * @throws Mage_Core_Exception
      * @return array
      */
     public function getSezzleOrderInfo($reference)
@@ -474,10 +471,6 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 $session->setLastRecurringProfileIds($ids);
             }
 
-            $this->helper()->log('Session : ' . $this->getSessionId() . ' reference: ' . $quote->getReservedOrderId() . ': Ensuring amount due is 0.', Zend_Log::DEBUG);
-            //ensure the order amount due is 0
-            $order->setTotalDue(0);
-            $order->save();
             // prepare session to success or cancellation page clear current session
             $session->clearHelperData();
             // "last successful quote" for correctly redirect to success page
@@ -508,7 +501,9 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 $session->getQuote()->setIsActive(0)->save();
                 $this->helper()->log('Session : ' . $this->getSessionId() . ' reference: ' . $quote->getReservedOrderId() . ': Cleared cart.', Zend_Log::DEBUG);
                 return true;
-            } catch (Sezzle_Sezzlepay_Exception $e) {
+            } catch (Exception $e) {
+                $this->helper()->log('Session : ' . $this->getSessionId() . ' reference: ' . $quote->getReservedOrderId() . ': Exception occured while completing order : ', Zend_Log::ERR);
+                $this->helper()->log($e->getMessage(), Zend_Log::ERR);
                 $this->_cancelOrder($order);
                 return false;
             }

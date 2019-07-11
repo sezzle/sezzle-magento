@@ -11,8 +11,10 @@ class Sezzle_Sezzlepay_Model_Api_Processor
 {
     const API_PUBLIC_KEY_CONFIG_PATH = 'payment/sezzlepay/public_key';
     const API_PRIVATE_KEY_CONFIG_PATH = 'payment/sezzlepay/private_key';
+    const API_MERCHANT_ID_CONFIG_PATH = 'payment/sezzlepay/merchant_id';
     const CONTENT_TYPE_JSON = 'Content-Type:application/json';
     const BAD_REQUEST = 400;
+    const TIMEOUT = 80;
 
     /**
      * Api call to sezzle
@@ -31,7 +33,7 @@ class Sezzle_Sezzlepay_Model_Api_Processor
         try {
             $http = new Varien_Http_Adapter_Curl();
             $config = array(
-                'timeout' => 80
+                'timeout' => self::TIMEOUT
             );
             $headers = array(self::CONTENT_TYPE_JSON);
             if ($isAuth) {
