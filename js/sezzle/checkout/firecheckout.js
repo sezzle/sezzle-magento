@@ -32,6 +32,7 @@
                     }
                     else {
                         alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
+                        location.href = encodeURI(window.Sezzlepay.cartUrl);
                     }
                 };
             }

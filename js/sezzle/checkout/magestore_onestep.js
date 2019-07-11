@@ -84,11 +84,13 @@
                             }
                             else {
                                 alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
+                                location.href = encodeURI(window.Sezzlepay.cartUrl);
                             }
 
                         }.bind(this),
                         onFailure: function () {
                             alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
+                            location.href = encodeURI(window.Sezzlepay.cartUrl);
                         }
                     }
                 );

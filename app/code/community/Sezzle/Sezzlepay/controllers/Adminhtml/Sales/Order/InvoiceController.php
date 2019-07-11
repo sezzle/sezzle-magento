@@ -41,7 +41,8 @@ class Sezzle_Sezzlepay_Adminhtml_Sales_Order_InvoiceController extends Mage_Admi
                         && $data['capture_case'] == self::CAPTURE_ONLINE
                         && $order->getPayment()->getMethodInstance()->getCode() == Sezzle_Sezzlepay_Model_Sezzlepay::PAYMENT_CODE) {
                         $captureExpirationTimestamp = Mage::getModel('core/date')->timestamp($order->getSezzleCaptureExpiry());
-                        $currentTimestamp = Mage::getModel('core/date')->timestamp("now");
+                        $currentTime = Mage::getModel('core/date')->gmtDate("Y-m-d H:i:s");
+                        $currentTimestamp = Mage::getModel('core/date')->timestamp($currentTime);
                         $grandTotal = round($order->getGrandTotal(), Sezzle_Sezzlepay_Model_Sezzlepay::PRECISION) * 100;
                         $sezzleOrderInfo = $this->getSezzlepayModel()
                                             ->getSezzleOrderInfo($order->getPayment()->getData('sezzle_reference_id'));
