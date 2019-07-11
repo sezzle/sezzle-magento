@@ -224,6 +224,35 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
      * @return $this|Mage_Payment_Model_Abstract
      * @throws Mage_Core_Exception
      */
+    public function authorize(Varien_Object $payment, $amount)
+    {
+        $reference = $payment->getData('sezzle_reference_id');
+        $grandTotalInCents = round($amount, self::PRECISION) * 100;
+
+        $this->helper()->log('Authorizing', Zend_Log::DEBUG);
+        $result = $this->getSezzleOrderInfo($reference);
+
+        $this->helper()->log(array(
+            "response" => $result
+        ), Zend_Log::DEBUG);
+
+        if (isset($result['amount_in_cents']) 
+            && !$this->isOrderAmountMatched($grandTotalInCents, $result['amount_in_cents']))
+        {
+            Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Unable to authorize due to invalid order total.'));
+        }
+
+        // invalid checkout
+        Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Invalid checkout. Please retry again.'));
+        return $this;
+    }
+
+    /**
+     * @param Varien_Object $payment
+     * @param float $amount
+     * @return $this|Mage_Payment_Model_Abstract
+     * @throws Mage_Core_Exception
+     */
     public function capture(Varien_Object $payment, $amount)
     {
         $reference = $payment->getData('sezzle_reference_id');
