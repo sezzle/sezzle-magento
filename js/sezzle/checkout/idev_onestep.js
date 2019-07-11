@@ -57,7 +57,7 @@ function doSezzlepayAPICall(saveURL, params)
                 }
                 
                 if (response.redirect) {
-                    location.href = response.redirect
+                    location.href = encodeURI(response.redirect);
                 }
                 else {
                     alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());

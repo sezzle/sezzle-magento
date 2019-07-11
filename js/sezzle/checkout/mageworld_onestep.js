@@ -47,14 +47,14 @@ jQuery(document).ready(
                         }
 
                         if (response.redirect) {
-                            location.href = response.redirect
+                            location.href = encodeURI(response.redirect);
                         }
                         else {
                             alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
                         }
                     }.bind(this),
                     onFailure: function () {
-                        alert('Unable to reach Sezzle Gateway.');alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
+                        alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
                     }
                 }
             );
