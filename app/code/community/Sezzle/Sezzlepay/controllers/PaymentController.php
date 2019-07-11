@@ -121,8 +121,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             // Adding error for redirect and JSON
             $message = Mage::helper(
                 'sezzle_sezzlepay')->
-            __('There was an error processing your order. %s',
-                $e->getMessage());
+            __('There was an error processing your order.');
             $this->_getCheckoutSession()->addError($message);
             $response = array(
                 'success' => false,
@@ -300,8 +299,11 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             }
             $quote->save();
         } catch (Exception $e) {
+            $message = Mage::helper(
+                'sezzle_sezzlepay')->
+            __('There was an error while checking out.');
             // Add error message
-            $this->_getSession()->addError($e->getMessage());
+            $this->_getSession()->addError($message);
         }
     }
 
@@ -489,8 +491,11 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
             // Place order when validation is correct
             $this->_forward('placeOrder');
         } catch (Exception $e) {
+            $message = Mage::helper(
+                'sezzle_sezzlepay')->
+            __('There was an error while placing the order.');
             // Add error message
-            $this->_getSession()->addError($e->getMessage());
+            $this->_getSession()->addError($message);
             $this->_getSession()->log(
                 $this->__(
                     'Session : ' . $this->getSessionId() . ' Exception during order creation. %s', $e->getMessage()
@@ -548,6 +553,9 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                 $this->_redirect(Mage::helper('checkout/url')->getCheckoutUrl());
             }
         } catch (Exception $e) {
+            $message = Mage::helper(
+                'sezzle_sezzlepay')->
+            __('There was an error processing your order.');
             // Debug log
             $this->helper()->log(
                 $this->__(
@@ -560,7 +568,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                 ),
                 Zend_Log::ERR
             );
-            $this->_getSession()->addError($e->getMessage());
+            $this->_getSession()->addError($message);
             $this->_redirect('checkout/cart');
         }
     }
