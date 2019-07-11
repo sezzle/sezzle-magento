@@ -555,7 +555,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         } catch (Exception $e) {
             $message = Mage::helper(
                 'sezzle_sezzlepay')->
-            __('There was an error processing your order.');
+            __($e->getMessage());
             // Debug log
             $this->helper()->log(
                 $this->__(

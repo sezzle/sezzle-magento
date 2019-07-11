@@ -236,6 +236,12 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             && !$this->isOrderAmountMatched($grandTotalInCents, $result['amount_in_cents']))
         {
             Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Unable to authorize due to invalid order total.'));
+            return $this;
+        }
+        else {
+            $payment->setAdditionalInformation('payment_type', $this->getConfigData('payment_action'));
+            $this->helper()->log('Authorization successful', Zend_Log::DEBUG);
+            return $this;
         }
 
         // invalid checkout
@@ -266,6 +272,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             && !$this->isOrderAmountMatched($grandTotalInCents, $result['amount_in_cents']))
         {
             Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Sezzle Pay gateway has rejected request due to invalid order total.'));
+            return $this;
         }
 
         $captureExpiration = (isset($result['capture_expiration']) && $result['capture_expiration']) ? $result['capture_expiration'] : null;

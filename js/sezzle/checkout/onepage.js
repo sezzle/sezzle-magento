@@ -42,10 +42,12 @@
                     }
                     else {
                         alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
+                        location.href = encodeURI(window.Sezzlepay.cartUrl);
                     }
                 };
                 this.onFailure = function () {
                     alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
+                    location.href = encodeURI(window.Sezzlepay.cartUrl);
                 }
             }
             reviewSave.apply(this, arguments);
