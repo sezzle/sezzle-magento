@@ -72,6 +72,15 @@
                 </args>
             </sezzlepay>
         </routers>
+        <translate>
+            <modules>
+                <Sezzle_Sezzlepay>
+                    <files>
+                        <default>Sezzle_Sezzlepay.csv</default>
+                    </files>
+                </Sezzle_Sezzlepay>
+            </modules>
+        </translate>
     </frontend>
     <admin>
 		<routers>
