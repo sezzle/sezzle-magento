@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--/**
+* Sezzlepay JS Translator
+*
+* @category   Sezzle
+* @package    Sezzle_Sezzlepay
+* @author     Sezzle Team
+*/-->
+<jstranslator>
+    <gateway-fault translate="message" module="sezzlepay">
+        <message>Unable to reach Sezzle Gateway</message>
+    </gateway-fault>
+</jstranslator>

@@ -13,7 +13,7 @@
                             'all-logs': sendAllLogs
                         },
                         onFailure: function () {
-                            alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
+                            alert(Translator.translate('Unable to reach Sezzle Gateway').stripTags());
                         }
                     }
                 );
@@ -31,7 +31,7 @@
                         location.href = encodeURI(response.redirect);
                     }
                     else {
-                        alert(Translator.translate('Unable to reach Sezzle Gateway.').stripTags());
+                        alert(Translator.translate('Unable to reach Sezzle Gateway').stripTags());
                         location.href = encodeURI(window.Sezzlepay.cartUrl);
                     }
                 };
