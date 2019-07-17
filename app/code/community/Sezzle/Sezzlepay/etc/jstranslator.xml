@@ -7,7 +7,7 @@
 * @author     Sezzle Team
 */-->
 <jstranslator>
-    <gateway-fault translate="message" module="sezzlepay">
+    <gateway-fault translate="message" module="sezzle_sezzlepay">
         <message>Unable to reach Sezzle Gateway</message>
     </gateway-fault>
 </jstranslator>
