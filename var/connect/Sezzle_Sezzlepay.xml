@@ -1,5 +1,5 @@
 <_>
-   <form_key>VFdhM3RUMg9UV9Wu</form_key>
+   <form_key>r4GY4l9bNPlKSBJL</form_key>
    <name>Sezzle_Sezzlepay</name>
    <channel>community</channel>
    <version_ids>
@@ -15,7 +15,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
    <stability>stable</stability>
    <notes>The following are the highlights of this version:
 
-1. Translator for checkout JS added. </notes>
+1. Quality fixes.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -53,7 +53,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                                                            </files>
+            <files>                                                              </files>
          </files>
       </package>
       <extension>
