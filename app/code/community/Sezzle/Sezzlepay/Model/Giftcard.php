@@ -54,7 +54,7 @@ class Sezzle_Sezzlepay_Model_Giftcard
                 $quote->setGiftCardsAmountUsed($balance);
                 $quote->setGiftCards($giftCards);
                 //deduct the gift card
-                $giftCardsData = unserialize($giftCards);
+                $giftCardsData = Mage::helper('core/unserializeArray')->unserialize($giftCards);
                 $giftCardsAccount = Mage::getModel('enterprise_giftcardaccount/giftcardaccount')
                     ->loadByCode($giftCardsData[0]['c']);
                 if (!$giftCardsAccount->getId()) {
