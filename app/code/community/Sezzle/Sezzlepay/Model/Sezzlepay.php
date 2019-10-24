@@ -283,6 +283,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
         $captureExpirationTimestamp = Mage::getModel('core/date')->timestamp($captureExpiration);
         $currentTimestamp = Mage::getModel('core/date')->timestamp("now");
         if ($captureExpirationTimestamp >= $currentTimestamp) {
+            $payment->setAdditionalInformation('payment_type', $this->getConfigData('payment_action'));
             $this->helper()->log('Valid checkout', Zend_Log::DEBUG);
             $payment->setTransactionId($reference)->setIsTransactionClosed(false);
             return $this;
@@ -490,7 +491,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             try {
                 $this->helper()->log('Session : ' . $this->getSessionId() . ' reference: ' . $quote->getReservedOrderId() . ': Capturing payment in Sezzle.', Zend_Log::DEBUG);
                 if ($this->getSezzleConfigModel()->getPaymentAction() == self::AUTH_CAPTURE) {
-                    $this->sezzleCaptureAndComplete($order->getPayment());
+                    $this->sezzleCaptureAndComplete($order);
                     $order->getPayment()->setIsTransactionClosed(true);
                 }
                 elseif ($this->getSezzleConfigModel()->getPaymentAction() == self::AUTH) {
@@ -539,13 +540,13 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     }
 
     /**
-     * @param Varien_Object $payment
+     * @param Varien_Object $order
      * @return $this
      * @throws Mage_Core_Exception
      */
-    public function sezzleCaptureAndComplete(Varien_Object $payment)
+    public function sezzleCaptureAndComplete(Varien_Object $order)
     {
-        $reference = $payment->getData('sezzle_reference_id');
+        $reference = $order->getPayment()->getData('sezzle_reference_id');
         // Charge
         $result = $this->getApiProcessor()->sendApiRequest(
             $this->getApiRouter()->getCheckoutCompleteUrl($reference),
@@ -559,6 +560,9 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 'Sezzle_Sezzlepay',
                 __('Sezzle Pay API Error: %s', $result['message'])
             );
+        }
+        elseif (isset($result["order_reference_id"]) && $result["order_reference_id"] != null) {
+            $order->setIsCaptured(1)->save();
         }
 
         return true;

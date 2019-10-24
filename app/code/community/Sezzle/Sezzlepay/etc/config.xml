@@ -9,7 +9,7 @@
 <config>
     <modules>
         <Sezzle_Sezzlepay>
-            <version>4.0.2</version>
+            <version>4.0.3</version>
         </Sezzle_Sezzlepay>
     </modules>
     <global>
@@ -102,5 +102,13 @@
                 </sezzlepay>
             </updates>
         </layout>
-        </adminhtml>
+    </adminhtml>
+    <crontab>
+        <jobs>
+            <sezzle_sezzlepay_daily_send>
+                <schedule><cron_expr>*/1 * * * *</cron_expr></schedule>
+                <run><model>sezzle_sezzlepay/observer::capturePayment</model></run>
+            </sezzle_sezzlepay_daily_send>
+        </jobs>
+    </crontab>
 </config>
