@@ -226,8 +226,8 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         );
         $quote = $this->_getQuote();
         if (!$quote->hasItems() || $quote->getHasError()) {
-            $this->getResponse()
-                ->setHeader('HTTP/1.1', '403 Forbidden');
+//            $this->getResponse()
+//                ->setHeader('HTTP/1.1', '403 Forbidden');
 
             if (!$quote->hasItems()) {
                 $message = 'No items in quote';
@@ -493,15 +493,16 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         } catch (Exception $e) {
             $message = Mage::helper(
                 'sezzle_sezzlepay')->
-            __('There was an error while placing the order.');
+            __('There was an error while placing the order. Reason might be no items in the cart.');
             // Add error message
             $this->_getSession()->addError($message);
-            $this->_getSession()->log(
+            $this->helper()->log(
                 $this->__(
                     'Session : ' . $this->getSessionId() . ' Exception during order creation. %s', $e->getMessage()
                 ),
                 Zend_Log::ERR
             );
+            $this->_redirect('checkout/cart');
         }
     }
 

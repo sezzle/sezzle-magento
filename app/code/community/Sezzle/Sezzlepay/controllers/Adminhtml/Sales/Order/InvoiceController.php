@@ -33,12 +33,15 @@ class Sezzle_Sezzlepay_Adminhtml_Sales_Order_InvoiceController extends Mage_Admi
 
         try {
             $invoice = $this->_initInvoice();
+            $hasSezzleCaptured = false;
             if ($invoice) {
 
                 if (!empty($data['capture_case'])) {
                     $order = Mage::getModel('sales/order')->load($orderId);
                     if ($order->getId() 
                         && $data['capture_case'] == self::CAPTURE_ONLINE
+                        && $order->getIsCaptured() == Sezzle_Sezzlepay_Model_Sezzlepay::STATE_NOT_CAPTURED
+                        && $order->getPayment()->getAdditionalInformation("payment_type") == Sezzle_Sezzlepay_Model_Sezzlepay::AUTH
                         && $order->getPayment()->getMethodInstance()->getCode() == Sezzle_Sezzlepay_Model_Sezzlepay::PAYMENT_CODE) {
                         $captureExpirationTimestamp = Mage::getModel('core/date')->timestamp($order->getSezzleCaptureExpiry());
                         $currentTime = Mage::getModel('core/date')->gmtDate("Y-m-d H:i:s");
@@ -54,7 +57,7 @@ class Sezzle_Sezzlepay_Adminhtml_Sales_Order_InvoiceController extends Mage_Admi
                         }
                         elseif ($captureExpirationTimestamp >= $currentTimestamp) {
                             $hasSezzleCaptured = $this->getSezzlepayModel()
-                                                        ->sezzleCaptureAndComplete($order->getPayment());
+                                                        ->sezzleCaptureAndComplete($order);
                             if ($hasSezzleCaptured) {
                                 $invoice->setRequestedCaptureCase($data['capture_case']);
                             }
@@ -84,6 +87,9 @@ class Sezzle_Sezzlepay_Adminhtml_Sales_Order_InvoiceController extends Mage_Admi
 
                 $invoice->getOrder()->setCustomerNoteNotify(!empty($data['send_email']));
                 $invoice->getOrder()->setIsInProcess(true);
+                if ($invoice->getOrder()->getIsCaptured() == Sezzle_Sezzlepay_Model_Sezzlepay::STATE_NOT_CAPTURED && $hasSezzleCaptured) {
+                    $invoice->getOrder()->setIsCaptured(Sezzle_Sezzlepay_Model_Sezzlepay::STATE_CAPTURED);
+                }
 
                 $transactionSave = Mage::getModel('core/resource_transaction')
                     ->addObject($invoice)
