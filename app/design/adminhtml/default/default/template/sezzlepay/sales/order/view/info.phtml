@@ -14,9 +14,13 @@ $orderStoreDate = $this->formatDate($_order->getCreatedAtStoreDate(), 'medium', 
 $sezzleCaptureExpiry = $_order->getSezzleCaptureExpiry() ? 
                     $this->formatDate($_order->getSezzleCaptureExpiry(), 'medium', true)
                     : null;
-$captureInfo = ($_order->getGrandTotal() == $_order->getTotalDue()) 
+$paymentType = $_order->getPayment()->getAdditionalInformation("payment_type");
+$captureInfo = ($_order->getGrandTotal() == $_order->getTotalDue())
                 ? Mage::helper('sales')->__('(Please capture before this)')
                 : Mage::helper('sales')->__('(Captured)');
+$captureStatus = $_order->getIsCaptured() == Sezzle_Sezzlepay_Model_Sezzlepay::STATE_CAPTURED
+    ? Mage::helper('sales')->__('Captured')
+    : Mage::helper('sales')->__('Not Captured');
 $paymentMethodCode = $_order->getPayment()->getMethodInstance()->getCode();
 ?>
 <div class="box-left">
@@ -89,8 +93,9 @@ $paymentMethodCode = $_order->getPayment()->getMethodInstance()->getCode();
                 <td class="value"><strong><?php echo $_order->getBaseToOrderRate() ?></strong></td>
             </tr>
             <?php endif; ?>
-            <?php if ($sezzleCaptureExpiry 
-                    && $paymentMethodCode == Sezzle_Sezzlepay_Model_Sezzlepay::PAYMENT_CODE) : ?>
+            <?php if ($sezzleCaptureExpiry && $captureStatus == Sezzle_Sezzlepay_Model_Sezzlepay::STATE_NOT_CAPTURED
+                    && ($paymentMethodCode == Sezzle_Sezzlepay_Model_Sezzlepay::PAYMENT_CODE)
+                    && $paymentType == Sezzle_Sezzlepay_Model_Sezzlepay::AUTH) : ?>
             <tr>
                 <td class="label"><label><?php echo Mage::helper('sales')->__('Sezzle Capture Expiry') ?></label></td>
                 <td class="value">
@@ -98,6 +103,16 @@ $paymentMethodCode = $_order->getPayment()->getMethodInstance()->getCode();
                         <?php echo $sezzleCaptureExpiry; ?> <br>
                     </strong>
                     <?php echo $captureInfo; ?>
+                </td>
+            </tr>
+            <?php endif; ?>
+            <?php if ($paymentMethodCode == Sezzle_Sezzlepay_Model_Sezzlepay::PAYMENT_CODE) : ?>
+            <tr>
+                <td class="label"><label><?php echo Mage::helper('sales')->__('Sezzle Capture Status') ?></label></td>
+                <td class="value">
+                    <strong>
+                        <?php echo $captureStatus; ?> <br>
+                    </strong>
                 </td>
             </tr>
             <?php endif; ?>

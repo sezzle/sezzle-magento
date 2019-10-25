@@ -9,7 +9,7 @@
 <config>
     <modules>
         <Sezzle_Sezzlepay>
-            <version>4.0.2</version>
+            <version>4.0.3</version>
         </Sezzle_Sezzlepay>
     </modules>
     <global>
@@ -17,6 +17,11 @@
             <sezzle_sezzlepay>
                 <class>Sezzle_Sezzlepay_Block</class>
             </sezzle_sezzlepay>
+            <adminhtml>
+                <rewrite>
+                    <sales_order_grid>Sezzle_Sezzlepay_Block_Adminhtml_Order_Grid</sales_order_grid>
+                </rewrite>
+            </adminhtml>
         </blocks>
         <models>
             <sezzle_sezzlepay>
@@ -50,7 +55,7 @@
                 <title>Sezzle Pay PayLater 0% Interest</title>
                 <active>1</active>
                 <model>sezzle_sezzlepay/sezzlepay</model>
-                <order_status>processing</order_status>
+                <order_status>pending</order_status>
                 <payment_action>authorize_capture</payment_action>
             </sezzlepay>
         </payment>
@@ -102,5 +107,13 @@
                 </sezzlepay>
             </updates>
         </layout>
-        </adminhtml>
+    </adminhtml>
+    <crontab>
+        <jobs>
+            <sezzle_capture_payment>
+                <schedule><cron_expr>*/5 * * * *</cron_expr></schedule>
+                <run><model>sezzle_sezzlepay/observer::capturePayment</model></run>
+            </sezzle_capture_payment>
+        </jobs>
+    </crontab>
 </config>

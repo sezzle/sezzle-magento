@@ -12,6 +12,8 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     /**
      * Constants
      */
+    const STATE_CAPTURED       = 1;
+    const STATE_NOT_CAPTURED   = 0;
     const API_PUBLIC_KEY_CONFIG_PATH = 'payment/sezzlepay/public_key';
     const API_PRIVATE_KEY_CONFIG_PATH = 'payment/sezzlepay/private_key';
     const API_MODE_CONFIG_FIELD = 'api_mode';
@@ -21,6 +23,10 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     const PAYMENT_CODE = 'sezzlepay';
     const PRECISION = 2;
 
+    /**
+     * @var string
+     */
+    protected static $_states;
     /**
      * @var string
      */
@@ -283,14 +289,31 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
         $captureExpirationTimestamp = Mage::getModel('core/date')->timestamp($captureExpiration);
         $currentTimestamp = Mage::getModel('core/date')->timestamp("now");
         if ($captureExpirationTimestamp >= $currentTimestamp) {
+            $payment->setAdditionalInformation('payment_type', $this->getConfigData('payment_action'));
             $this->helper()->log('Valid checkout', Zend_Log::DEBUG);
-            $payment->setTransactionId($reference)->setIsTransactionClosed(false);
+            $this->helper()->log('Session : ' . $this->getSessionId() . ' Sezzle reference: ' . $reference . ': Capturing payment in Sezzle.', Zend_Log::DEBUG);
+            $hasSezzleCaptured = $this->sezzleCaptureAndComplete($payment->getOrder());
+            if ($hasSezzleCaptured) {
+                $this->helper()->log('Session : ' . $this->getSessionId() . ' Sezzle reference: ' . $reference . ': Captured payment in Sezzle.', Zend_Log::DEBUG);
+                $payment->setTransactionId($reference)->setIsTransactionClosed(true);
+            }
             return $this;
         }
 
         // invalid checkout
         Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Invalid checkout. Please retry again.'));
         return $this;
+    }
+
+    public function getCaptureStates()
+    {
+        if (is_null(self::$_states)) {
+            self::$_states = array(
+                self::STATE_CAPTURED       => Mage::helper('sales')->__('Captured'),
+                self::STATE_NOT_CAPTURED       => Mage::helper('sales')->__('Not Captured'),
+            );
+        }
+        return self::$_states;
     }
     
     /**
@@ -488,19 +511,16 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             $session->setLastOrderId($order->getId())
                 ->setLastRealOrderId($order->getIncrementId());
             try {
-                $this->helper()->log('Session : ' . $this->getSessionId() . ' reference: ' . $quote->getReservedOrderId() . ': Capturing payment in Sezzle.', Zend_Log::DEBUG);
-                if ($this->getSezzleConfigModel()->getPaymentAction() == self::AUTH_CAPTURE) {
-                    $this->sezzleCaptureAndComplete($order->getPayment());
-                    $order->getPayment()->setIsTransactionClosed(true);
+
+                $sezzleOrderInfo = $this->getSezzleOrderInfo($order->getPayment()->getData('sezzle_reference_id'));
+                if (isset($sezzleOrderInfo['capture_expiration']) && $sezzleOrderInfo['capture_expiration']) {
+                    $order->setSezzleCaptureExpiry($sezzleOrderInfo['capture_expiration']);
+                    $order->save();
                 }
-                elseif ($this->getSezzleConfigModel()->getPaymentAction() == self::AUTH) {
-                    $sezzleOrderInfo = $this->getSezzleOrderInfo($order->getPayment()->getData('sezzle_reference_id'));
-                    if (isset($sezzleOrderInfo['capture_expiration']) && $sezzleOrderInfo['capture_expiration']) {
-                        $order->setSezzleCaptureExpiry($sezzleOrderInfo['capture_expiration']);
-                        $order->save();
-                    }
+                if ($order->getIsCaptured() == self::STATE_CAPTURED) {
+                    $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true)->save();
                 }
-                $this->helper()->log('Session : ' . $this->getSessionId() . ' reference: ' . $quote->getReservedOrderId() . ': Captured payment in Sezzle.', Zend_Log::DEBUG);
+
                 if (!$order->getEmailSent()) {
                     $order->sendNewOrderEmail();
                 }
@@ -539,13 +559,13 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     }
 
     /**
-     * @param Varien_Object $payment
+     * @param Varien_Object $order
      * @return $this
      * @throws Mage_Core_Exception
      */
-    public function sezzleCaptureAndComplete(Varien_Object $payment)
+    public function sezzleCaptureAndComplete(Varien_Object $order)
     {
-        $reference = $payment->getData('sezzle_reference_id');
+        $reference = $order->getPayment()->getData('sezzle_reference_id');
         // Charge
         $result = $this->getApiProcessor()->sendApiRequest(
             $this->getApiRouter()->getCheckoutCompleteUrl($reference),
@@ -559,6 +579,9 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 'Sezzle_Sezzlepay',
                 __('Sezzle Pay API Error: %s', $result['message'])
             );
+        }
+        elseif (isset($result["order_reference_id"]) && $result["order_reference_id"] != null) {
+            $order->setIsCaptured(self::STATE_CAPTURED)->save();
         }
 
         return true;
