@@ -337,7 +337,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             }
             else {
                 $this->helper()->log('Session : ' . $this->getSessionId() . ' Sezzle reference: ' . $reference . ': Capturing of payment in Sezzle is unsuccessful.', Zend_Log::DEBUG);
-                Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Something went while registering the order.'));
+                Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Something went wrong while registering the order.'));
             }
             return $this;
         }
