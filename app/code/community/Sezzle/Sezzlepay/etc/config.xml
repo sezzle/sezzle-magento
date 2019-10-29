@@ -55,8 +55,10 @@
                 <title>Sezzle Pay PayLater 0% Interest</title>
                 <active>1</active>
                 <model>sezzle_sezzlepay/sezzlepay</model>
-                <order_status>pending</order_status>
+                <order_status>processing</order_status>
                 <payment_action>authorize_capture</payment_action>
+                <public_key backend_model="adminhtml/system_config_backend_encrypted"/>
+                <private_key backend_model="adminhtml/system_config_backend_encrypted"/>
             </sezzlepay>
         </payment>
     </default>

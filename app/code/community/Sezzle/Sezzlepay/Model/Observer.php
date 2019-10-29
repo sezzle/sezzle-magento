@@ -45,5 +45,4 @@ class Sezzle_Sezzlepay_Model_Observer
     {
         return Mage::helper('sezzle_sezzlepay');
     }
-
 }

@@ -82,7 +82,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     /**
      * @var bool
      */
-    protected $_isInitializeNeeded = false;
+    protected $_isInitializeNeeded = true;
     /**
      * @var bool
      */
@@ -180,6 +180,40 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     }
 
     /**
+     * Instantiate state and set it to state object
+     *
+     * @param string $paymentAction
+     * @param Varien_Object
+     */
+    public function initialize($paymentAction, $stateObject)
+    {
+        switch ($paymentAction) {
+            case self::ACTION_AUTHORIZE:
+                $payment = $this->getInfoInstance();
+                $order = $payment->getOrder();
+                $order->setCanSendNewEmailFlag(false);
+                $payment->authorize(true, $order->getBaseTotalDue()); // base amount will be set inside
+                $payment->setAmountAuthorized($order->getTotalDue());
+
+                $order->setState(Mage_Sales_Model_Order::STATE_NEW, 'new', '', false);
+
+                $stateObject->setState(Mage_Sales_Model_Order::STATE_NEW);
+                $stateObject->setStatus('pending');
+                $stateObject->setIsNotified(false);
+                break;
+            case self::ACTION_AUTHORIZE_CAPTURE:
+                $payment = $this->getInfoInstance();
+                $order = $payment->getOrder();
+                $order->setCanSendNewEmailFlag(false);
+                $payment->capture(null);
+                $payment->setAmountPaid($order->getTotalDue());
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
      * Get Sezzle helper
      *
      * @return Mage_Core_Helper_Abstract
@@ -263,6 +297,10 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
      */
     public function capture(Varien_Object $payment, $amount)
     {
+        if ($amount <= 0) {
+            Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Invalid amount for capture.'));
+        }
+
         $reference = $payment->getData('sezzle_reference_id');
         $grandTotalInCents = round($amount, self::PRECISION) * 100;
 
@@ -296,6 +334,10 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             if ($hasSezzleCaptured) {
                 $this->helper()->log('Session : ' . $this->getSessionId() . ' Sezzle reference: ' . $reference . ': Captured payment in Sezzle.', Zend_Log::DEBUG);
                 $payment->setTransactionId($reference)->setIsTransactionClosed(true);
+            }
+            else {
+                $this->helper()->log('Session : ' . $this->getSessionId() . ' Sezzle reference: ' . $reference . ': Capturing of payment in Sezzle is unsuccessful.', Zend_Log::DEBUG);
+                Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Something went while registering the order.'));
             }
             return $this;
         }
@@ -516,9 +558,6 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 if (isset($sezzleOrderInfo['capture_expiration']) && $sezzleOrderInfo['capture_expiration']) {
                     $order->setSezzleCaptureExpiry($sezzleOrderInfo['capture_expiration']);
                     $order->save();
-                }
-                if ($order->getIsCaptured() == self::STATE_CAPTURED) {
-                    $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true)->save();
                 }
 
                 if (!$order->getEmailSent()) {
