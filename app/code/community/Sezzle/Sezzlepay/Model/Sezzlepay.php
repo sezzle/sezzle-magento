@@ -207,6 +207,10 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 $order->setCanSendNewEmailFlag(false);
                 $payment->capture(null);
                 $payment->setAmountPaid($order->getTotalDue());
+                $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, 'processing', '', false);
+
+                $stateObject->setState(Mage_Sales_Model_Order::STATE_PROCESSING);
+                $stateObject->setStatus('processing');
                 break;
             default:
                 break;
@@ -319,6 +323,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             return $this;
         }
 
+        $capturedAt = (isset($result['captured_at']) && $result['captured_at']) ? $result['captured_at'] : null;
         $captureExpiration = (isset($result['capture_expiration']) && $result['capture_expiration']) ? $result['capture_expiration'] : null;
         if ($captureExpiration === null) {
             Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Not authorized on Sezzle. Please try again.'));
@@ -326,7 +331,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
         }
         $captureExpirationTimestamp = Mage::getModel('core/date')->timestamp($captureExpiration);
         $currentTimestamp = Mage::getModel('core/date')->timestamp("now");
-        if ($captureExpirationTimestamp >= $currentTimestamp) {
+        if (($captureExpirationTimestamp >= $currentTimestamp) && $capturedAt == null) {
             $payment->setAdditionalInformation('payment_type', $this->getConfigData('payment_action'));
             $this->helper()->log('Valid checkout', Zend_Log::DEBUG);
             $this->helper()->log('Session : ' . $this->getSessionId() . ' Sezzle reference: ' . $reference . ': Capturing payment in Sezzle.', Zend_Log::DEBUG);
@@ -340,6 +345,9 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Something went wrong while registering the order.'));
             }
             return $this;
+        } else {
+            $this->helper()->log('Session : ' . $this->getSessionId() . ' Sezzle reference: ' . $reference . ': Payment already captured in Sezzle.', Zend_Log::DEBUG);
+            Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Payment already captured in Sezzle.'));
         }
 
         // invalid checkout
