@@ -50,28 +50,7 @@ class Sezzle_Sezzlepay_Adminhtml_Sales_Order_InvoiceController extends Mage_Admi
                         && $order->getIsCaptured() == Sezzle_Sezzlepay_Model_Sezzlepay::STATE_NOT_CAPTURED
                         && $order->getPayment()->getAdditionalInformation("payment_type") == Sezzle_Sezzlepay_Model_Sezzlepay::AUTH
                         && $order->getPayment()->getMethodInstance()->getCode() == Sezzle_Sezzlepay_Model_Sezzlepay::PAYMENT_CODE) {
-                        $captureExpirationTimestamp = Mage::getModel('core/date')->timestamp($order->getSezzleCaptureExpiry());
-                        $currentTime = Mage::getModel('core/date')->gmtDate("Y-m-d H:i:s");
-                        $currentTimestamp = Mage::getModel('core/date')->timestamp($currentTime);
-                        $grandTotal = round($order->getGrandTotal(), Sezzle_Sezzlepay_Model_Sezzlepay::PRECISION) * 100;
-                        $sezzleOrderInfo = $this->getSezzlepayModel()
-                                            ->getSezzleOrderInfo($order->getPayment()->getData('sezzle_reference_id'));
-                        
-                        if (isset($sezzleOrderInfo['amount_in_cents'])
-                            && ($grandTotal != $sezzleOrderInfo['amount_in_cents'])) {
-                            Mage::throwException(Mage::helper('sezzle_sezzlepay')->
-                            __('Capture request has been rejected due to invalid order total.'));
-                        }
-                        elseif ($captureExpirationTimestamp >= $currentTimestamp) {
-                            $hasSezzleCaptured = $this->getSezzlepayModel()
-                                                        ->sezzleCaptureAndComplete($order);
-                            if ($hasSezzleCaptured) {
-                                $invoice->setRequestedCaptureCase($data['capture_case']);
-                            }
-                        }
-                        else {
-                            Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Capture time for this order has been expired. Contact <a href="https://sezzle.com/contact-us/merchant-support">Sezzle Merchant Support</a>.'));
-                        }
+                        $invoice->setRequestedCaptureCase($data['capture_case']);
                     }
                     else {
                         $invoice->setRequestedCaptureCase($data['capture_case']);

@@ -226,8 +226,8 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         );
         $quote = $this->_getQuote();
         if (!$quote->hasItems() || $quote->getHasError()) {
-//            $this->getResponse()
-//                ->setHeader('HTTP/1.1', '403 Forbidden');
+            $this->getResponse()
+                ->setHeader('HTTP/1.1', '403 Forbidden');
 
             if (!$quote->hasItems()) {
                 $message = 'No items in quote';
