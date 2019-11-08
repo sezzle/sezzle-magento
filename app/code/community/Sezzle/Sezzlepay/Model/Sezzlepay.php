@@ -163,7 +163,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 );
             }
 
-            $checkoutUrl = $result['checkout_url'];
+            $checkoutUrl = isset($result['checkout_url']) ? $result['checkout_url'] : "";
             if (empty($checkoutUrl)) {
                 $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Sezzle Pay API Error : Received empty checkout URL from Sezzle.', Zend_Log::DEBUG);
                 throw Mage::exception(
