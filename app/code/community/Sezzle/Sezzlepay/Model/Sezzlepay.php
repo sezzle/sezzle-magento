@@ -266,7 +266,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     public function authorize(Varien_Object $payment, $amount)
     {
         $reference = $payment->getData('sezzle_reference_id');
-        $grandTotalInCents = round($amount, self::PRECISION) * 100;
+        $grandTotalInCents = (int)(round($amount * 100, self::PRECISION));
 
         $this->helper()->log('Authorizing', Zend_Log::DEBUG);
         $result = $this->getSezzleOrderInfo($reference);
@@ -305,7 +305,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
         }
 
         $reference = $payment->getData('sezzle_reference_id');
-        $grandTotalInCents = round($amount, self::PRECISION) * 100;
+        $grandTotalInCents = (int)(round($amount * 100, self::PRECISION));
 
         $this->helper()->log('Checking if checkout is valid', Zend_Log::DEBUG);
         // check if transaction id is valid
@@ -492,7 +492,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             $this->getApiRouter()->getCheckoutRefundUrl($reference),
             array(
                 "amount" => array(
-                    "amount_in_cents" => round($amount, self::PRECISION) * 100,
+                    "amount_in_cents" => (int)(round($amount * 100, self::PRECISION)),
                     "currency" => $currency
                 )
             ),
