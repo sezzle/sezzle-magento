@@ -23,13 +23,16 @@ class Sezzle_Sezzlepay_Model_Api_Processor
      * @param $body
      * @param bool $isAuth
      * @param string $method
-     * @return Zend_Http_Response
+     * @return string
      * @throws Mage_Core_Exception
      */
     public function sendApiRequest($url, $body = false, $isAuth = true, $method = Varien_Http_Client::GET)
     {
         $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/sezzlepay');
         $sezzlePaymentModel->helper()->log('Session : ' . $sezzlePaymentModel->getSessionID() . " Sending Request $url");
+        $encodedBody = Mage::helper('core')->jsonEncode($body);
+        $sezzlePaymentModel->helper()->log("Request Body");
+        $sezzlePaymentModel->helper()->log($encodedBody);
         try {
             $http = new Varien_Http_Adapter_Curl();
             $config = array(
@@ -48,12 +51,15 @@ class Sezzle_Sezzlepay_Model_Api_Processor
                 $url,
                 '1.1',
                 $headers,
-                Mage::helper('core')->jsonEncode($body)
+                $encodedBody
             );
             $response = $http->read();
             $response = preg_split('/^\r?$/m', $response, 2);
             $response = trim($response[1]);
-            return $response;
+            $decodedBody = Mage::helper('core')->jsonDecode($response);
+            $sezzlePaymentModel->helper()->log("Response Body");
+            $sezzlePaymentModel->helper()->log($decodedBody);
+            return $decodedBody;
         } catch (Exception $e) {
             throw Mage::exception(
                 'Sezzle_Sezzlepay',
@@ -79,14 +85,13 @@ class Sezzle_Sezzlepay_Model_Api_Processor
                 false,
                 Varien_Http_Client::POST
             );
-            $resultObject = Mage::helper('core')->jsonDecode($result);
             if (isset($result['status']) && $result['status'] == self::BAD_REQUEST) {
                 throw Mage::exception(
                     'Sezzle_Sezzlepay',
                     __('Sezzle Pay API Error: %s', $result['message'])
                 );
             }
-            $token = isset($resultObject['token']) ? $resultObject['token'] : '';
+            $token = isset($result['token']) ? $result['token'] : '';
             if (empty($token)) {
                 throw Mage::exception(
                     'Sezzle_Sezzlepay',
