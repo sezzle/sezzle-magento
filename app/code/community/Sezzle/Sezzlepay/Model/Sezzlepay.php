@@ -155,16 +155,15 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 true,
                 Varien_Http_Client::POST
             );
-            $resultObject = Mage::helper('core')->jsonDecode($result);
             if (isset($result['status']) && $result['status'] == Sezzle_Sezzlepay_Model_Api_Processor::BAD_REQUEST) {
                 $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Sezzle Pay API Error : Error receiving complete URL from Sezzle.', Zend_Log::DEBUG);
                 throw Mage::exception(
                     'Sezzle_Sezzlepay',
-                    __('Sezzle Pay API Error: %s', $resultObject['message'])
+                    __('Sezzle Pay API Error: %s', $result['message'])
                 );
             }
 
-            $checkoutUrl = $resultObject['checkout_url'];
+            $checkoutUrl = isset($result['checkout_url']) ? $result['checkout_url'] : "";
             if (empty($checkoutUrl)) {
                 $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Sezzle Pay API Error : Received empty checkout URL from Sezzle.', Zend_Log::DEBUG);
                 throw Mage::exception(
@@ -267,7 +266,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     public function authorize(Varien_Object $payment, $amount)
     {
         $reference = $payment->getData('sezzle_reference_id');
-        $grandTotalInCents = round($amount, self::PRECISION) * 100;
+        $grandTotalInCents = (int)(round($amount * 100, self::PRECISION));
 
         $this->helper()->log('Authorizing', Zend_Log::DEBUG);
         $result = $this->getSezzleOrderInfo($reference);
@@ -306,7 +305,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
         }
 
         $reference = $payment->getData('sezzle_reference_id');
-        $grandTotalInCents = round($amount, self::PRECISION) * 100;
+        $grandTotalInCents = (int)(round($amount * 100, self::PRECISION));
 
         $this->helper()->log('Checking if checkout is valid', Zend_Log::DEBUG);
         // check if transaction id is valid
@@ -378,7 +377,6 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
         $result = $this->getApiProcessor()->sendApiRequest(
             $this->getApiRouter()->getCheckoutDetailsUrl($reference)
         );
-        $result = Mage::helper('core')->jsonDecode($result);
         if (isset($result['status']) && $result['status'] == Sezzle_Sezzlepay_Model_Api_Processor::BAD_REQUEST) {
             $this->helper()->log('Checkout is invalid', Zend_Log::DEBUG);
             Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Invalid checkout. Please retry again.'));
@@ -400,7 +398,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     protected function createCheckoutRequestBody($quote, $reference, $cancelUrl, $completeUrl)
     {
         $requestBody = array();
-        $requestBody["amount_in_cents"] = round($quote->getGrandTotal(), self::PRECISION) * 100;
+        $requestBody["amount_in_cents"] = (int)(round($quote->getGrandTotal() * 100, self::PRECISION));
         $requestBody["currency_code"] = Mage::app()->getStore()->getCurrentCurrencyCode();
         $requestBody["order_description"] = $reference;
         $requestBody["order_reference_id"] = $reference;
@@ -434,7 +432,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
         $requestBody["items"] = array();
         foreach ($quote->getAllVisibleItems() as $item) {
             $productName = $item->getProduct()->getName();
-            $productPrice = $item->getProduct()->getPrice();
+            $productPrice = ($item->getProduct()->getPrice() * 100);
             $productSKU = $item->getProduct()->getSku();
             $productQuantity = $item->getQty();
             $itemData = array(
@@ -442,7 +440,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 "sku" => $productSKU,
                 "quantity" => $productQuantity,
                 "price" => array(
-                    "amount_in_cents" => round($productPrice, self::PRECISION) * 100,
+                    "amount_in_cents" => (int)(round($productPrice, self::PRECISION)),
                     "currency" => $requestBody["currency_code"]
                 )
             );
@@ -494,14 +492,13 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             $this->getApiRouter()->getCheckoutRefundUrl($reference),
             array(
                 "amount" => array(
-                    "amount_in_cents" => round($amount, self::PRECISION) * 100,
+                    "amount_in_cents" => (int)(round($amount * 100, self::PRECISION)),
                     "currency" => $currency
                 )
             ),
             true,
             Varien_Http_Client::POST
         );
-        $result = Mage::helper('core')->jsonDecode($result);
         if (isset($result['status']) && $result['status'] == Sezzle_Sezzlepay_Model_Api_Processor::BAD_REQUEST) {
             throw Mage::exception(
                 'Sezzle_Sezzlepay',
@@ -620,7 +617,6 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             true,
             Varien_Http_Client::POST
         );
-        $result = Mage::helper('core')->jsonDecode($result);
         if (isset($result['status']) && $result['status'] == Sezzle_Sezzlepay_Model_Api_Processor::BAD_REQUEST) {
             throw Mage::exception(
                 'Sezzle_Sezzlepay',

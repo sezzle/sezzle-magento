@@ -422,7 +422,6 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                 true,
                 Varien_Http_Client::POST
             );
-            $result = Mage::helper('core')->jsonDecode($result);
             if (isset($result['status']) && $result['status'] == Sezzle_Sezzlepay_Model_Api_Processor::BAD_REQUEST) {
                 $this->helper()->log("Could not send log to Sezzle");
             }
