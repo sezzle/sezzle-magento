@@ -37,6 +37,25 @@ class Sezzle_Sezzlepay_Model_Observer
     }
 
     /**
+     * Hide Sezzle based on min checkout amount(grand total)
+     *
+     * @return void
+     */
+    public function hideGateway(Varien_Event_Observer $observer) {
+        $quote = $observer->getEvent()->getQuote();
+        $result = $observer->getEvent()->getResult();
+        $methodInstance = $observer->getEvent()->getMethodInstance();
+
+        $minCheckoutAmount = $methodInstance->getConfigData('min_checkout_amount', $quote ? $quote->getStoreId() : null);
+
+        if ($methodInstance->getCode() == Sezzle_Sezzlepay_Model_Sezzlepay::PAYMENT_CODE
+            && $quote
+            && ($quote->getBaseGrandTotal() < $minCheckoutAmount)) {
+                $result->isAvailable = false;
+        }
+    }
+
+    /**
      * Get Sezzle helper
      *
      * @return Mage_Core_Helper_Abstract
