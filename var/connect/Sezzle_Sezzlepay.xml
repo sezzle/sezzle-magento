@@ -1,5 +1,5 @@
 <_>
-   <form_key>p94iBWzzqKR7GmiI</form_key>
+   <form_key>WXMmtR0GjlUcSbtp</form_key>
    <name>Sezzle_Sezzlepay</name>
    <channel>community</channel>
    <version_ids>
@@ -11,12 +11,11 @@
 Visit https://www.sezzle.com to know more about Sezzle.</description>
    <license>Apache 2.0</license>
    <license_uri/>
-   <version>4.2.3</version>
+   <version>4.3.0</version>
    <stability>stable</stability>
    <notes>The following are the highlights of this version:
 
-1. Price conversion issue fix.
-2. Logger added to trace request and response payload.</notes>
+1. Hide Sezzle based on min checkout amount.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -54,7 +53,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                                                                  </files>
+            <files>                                                                   </files>
          </files>
       </package>
       <extension>
