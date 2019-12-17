@@ -88,6 +88,16 @@
                 </Sezzle_Sezzlepay>
             </modules>
         </translate>
+        <events>
+            <payment_method_is_active>
+                <observers>
+                    <hide_gateway>
+                        <class>sezzle_sezzlepay/observer</class>
+                        <method>hideGateway</method>
+                    </hide_gateway>
+                </observers>
+            </payment_method_is_active>
+        </events>
     </frontend>
     <admin>
 		<routers>
