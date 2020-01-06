@@ -558,7 +558,6 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             $session->setLastOrderId($order->getId())
                 ->setLastRealOrderId($order->getIncrementId());
             try {
-
                 $sezzleOrderInfo = $this->getSezzleOrderInfo($order->getPayment()->getData('sezzle_reference_id'));
                 if (isset($sezzleOrderInfo['capture_expiration']) && $sezzleOrderInfo['capture_expiration']) {
                     $order->setSezzleCaptureExpiry($sezzleOrderInfo['capture_expiration']);
@@ -571,13 +570,11 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 // clear the cart only if capture successful
                 $session->getQuote()->setIsActive(0)->save();
                 $this->helper()->log('Session : ' . $this->getSessionId() . ' reference: ' . $quote->getReservedOrderId() . ': Cleared cart.', Zend_Log::DEBUG);
-                return true;
             } catch (Exception $e) {
                 $this->helper()->log('Session : ' . $this->getSessionId() . ' reference: ' . $quote->getReservedOrderId() . ': Exception occured while completing order : ', Zend_Log::ERR);
                 $this->helper()->log($e->getMessage(), Zend_Log::ERR);
-                $this->_cancelOrder($order);
-                return false;
             }
+            return true;
         }
         return false;
     }
