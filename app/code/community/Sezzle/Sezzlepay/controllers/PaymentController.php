@@ -95,8 +95,10 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                     Zend_Log::DEBUG
                 );
             }
-            $moduleStoreCredit = $this->getModuleStoreCreditUsed();
-            $this->_quote = Mage::helper('sezzle_sezzlepay')->setStoreCreditSession($this->_quote, $moduleStoreCredit);
+
+            if ($this->getModuleStoreCreditUsed()) {
+                $this->_quote = Mage::helper('sezzle_sezzlepay')->setStoreCreditSession($this->_quote, $this->getModuleStoreCreditUsed());
+            }
             $redirectUrl = Mage::getModel('sezzle_sezzlepay/sezzlepay')->start($this->_quote);
             $response = array(
                 'success' => true,
@@ -491,7 +493,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
         } catch (Exception $e) {
             $message = Mage::helper(
                 'sezzle_sezzlepay'
-            )-> __('There was an error while placing the order. Reason might be no items in the cart.');
+            )->__('There was an error while placing the order. Reason might be no items in the cart.');
             // Add error message
             $this->_getSession()->addError($message);
             $this->helper()->log(
@@ -549,8 +551,9 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                 if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
                     Mage::helper('sezzle_sezzlepay')->giftCardsPlaceOrder();
                 }
-                $moduleStoreCredit = $this->getModuleStoreCreditUsed();
-                Mage::helper('sezzle_sezzlepay')->storeCreditPlaceOrder($moduleStoreCredit);
+                if ($this->getModuleStoreCreditUsed()) {
+                    Mage::helper('sezzle_sezzlepay')->storeCreditPlaceOrder($this->getModuleStoreCreditUsed());
+                }
                 $this->_redirect('checkout/onepage/success');
             } else {
                 $this->helper()->log('Session : ' . $this->getSessionId() . ' reference: ' . $this->_quote->getReservedOrderId() . ': Order failed. Redirecting to checkout.', Zend_Log::DEBUG);
@@ -751,9 +754,13 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
      */
     private function getModuleStoreCreditUsed()
     {
-        return Mage::getEdition() ?
-            Mage::EDITION_ENTERPRISE :
-            Mage::helper('core')->isModuleEnabled('Amasty_StoreCredit') ?
+        return Mage::getEdition() == Mage::EDITION_ENTERPRISE ?
+            Mage::helper('core')->isModuleOutputEnabled(Sezzle_Sezzlepay_Model_Storecredit::ENTERPRISE_STORE_CREDIT) ?
+                Sezzle_Sezzlepay_Model_Storecredit::ENTERPRISE_STORE_CREDIT :
+                Mage::helper('core')->isModuleOutputEnabled(Sezzle_Sezzlepay_Model_Storecredit::AMASTY_STORE_CREDIT) ?
+                    Sezzle_Sezzlepay_Model_Storecredit::AMASTY_STORE_CREDIT :
+                    "" :
+            Mage::helper('core')->isModuleOutputEnabled(Sezzle_Sezzlepay_Model_Storecredit::AMASTY_STORE_CREDIT) ?
                 Sezzle_Sezzlepay_Model_Storecredit::AMASTY_STORE_CREDIT :
                 "";
     }

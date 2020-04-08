@@ -9,7 +9,7 @@
  */
 class Sezzle_Sezzlepay_Model_Storecredit
 {
-    const ENTERPRISE_STORE_CREDIT = "Enterprise";
+    const ENTERPRISE_STORE_CREDIT = "Enterprise_CustomerBalance";
     const AMASTY_STORE_CREDIT = "Amasty_StoreCredit";
 
     /**
@@ -27,28 +27,14 @@ class Sezzle_Sezzlepay_Model_Storecredit
             $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/sezzlepay');
             $helper = $sezzlePaymentModel->helper();
             if ($isLoggedIn) {
-                switch ($module) {
-                    case self::ENTERPRISE_STORE_CREDIT:
-                        if ($quote->getCustomerBalanceAmountUsed()) {
-                            Mage::getSingleton('checkout/session')
-                                ->setData('sezzleCustomerBalance', $quote->getCustomerBalanceAmountUsed());
-                        } elseif (!empty($params) && isset($params['payment'])) {
-                            if (isset($params['payment']['use_customer_balance'])) {
-                                $this->updateQuote($quote, $module);
-                            }
-                        }
-                        break;
-                    case self::AMASTY_STORE_CREDIT:
-                        if ($quote->getCustomerBalanceAmountUsed()) {
-                            Mage::getSingleton('checkout/session')
-                                ->setData('sezzleCustomerBalance', $quote->getCustomerBalanceAmountUsed());
-                        } elseif (!empty($params) && isset($params['payment'])) {
-                            if (isset($params['payment']['amstcred_use_customer_balance'])) {
-                                $this->updateQuote($quote, $module);
-                            }
-                        }
-                        break;
-                    default:
+                if ($quote->getCustomerBalanceAmountUsed()) {
+                    Mage::getSingleton('checkout/session')
+                        ->setData('sezzleCustomerBalance', $quote->getCustomerBalanceAmountUsed());
+                } elseif (!empty($params) && isset($params['payment'])) {
+                    $workingParameters = $this->getWorkingParameters($module, $params);
+                    if ($workingParameters->getUseCustomerBalance()) {
+                        $this->updateQuote($quote, $workingParameters->getBalanceModel());
+                    }
                 }
                 Mage::getSingleton('checkout/session')->setData('sezzleGrandTotal', $quote->getGrandTotal());
                 Mage::getSingleton('checkout/session')->setData('sezzleSubtotal', $quote->getSubtotal());
@@ -65,33 +51,46 @@ class Sezzle_Sezzlepay_Model_Storecredit
     }
 
     /**
-     * Update quote
+     * Get working params required for other functions
      *
-     * @param $quote
      * @param $module
+     * @param $params
+     *
+     * @return Varien_Object
      */
-    private function updateQuote($quote, $module)
+    private function getWorkingParameters($module, $params = null)
     {
-        $customerId = Mage::getSingleton('customer/session')->getId();
-        $websiteId = Mage::app()->getStore()->getWebsiteId();
-        $balance = 0;
+        $workingParameters = Varien_Object::class;
         switch ($module) {
             case self::ENTERPRISE_STORE_CREDIT:
-                $balance = Mage::getModel('enterprise_customerbalance/balance')
-                    ->setCustomerId($customerId)
-                    ->setWebsiteId($websiteId)
-                    ->loadByCustomer()
-                    ->getAmount();
+                $balanceModel = Mage::getModel('enterprise_customerbalance/balance');
+                $workingParameters->setData('balance_model', $balanceModel);
+                $workingParameters->setData('use_customer_balance', isset($params['payment']['use_customer_balance']));
                 break;
             case self::AMASTY_STORE_CREDIT:
-                $balance = Mage::getModel('amstcred/balance')
-                    ->setCustomerId($customerId)
-                    ->setWebsiteId($websiteId)
-                    ->loadByCustomer()
-                    ->getAmount();
+                $balanceModel = Mage::getModel('amstcred/balance');
+                $workingParameters->setData('balance_model', $balanceModel);
+                $workingParameters->setData('use_customer_balance', isset($params['payment']['amstcred_use_customer_balance']));
                 break;
             default:
         }
+        return $workingParameters;
+    }
+
+    /**
+     * Update quote
+     *
+     * @param $quote
+     * @param $workingParams
+     */
+    private function updateQuote($quote, $workingParams)
+    {
+        $customerId = Mage::getSingleton('customer/session')->getId();
+        $websiteId = Mage::app()->getStore()->getWebsiteId();
+        $balance = $workingParams->setCustomerId($customerId)
+            ->setWebsiteId($websiteId)
+            ->loadByCustomer()
+            ->getAmount();
         $quote->setUseCustomerBalance(1);
         $quote->setCustomerBalanceAmountUsed($balance->getAmount());
         $grandTotal = $quote->getGrandTotal();
@@ -177,7 +176,8 @@ class Sezzle_Sezzlepay_Model_Storecredit
                 $order->setBaseCustomerBalanceInvoiced($balanceUsed);
                 $order->setTotalPaid($order->getGrandTotal());
                 $order->save();
-                $this->customerBalanceDeductionFallback($orderId, $balanceUsed, $module);
+                $workingParams = $this->getWorkingParameters($module);
+                $this->customerBalanceDeductionFallback($orderId, $balanceUsed, $workingParams->getBalanceModel());
                 Mage::getSingleton('checkout/session')->unsetData('sezzleCustomerBalance');
             }
             return true;
@@ -198,33 +198,19 @@ class Sezzle_Sezzlepay_Model_Storecredit
      *
      * @param $orderId
      * @param $balanceUsed
-     * @param $module
+     * @param $balanceModel
      * @throws Mage_Core_Exception
      */
-    protected function customerBalanceDeductionFallback($orderId, $balanceUsed, $module)
+    protected function customerBalanceDeductionFallback($orderId, $balanceUsed, $balanceModel)
     {
         // Get the first customer in the store's ID
         $customerId = Mage::getSingleton('customer/session')->getId();
         $sezzlePaymentModel = Mage::getModel('sezzle_sezzlepay/sezzlepay');
         $helper = $sezzlePaymentModel->helper();
-        $balance = 0;
-        switch ($module) {
-            case self::ENTERPRISE_STORE_CREDIT:
-                $balanceModel = Mage::getModel('enterprise_customerbalance/balance')
-                    ->setCustomerId($customerId)
-                    ->setWebsiteId(Mage::app()->getWebsite()->getId($orderId))
-                    ->loadByCustomer();
-                $balance = $balanceModel->getAmount();
-                break;
-            case self::AMASTY_STORE_CREDIT:
-                $balanceModel = Mage::getModel('amstcred/balance')
-                    ->setCustomerId($customerId)
-                    ->setWebsiteId(Mage::app()->getWebsite()->getId($orderId))
-                    ->loadByCustomer();
-                $balance = $balanceModel->getAmount();
-                break;
-            default:
-        }
+        $balanceModel->setCustomerId($customerId)
+            ->setWebsiteId(Mage::app()->getWebsite()->getId($orderId))
+            ->loadByCustomer();
+        $balance = $balanceModel->getAmount();
         if ($balance > 0) {
             //safeguard against a possibility of minus balance
             $balanceModel->setAmountDelta(-1 * $balanceUsed)
