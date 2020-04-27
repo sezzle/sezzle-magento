@@ -7,7 +7,7 @@
 * @author     Sezzle Team
 */
 ?>
-<?php if ($this->isWidgetAllowedForPDP()) : ?>
+<?php if ($this->isWidgetAllowedForCartPage()) : ?>
     <script type="text/javascript">
         document.observe('dom:loaded', function () {
             Sezzle.render(<?php echo $this->getMerchantID() ?>);
