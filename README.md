@@ -25,7 +25,7 @@ This document will help you in installing `Sezzle's Magento` extension. This ext
 * Flush the cache storage by selecting `Flush Cache Storage`.
 * Flush the js/css cache.
 
-## Admin Configuration
+## Configure Sezzle
 
 * To configure your `Sezzle Gateway` in `Magento` Admin complete the following steps. Prerequisite for this section is to obtain a `Private Key` and `Public Key` from `Sezzle Merchant Dashboard`.
 * Go to `System > Configuration > Sales > Payment Methods > Sezzle`
@@ -35,8 +35,8 @@ This document will help you in installing `Sezzle's Magento` extension. This ext
     * Set `Api Mode` to either `Sandbox/Test` or `Live`.
     * Set `Payment from Applicable Countries` to `Specific Countries`.
     * Set `Payment from Specific Countries` to `United States` or `Canada`.
-    * Set `Add Widget Script in PDP` to `Yes` for adding widget script in the Product Display Page which will help in enabling Sezzle Widget Modal in PDP.
-    * Set `Add Widget Script in Cart Page` to `Yes` for adding widget script in the Cart Page which will help in enabling Sezzle Widget Modal in Cart Page.
+    * Set `Add Widget Script in PDP` to `Yes` for adding widget script in the Product Display Page which will help in enabling `Sezzle Widget` Modal in PDP.
+    * Set `Add Widget Script in Cart Page` to `Yes` for adding widget script in the Cart Page which will help in enabling `Sezzle Widget` Modal in Cart Page.
     * Set `Private Key` as received from `API Keys` section of `Sezzle Merchant Dashboard`.
     * Set `Public Key` as received from your `API Keys` section of `Sezzle Merchant Dashboard`.
     * Set `Payment Action` as `Authorize only` for doing payment authorization only and `Authorize and Capture` for doing authorization as well as payment capture.
