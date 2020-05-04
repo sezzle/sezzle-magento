@@ -1,5 +1,5 @@
 <_>
-   <form_key>VzEumC8botflhqbB</form_key>
+   <form_key>pFljOzJpGvSxSiT4</form_key>
    <name>Sezzle_Sezzlepay</name>
    <channel>community</channel>
    <version_ids>
@@ -11,11 +11,12 @@
 Visit https://www.sezzle.com to know more about Sezzle.</description>
    <license>Apache 2.0</license>
    <license_uri/>
-   <version>4.3.1</version>
+   <version>4.3.2</version>
    <stability>stable</stability>
    <notes>The following are the highlights of this version:
 
-1. Cancelling of order after payment capture and order placement issue fix.</notes>
+1. Removing widget configuration access for configuration.
+2. Allowing to add only widget script to PDP and Cart Page.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -53,7 +54,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                                                                    </files>
+            <files>                                                                     </files>
          </files>
       </package>
       <extension>
