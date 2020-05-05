@@ -14,9 +14,8 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
    <version>4.3.2</version>
    <stability>stable</stability>
    <notes>The following are the highlights of this version:
-
-1. Removing widget configuration access for configuration.
-2. Allowing to add only widget script to PDP and Cart Page.</notes>
+1. Removing widget configuration access from admin.
+2. Allowing to add Widget script in PDP and Cart Page.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -111,8 +110,4 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
          <ignore/>
       </ignore>
    </contents>
-   <page>1</page>
-   <limit>200</limit>
-   <folder/>
-   <package/>
 </_>
