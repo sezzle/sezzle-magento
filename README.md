@@ -27,7 +27,7 @@ This document will help you in installing `Sezzle's Magento` extension. This ext
 
 ## Configure Sezzle
 
-* To configure your `Sezzle Gateway` in `Magento` Admin complete the following steps. Prerequisite for this section is to obtain a `Private Key` and `Public Key` from `Sezzle Merchant Dashboard`.
+* To configure your `Sezzle Gateway` in `Magento` Admin complete the following steps. Prerequisite for this section is to obtain a `Private Key` and `Public Key` from [`Sezzle Merchant Dashboard`](https://dashboard.sezzle.com/merchant/). Sign Up if you have not signed up to get the necessities.
 * Go to `System > Configuration > Sales > Payment Methods > Sezzle`
 * Configure the plugin as follows:
     * Set `Enabled` to `yes`.
@@ -84,7 +84,7 @@ This document will help you in installing `Sezzle's Magento` extension. This ext
 
 ## How Sandbox works?
 
-* In the `Sezzle` configuration page of your `Magento` admin, enter the `Sandbox` `API Keys` from your `Sezzle Merchant Sandbox Dashboard` and set the `Payment Mode` to `Sandbox`, then save the configuration. Make sure you are doing this on your `dev/staging` website.
+* In the `Sezzle` configuration page of your `Magento` admin, enter the `Sandbox` `API Keys` from your [`Sezzle Merchant Sandbox Dashboard`](https://sandbox.dashboard.sezzle.com/merchant/) and set the `Payment Mode` to `Sandbox`, then save the configuration. Make sure you are doing this on your `dev/staging` website.
 * On your website, add an item to the cart, then proceed to `Checkout` and select `Sezzle` as the payment method.
 * Click `Continue` then `Place Order` and you should be redirected to the `Sezzle Checkout` page. If prompted, sign in and continue.
 * Enter the payment details using test data, then click `Complete Order`.
