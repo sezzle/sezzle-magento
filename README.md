@@ -27,11 +27,11 @@ This document will help you in installing `Sezzle's Magento` extension. This ext
 
 ## Configure Sezzle
 
-* To configure your `Sezzle Gateway` in `Magento` Admin complete the following steps. Prerequisite for this section is to obtain a `Private Key` and `Public Key` from [`Sezzle Merchant Dashboard`](https://dashboard.sezzle.com/merchant/). Sign Up if you have not signed up to get the necessities.
+* To configure your `Sezzle Gateway` in `Magento` Admin complete the following steps. Prerequisite for this section is to obtain `Merchant ID`, `Private Key` and `Public Key` from [`Sezzle Merchant Dashboard`](https://dashboard.sezzle.com/merchant/). Sign Up if you have not signed up to get the necessities.
 * Go to `System > Configuration > Sales > Payment Methods > Sezzle`
 * Configure the plugin as follows:
     * Set `Enabled` to `yes`.
-    * Set `Merchant Id`.
+    * Set `Merchant Id` as received from `Business` section of `Sezzle Merchant Dashboard`.
     * Set `Api Mode` to either `Sandbox/Test` or `Live`.
     * Set `Payment from Applicable Countries` to `Specific Countries`.
     * Set `Payment from Specific Countries` to `United States` or `Canada` as Sezzle is currently available for US and Canada only.
