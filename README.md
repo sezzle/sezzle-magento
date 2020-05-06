@@ -34,7 +34,7 @@ This document will help you in installing `Sezzle's Magento` extension. This ext
     * Set `Merchant Id`.
     * Set `Api Mode` to either `Sandbox/Test` or `Live`.
     * Set `Payment from Applicable Countries` to `Specific Countries`.
-    * Set `Payment from Specific Countries` to `United States` or `Canada`.
+    * Set `Payment from Specific Countries` to `United States` or `Canada` as Sezzle is currently available for US and Canada only.
     * Set `Add Widget Script in PDP` to `Yes` for adding widget script in the Product Display Page which will help in enabling `Sezzle Widget` Modal in PDP.
     * Set `Add Widget Script in Cart Page` to `Yes` for adding widget script in the Cart Page which will help in enabling `Sezzle Widget` Modal in Cart Page.
     * Set `Private Key` as received from `API Keys` section of `Sezzle Merchant Dashboard`.
