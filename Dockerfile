@@ -7,7 +7,6 @@ LABEL php_version="7.3.1"
 LABEL magento_version=${MAGENTO_VERSION}
 
 ENV INSTALL_DIR /var/www/html/
-ENV SEZZLE_PATH app/code/community/Sezzle/Sezzlepay/
 
 USER root
 
@@ -28,11 +27,5 @@ RUN unzip -q magento.zip && \
     rm magento.zip && \
     mv magento-mirror-${MAGENTO_VERSION}/* $INSTALL_DIR && \
     rm -rf magento-mirror-${MAGENTO_VERSION}
-
-RUN mkdir -p $SEZZLE_PATH
-
-ADD $SEZZLE_PATH $SEZZLE_PATH
-
-WORKDIR $INSTALL_DIR
 
 VOLUME $INSTALL_DIR

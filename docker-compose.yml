@@ -27,9 +27,9 @@ services:
       - docker.env
     volumes:
       - database:/var/lib/mysql
-  sezzle_magento2_phpmyadmin:
+  sezzle_magento1_phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: sezzle_magento2_phpmyadmin
+    container_name: sezzle_magento1_phpmyadmin
     restart: always
     ports:
       - "8585:80"
