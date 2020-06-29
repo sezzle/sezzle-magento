@@ -28,4 +28,3 @@ RUN unzip -q magento.zip && \
     mv magento-mirror-${MAGENTO_VERSION}/* $INSTALL_DIR && \
     rm -rf magento-mirror-${MAGENTO_VERSION}
 
-VOLUME $INSTALL_DIR
