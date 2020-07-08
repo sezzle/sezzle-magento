@@ -7,7 +7,7 @@ $store = Mage::app()->getStore();
 $website = Mage::app()->getWebsite();
 $websiteId = $website->getId();
 
-$logFile = '/var/www/html/var/log/sezzle.log';
+$logFile = '/var/www/html/var/log/sezzle-pay.log';
 
 $options = getopt("", array(
     "email::",
@@ -15,8 +15,8 @@ $options = getopt("", array(
 ));
 
 $customerData = array_merge(array(
-    first_name => 'Arijit',
-    last_name => 'De',
+    first_name => 'John',
+    last_name => 'Doe',
     email => 'dev@sezzle.com',
     password => 'abcd.1234'
 ), $options);
