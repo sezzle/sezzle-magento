@@ -1,5 +1,5 @@
 <_>
-   <form_key>aHV4OoA5F5fYbb0N</form_key>
+   <form_key>xra8SNQ2N3cimI8Z</form_key>
    <name>Sezzle_Sezzlepay</name>
    <channel>community</channel>
    <version_ids>
@@ -11,10 +11,10 @@
 Visit https://www.sezzle.com to know more about Sezzle.</description>
    <license>Apache 2.0</license>
    <license_uri/>
-   <version>4.3.3</version>
+   <version>4.3.4</version>
    <stability>stable</stability>
    <notes>The following are the highlights of this version:
-1. Updated documentation.</notes>
+1. Support of docker environment.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -52,7 +52,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                                                                      </files>
+            <files>                                                                       </files>
          </files>
       </package>
       <extension>
@@ -109,4 +109,8 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
          <ignore/>
       </ignore>
    </contents>
+   <page>1</page>
+   <limit>200</limit>
+   <folder/>
+   <package/>
 </_>
