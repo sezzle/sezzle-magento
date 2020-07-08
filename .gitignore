@@ -51,13 +51,16 @@
 !/app/design/
 
 # Ignore all in app/code except Sezzle
-!/app/code/
 /app/code/core
 /app/code/local
 /app/etc/community
 /app/code/community/*
 !/app/code/community/Sezzle
 !/app/code/community/Sezzle/*
+!/deploy
+!/docker.env
+!/docker-compose.yml
+!/Dockerfile
 
 # Ignore all of app/etc except our specific module files
 /app/etc/*
