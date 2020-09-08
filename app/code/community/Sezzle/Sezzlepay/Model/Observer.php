@@ -16,20 +16,27 @@ class Sezzle_Sezzlepay_Model_Observer
      */
     public function capturePayment() {
         $this->helper()->log("****Start of Capture Payment for non captured orders via Cron****",Zend_Log::DEBUG);
-        $nonCapturedOrders = Mage::getModel("sales/order")
-            ->getCollection()
-            ->addFieldToFilter("is_captured",Sezzle_Sezzlepay_Model_Sezzlepay::STATE_NOT_CAPTURED);
+        $collection = Mage::getModel('sales/order')->getCollection()
+            ->join(
+                array('payment' => 'sales/order_payment'),
+                'main_table.entity_id = payment.parent_id',
+                array('payment_method' => 'payment.method')
+            )->addFieldToFilter('payment.method', array('eq' => 'sezzlepay'));
+
         $currentTimestamp = Mage::getModel('core/date')->timestamp("now");
-        foreach ($nonCapturedOrders as $order) {
-            $captureExpiration = $order->getSezzleCaptureExpiry();
-            $captureExpirationTimestamp = Mage::getModel('core/date')->timestamp($captureExpiration);
+        foreach ($collection as $order) {
             $paymentType = $order->getPayment()->getAdditionalInformation("payment_type");
-            if (($captureExpirationTimestamp >= $currentTimestamp) && $paymentType == Sezzle_Sezzlepay_Model_Sezzlepay::AUTH_CAPTURE) {
-                $this->helper()->log("Capturing payment for order #".$order->getIncrementId());
-                $hasSezzleCaptured = Mage::getModel("sezzle_sezzlepay/sezzlepay")->sezzleCaptureAndComplete($order);
-                if ($hasSezzleCaptured) {
-                    $this->helper()->log("Capturing payment for order #".$order->getIncrementId()." is successful");
-                    $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true)->save();
+            if (!$order->getPayment()->getAdditionalInformation('is_captured')
+                && $paymentType == Sezzle_Sezzlepay_Model_Sezzlepay::AUTH_CAPTURE) {
+                $captureExpiration = $order->getPayment()->getAdditionalInformation('sezzle_capture_expiry');
+                $captureExpirationTimestamp = Mage::getModel('core/date')->timestamp($captureExpiration);
+                if (($captureExpirationTimestamp >= $currentTimestamp)) {
+                    $this->helper()->log("Capturing payment for order #" . $order->getIncrementId());
+                    $hasSezzleCaptured = Mage::getModel("sezzle_sezzlepay/sezzlepay")->sezzleCaptureAndComplete($order);
+                    if ($hasSezzleCaptured) {
+                        $this->helper()->log("Capturing payment for order #" . $order->getIncrementId() . " is successful");
+                        $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true)->save();
+                    }
                 }
             }
         }

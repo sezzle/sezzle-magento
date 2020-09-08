@@ -9,7 +9,7 @@
 <config>
     <modules>
         <Sezzle_Sezzlepay>
-            <version>4.0.3</version>
+            <version>4.1.0</version>
         </Sezzle_Sezzlepay>
     </modules>
     <global>
@@ -17,11 +17,6 @@
             <sezzle_sezzlepay>
                 <class>Sezzle_Sezzlepay_Block</class>
             </sezzle_sezzlepay>
-            <adminhtml>
-                <rewrite>
-                    <sales_order_grid>Sezzle_Sezzlepay_Block_Adminhtml_Order_Grid</sales_order_grid>
-                </rewrite>
-            </adminhtml>
         </blocks>
         <models>
             <sezzle_sezzlepay>
@@ -33,26 +28,11 @@
                 <class>Sezzle_Sezzlepay_Helper</class>
             </sezzle_sezzlepay>
         </helpers>
-        <fieldsets>
-            <sales_convert_quote_payment>
-                <sezzle_reference_id>
-                    <to_order_payment>*</to_order_payment>
-                </sezzle_reference_id>
-            </sales_convert_quote_payment>
-        </fieldsets>
-        <resources>
-            <sezzlepay_setup>
-                <setup>
-                    <module>Sezzle_Sezzlepay</module>
-                    <class>Mage_Sales_Model_Resource_Setup</class>
-                </setup>
-            </sezzlepay_setup>
-        </resources>
     </global>
     <default>
         <payment>
             <sezzlepay>
-                <title>Sezzle Pay PayLater 0% Interest</title>
+                <title>Sezzle PayLater 0% Interest</title>
                 <active>1</active>
                 <model>sezzle_sezzlepay/sezzlepay</model>
                 <order_status>processing</order_status>
@@ -99,18 +79,6 @@
             </payment_method_is_active>
         </events>
     </frontend>
-    <admin>
-		<routers>
-			<adminhtml>
-				<args>
-					<modules>
-						<sezzle_sezzlepay before="Mage_Adminhtml">Sezzle_Sezzlepay_Adminhtml</sezzle_sezzlepay>
-					</modules>
-				</args>
-			</adminhtml>
-		</routers>
-        
-	</admin>
     <adminhtml>
     <layout>
             <updates>

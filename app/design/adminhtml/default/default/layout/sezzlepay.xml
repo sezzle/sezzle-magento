@@ -1,15 +1,15 @@
 <layout>
     <adminhtml_sales_order_view>
-        <reference name="order_info">
+        <reference name="order_tab_info">
             <action method="setTemplate">
-                <template>sezzlepay/sales/order/view/info.phtml</template>
+                <template>sezzlepay/sales/order/view/tab/info.phtml</template>
             </action>
         </reference>
     </adminhtml_sales_order_view>
     <adminhtml_sales_order_invoice_new>
-        <reference name="order_info">
+        <reference name="form">
             <action method="setTemplate">
-                <template>sezzlepay/sales/order/view/info.phtml</template>
+                <template>sezzlepay/sales/order/invoice/create/form.phtml</template>
             </action>
         </reference>
         <reference name="order_items">
