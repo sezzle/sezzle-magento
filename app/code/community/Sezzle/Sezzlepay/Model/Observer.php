@@ -35,7 +35,6 @@ class Sezzle_Sezzlepay_Model_Observer
                     $hasSezzleCaptured = Mage::getModel("sezzle_sezzlepay/sezzlepay")->sezzleCaptureAndComplete($order);
                     if ($hasSezzleCaptured) {
                         $this->helper()->log("Capturing payment for order #" . $order->getIncrementId() . " is successful");
-                        $order->getPayment()->setAdditionalInformation('is_captured', Sezzle_Sezzlepay_Model_Sezzlepay::STATE_CAPTURED);
                         $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true)->save();
                     }
                 }
