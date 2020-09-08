@@ -134,7 +134,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Reserved an order ID for this quote.', Zend_Log::DEBUG);
             // use reserved merchant order id as reference id
             $reference = $this->createUniqueReferenceId($quote->getReservedOrderId());
-            $quote->getPayment()->setData('sezzle_reference_id', $reference)->save();
+            $quote->getPayment()->setAdditionalInformation('sezzle_reference_id', $reference)->save();
             $this->helper()->log('Session : ' . $this->getSessionID() . ' reference: ' . $quote->getReservedOrderId() . ': Unique reference ID created.', Zend_Log::DEBUG);
             $cancelUrl = Mage::getUrl('*/*/cancel');
             $completeUrl = Mage::getUrl('*/*/complete')
@@ -249,7 +249,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
 
     /**
      * Check if order total id matching
-     * 
+     *
      * @return bool
      */
     public function isOrderAmountMatched($magentoAmount, $sezzleAmount)
@@ -265,7 +265,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
      */
     public function authorize(Varien_Object $payment, $amount)
     {
-        $reference = $payment->getData('sezzle_reference_id');
+        $reference = $payment->getAdditionalInformation('sezzle_reference_id');
         $grandTotalInCents = (int)(round($amount * 100, self::PRECISION));
 
         $this->helper()->log('Authorizing', Zend_Log::DEBUG);
@@ -275,7 +275,13 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             "response" => $result
         ), Zend_Log::DEBUG);
 
-        if (isset($result['amount_in_cents']) 
+        $captureExpiration = (isset($result['capture_expiration']) && $result['capture_expiration']) ? $result['capture_expiration'] : null;
+        if ($captureExpiration === null) {
+            Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Not authorized on Sezzle. Please try again.'));
+            return $this;
+        }
+
+        if (isset($result['amount_in_cents'])
             && !$this->isOrderAmountMatched($grandTotalInCents, $result['amount_in_cents']))
         {
             Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Unable to authorize due to invalid order total.'));
@@ -304,7 +310,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Invalid amount for capture.'));
         }
 
-        $reference = $payment->getData('sezzle_reference_id');
+        $reference = $payment->getAdditionalInformation('sezzle_reference_id');
         $grandTotalInCents = (int)(round($amount * 100, self::PRECISION));
 
         $this->helper()->log('Checking if checkout is valid', Zend_Log::DEBUG);
@@ -315,7 +321,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             "response" => $result
         ), Zend_Log::DEBUG);
 
-        if (isset($result['amount_in_cents']) 
+        if (isset($result['amount_in_cents'])
             && !$this->isOrderAmountMatched($grandTotalInCents, $result['amount_in_cents']))
         {
             Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Sezzle Pay gateway has rejected request due to invalid order total.'));
@@ -364,10 +370,10 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
         }
         return self::$_states;
     }
-    
+
     /**
      * Get order info from Sezzle
-     * 
+     *
      * @param string $reference
      * @throws Mage_Core_Exception
      * @return array
@@ -463,7 +469,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
     /**
      * Api Router
      *
-     * @return Sezzle_Sezzlepay_Model_Api_Processor
+     * @return false|Mage_Core_Model_Abstract
      */
     public function getApiProcessor()
     {
@@ -475,12 +481,12 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
      *
      * @param Varien_Object $payment
      * @param float $amount
-     * @return $this|Mage_Payment_Model_Abstract
+     * @return Sezzle_Sezzlepay_Model_Sezzlepay
      * @throws Mage_Core_Exception
      */
     public function refund(Varien_Object $payment, $amount)
     {
-        $reference = $payment->getData('sezzle_reference_id');
+        $reference = $payment->getAdditionalInformation('sezzle_reference_id');
         $currency = $payment->getOrder()->getOrderCurrencyCode();
         $this->helper()->log('Session : ' . $this->getSessionId() . ' Refunding order reference: ' . $reference . ' amount: ' . $amount, Zend_Log::DEBUG);
         if ($amount == 0) {
@@ -505,6 +511,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
                 __('Sezzle Pay API Error: %s', $result['message'])
             );
         }
+        $payment->setAdditionalInformation('is_refunded', true);
         $this->helper()->log('Session : ' . $this->getSessionId() . ' Refund with sezzle successful' . $amount, Zend_Log::DEBUG);
         return $this;
     }
@@ -558,10 +565,9 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             $session->setLastOrderId($order->getId())
                 ->setLastRealOrderId($order->getIncrementId());
             try {
-                $sezzleOrderInfo = $this->getSezzleOrderInfo($order->getPayment()->getData('sezzle_reference_id'));
+                $sezzleOrderInfo = $this->getSezzleOrderInfo($order->getPayment()->getAdditionalInformation('sezzle_reference_id'));
                 if (isset($sezzleOrderInfo['capture_expiration']) && $sezzleOrderInfo['capture_expiration']) {
-                    $order->setSezzleCaptureExpiry($sezzleOrderInfo['capture_expiration']);
-                    $order->save();
+                    $order->getPayment()->setAdditionalInformation('sezzle_capture_expiry', $sezzleOrderInfo['capture_expiration'])->save();
                 }
 
                 if (!$order->getEmailSent()) {
@@ -601,12 +607,12 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
 
     /**
      * @param Varien_Object $order
-     * @return $this
+     * @return bool
      * @throws Mage_Core_Exception
      */
     public function sezzleCaptureAndComplete(Varien_Object $order)
     {
-        $reference = $order->getPayment()->getData('sezzle_reference_id');
+        $reference = $order->getPayment()->getAdditionalInformation('sezzle_reference_id');
         // Charge
         $result = $this->getApiProcessor()->sendApiRequest(
             $this->getApiRouter()->getCheckoutCompleteUrl($reference),
@@ -621,7 +627,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             );
         }
         elseif (isset($result["order_reference_id"]) && $result["order_reference_id"] != null) {
-            $order->setIsCaptured(self::STATE_CAPTURED)->save();
+            $order->getPayment()->setAdditionalInformation('is_captured', self::STATE_CAPTURED)->save();
         }
 
         return true;

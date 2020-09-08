@@ -17,7 +17,7 @@ class Sezzle_Sezzlepay_Adminhtml_Sales_Order_InvoiceController extends Mage_Admi
 
     /**
      * Get Sezzlepay Model
-     * 
+     *
      * @return Sezzle_Sezzlepay_Model_Sezzlepay
      */
     protected function getSezzlepayModel()
@@ -45,9 +45,9 @@ class Sezzle_Sezzlepay_Adminhtml_Sales_Order_InvoiceController extends Mage_Admi
 
                 if (!empty($data['capture_case'])) {
                     $order = Mage::getModel('sales/order')->load($orderId);
-                    if ($order->getId() 
+                    if ($order->getId()
                         && $data['capture_case'] == self::CAPTURE_ONLINE
-                        && $order->getIsCaptured() == Sezzle_Sezzlepay_Model_Sezzlepay::STATE_NOT_CAPTURED
+                        && $order->getPayment()->getAdditionalInformation('is_captured') == Sezzle_Sezzlepay_Model_Sezzlepay::STATE_NOT_CAPTURED
                         && $order->getPayment()->getAdditionalInformation("payment_type") == Sezzle_Sezzlepay_Model_Sezzlepay::AUTH
                         && $order->getPayment()->getMethodInstance()->getCode() == Sezzle_Sezzlepay_Model_Sezzlepay::PAYMENT_CODE) {
                         $invoice->setRequestedCaptureCase($data['capture_case']);
@@ -56,7 +56,7 @@ class Sezzle_Sezzlepay_Adminhtml_Sales_Order_InvoiceController extends Mage_Admi
                         $invoice->setRequestedCaptureCase($data['capture_case']);
                     }
                 }
-                
+
                 if (!empty($data['comment_text'])) {
                     $invoice->addComment(
                         $data['comment_text'],
@@ -73,8 +73,8 @@ class Sezzle_Sezzlepay_Adminhtml_Sales_Order_InvoiceController extends Mage_Admi
 
                 $invoice->getOrder()->setCustomerNoteNotify(!empty($data['send_email']));
                 $invoice->getOrder()->setIsInProcess(true);
-                if ($invoice->getOrder()->getIsCaptured() == Sezzle_Sezzlepay_Model_Sezzlepay::STATE_NOT_CAPTURED && $hasSezzleCaptured) {
-                    $invoice->getOrder()->setIsCaptured(Sezzle_Sezzlepay_Model_Sezzlepay::STATE_CAPTURED);
+                if ($invoice->getOrder()->getPayment()->getAdditionalInformation('is_captured') == Sezzle_Sezzlepay_Model_Sezzlepay::STATE_NOT_CAPTURED && $hasSezzleCaptured) {
+                    $invoice->getOrder()->getPayment()->setAdditionalInformation('is_captured', Sezzle_Sezzlepay_Model_Sezzlepay::STATE_CAPTURED);
                 }
 
                 $transactionSave = Mage::getModel('core/resource_transaction')

@@ -534,7 +534,7 @@ class Sezzle_Sezzlepay_PaymentController extends Mage_Core_Controller_Front_Acti
                 $this->_prepareSezzleCustomerQuote();
             }
 
-            if ($this->_quote->getPayment()->getData('sezzle_reference_id') != $magentoSezzleId) {
+            if ($this->_quote->getPayment()->getAdditionalInformation('sezzle_reference_id') != $magentoSezzleId) {
                 Mage::throwException(Mage::helper('sezzle_sezzlepay')->__('Sezzle checkout failed. Another session exists for this payment.'));
             }
 
