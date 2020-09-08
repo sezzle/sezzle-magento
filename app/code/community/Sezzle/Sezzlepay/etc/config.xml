@@ -32,7 +32,7 @@
     <default>
         <payment>
             <sezzlepay>
-                <title>Sezzle Pay PayLater 0% Interest</title>
+                <title>Sezzle PayLater 0% Interest</title>
                 <active>1</active>
                 <model>sezzle_sezzlepay/sezzlepay</model>
                 <order_status>processing</order_status>
@@ -79,18 +79,6 @@
             </payment_method_is_active>
         </events>
     </frontend>
-    <admin>
-		<routers>
-			<adminhtml>
-				<args>
-					<modules>
-						<sezzle_sezzlepay before="Mage_Adminhtml">Sezzle_Sezzlepay_Adminhtml</sezzle_sezzlepay>
-					</modules>
-				</args>
-			</adminhtml>
-		</routers>
-
-	</admin>
     <adminhtml>
     <layout>
             <updates>
