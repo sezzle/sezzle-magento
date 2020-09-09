@@ -7,7 +7,7 @@
 # Sezzle Extension for Magento 1
 
 ## Introduction
-This document will help you in installing `Sezzle's Magento` extension. This extension is a certified one and listed [here](https://marketplace.magento.com/sezzle-sezzle-sezzlepay.html) in the marketplace. The plugin can also be downloaded from [github](https://github.com/sezzle/sezzle-magento).
+This document will help you in installing `Sezzle's Magento` extension. The extension can also be downloaded from [here](https://github.com/sezzle/sezzle-magento/releases).
 
 ### For all purposes assume [Magento] as your root Magento directory.
 ## How to install the extension?
