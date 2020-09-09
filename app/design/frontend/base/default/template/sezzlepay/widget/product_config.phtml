@@ -10,7 +10,7 @@
 <?php if ($this->isWidgetAllowedForPDP()) : ?>
     <script type="text/javascript">
         document.observe('dom:loaded', function () {
-            Sezzle.render(<?php echo $this->getMerchantID() ?>);
+            Sezzle.render("<?php echo $this->getMerchantID() ?>");
         });
     </script>
 <?php endif; ?>
