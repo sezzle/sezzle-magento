@@ -34,6 +34,11 @@
             <block type="sezzle_sezzlepay/config" name="sezzlepay.checkout.default.config" template="sezzlepay/checkout/config.phtml" />
         </reference>
     </checkout_onepage_index>
+    <aw_onestepcheckout_index_index>
+        <reference name="content">
+            <block type="sezzle_sezzlepay/config" name="sezzle_sezzlepay.checkout.onestep.config" template="sezzlepay/checkout/config.phtml" />
+        </reference>
+    </aw_onestepcheckout_index_index>
     <onestepcheckout_index_index>
         <reference name="head">
             <block type="sezzle_sezzlepay/config" name="sezzle_sezzlepay.checkout.onestep.config" template="sezzlepay/checkout/config.phtml" />
