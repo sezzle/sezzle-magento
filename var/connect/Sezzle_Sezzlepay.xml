@@ -1,5 +1,5 @@
 <_>
-   <form_key>pWXVV50ssJCwLDN1</form_key>
+   <form_key>kgS57NN8PEezmEj1</form_key>
    <name>Sezzle_Sezzlepay</name>
    <channel>community</channel>
    <version_ids>
@@ -11,11 +11,10 @@
 Visit https://www.sezzle.com to know more about Sezzle.</description>
    <license>Apache 2.0</license>
    <license_uri/>
-   <version>4.4.0</version>
+   <version>4.4.1</version>
    <stability>stable</stability>
    <notes>The following are the highlights of this version:
-1. Sezzle specific columns have been removed from sales core tables.
-2. Removed column has been moved to payment additional information column.</notes>
+1. Aheadworks OneStepCheckout support.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -53,7 +52,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                                                                               </files>
+            <files>                                                                                </files>
          </files>
       </package>
       <extension>
@@ -110,4 +109,8 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
          <ignore/>
       </ignore>
    </contents>
+   <page>1</page>
+   <limit>200</limit>
+   <folder/>
+   <package/>
 </_>
