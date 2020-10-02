@@ -38,13 +38,16 @@
         <reference name="content">
             <block type="sezzle_sezzlepay/config" name="sezzle_sezzlepay.checkout.onestep.config" template="sezzlepay/checkout/config.phtml" />
         </reference>
-    </aw_onestepcheckout_index_index>
-    <onestepcheckout_index_index>
-        <reference name="content">
-            <block type="sezzle_sezzlepay/config" name="sezzle_sezzlepay.checkout.onestep.config" template="sezzlepay/checkout/config.phtml" />
-        </reference>
         <reference name="head">
             <action method="addJs"><script>sezzle/checkout/aw_checkout.js</script></action>
+        </reference>
+    </aw_onestepcheckout_index_index>
+    <onestepcheckout_index_index>
+        <reference name="head">
+            <block type="sezzle_sezzlepay/config" name="sezzle_sezzlepay.checkout.onestep.config" template="sezzlepay/checkout/config.phtml" />
+        </reference>
+        <reference name="before_body_end">
+            <block type="sezzle_sezzlepay/redirect" name="sezzlepay.checkout.magestore.info" after="-" template="sezzlepay/checkout/onestep.phtml"/>
         </reference>
     </onestepcheckout_index_index>
     <firecheckout_index_index>
