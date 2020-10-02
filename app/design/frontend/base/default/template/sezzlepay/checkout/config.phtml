@@ -12,7 +12,4 @@
     window.Sezzlepay.saveUrl = "<?php echo $this->getUrl('sezzlepay/payment/start', array('form_key' => Mage::getSingleton('core/session')->getFormKey(), '_secure' => true)) ?>";
     window.Sezzlepay.cartUrl = "<?php echo $this->getUrl('checkout/cart', array('_secure' => true)) ?>";
     window.Sezzlepay.logUrl = "<?php echo $this->getUrl('sezzlepay/payment/log', array('form_key' => Mage::getSingleton('core/session')->getFormKey(), '_secure' => true)) ?>";
-    if (typeof window.awOSCForm.placeOrderUrl !== 'undefined') {
-        window.awOSCForm.placeOrderUrl = "<?php echo $this->getUrl('sezzlepay/payment/start', array('form_key' => Mage::getSingleton('core/session')->getFormKey(), '_secure' => true)) ?>";
-    }
 </script>
