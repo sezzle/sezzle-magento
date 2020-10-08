@@ -1,5 +1,5 @@
 <_>
-   <form_key>kgS57NN8PEezmEj1</form_key>
+   <form_key>zwQPU9pocn7mHF1o</form_key>
    <name>Sezzle_Sezzlepay</name>
    <channel>community</channel>
    <version_ids>
@@ -52,7 +52,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                                                                                 </files>
+            <files>                                                                                  </files>
          </files>
       </package>
       <extension>
