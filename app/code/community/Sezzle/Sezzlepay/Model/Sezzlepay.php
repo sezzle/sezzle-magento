@@ -423,6 +423,7 @@ class Sezzle_Sezzlepay_Model_Sezzlepay extends Mage_Payment_Model_Method_Abstrac
             array_push($requestBody["items"], $itemData);
         }
         $requestBody["merchant_completes"] = true;
+        $requestBody["locale"] = Mage::app()->getLocale()->getLocaleCode();
         return $requestBody;
     }
 
