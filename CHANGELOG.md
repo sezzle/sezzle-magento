@@ -5,6 +5,9 @@
 </div>
 
 # Sezzle Magento 2 Extension Changelog
+## Version 4.4.2
+_Wed 28 Apr 2021
+- default widget configs
 
 ## Version 4.4.1
 
