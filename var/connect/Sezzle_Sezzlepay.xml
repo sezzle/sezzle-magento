@@ -1,5 +1,5 @@
 <_>
-   <form_key>zwQPU9pocn7mHF1o</form_key>
+   <form_key>NEKifwdVHAayE49J</form_key>
    <name>Sezzle_Sezzlepay</name>
    <channel>community</channel>
    <version_ids>
@@ -11,10 +11,10 @@
 Visit https://www.sezzle.com to know more about Sezzle.</description>
    <license>Apache 2.0</license>
    <license_uri/>
-   <version>4.4.1</version>
+   <version>4.4.2</version>
    <stability>stable</stability>
    <notes>The following are the highlights of this version:
-1. Aheadworks OneStepCheckout support.</notes>
+1. Allow store language settings to determine Sezzle-Checkout language.</notes>
    <authors>
       <name>
          <name>Rishi Mukherjee</name>
@@ -52,7 +52,7 @@ Visit https://www.sezzle.com to know more about Sezzle.</description>
             <max/>
          </max>
          <files>
-            <files>                                                                                  </files>
+            <files>                                                                                        </files>
          </files>
       </package>
       <extension>
