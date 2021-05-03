@@ -9,6 +9,21 @@
 _Wed 28 Apr 2021
 - default widget configs
 
+## Version 4.4.2
+
+_Wed 28 Apr 2021_
+
+### Supported Editions & Versions
+
+Tested and verified in clean installations of Magento 1:
+
+- Magento Community Edition (CE) version 1.7 and later.
+- Magento Enterprise Edition (EE) version 1.7 and later.
+
+### Highlights
+
+- Allow store language settings to determine Sezzle-Checkout language.
+
 ## Version 4.4.1
 
 _Tue 24 Sep 2020_
