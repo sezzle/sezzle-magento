@@ -5,9 +5,20 @@
 </div>
 
 # Sezzle Magento 2 Extension Changelog
-## Version 4.4.2
-_Wed 28 Apr 2021
-- default widget configs
+
+## Version 4.4.3
+_Tue 04 May 2021
+
+### Supported Editions & Versions
+
+Tested and verified in clean installations of Magento 1:
+
+- Magento Community Edition (CE) version 1.7 and later.
+- Magento Enterprise Edition (EE) version 1.7 and later.
+
+### Highlights
+
+- Default widget config.
 
 ## Version 4.4.2
 
