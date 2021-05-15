@@ -7,7 +7,7 @@
 # Sezzle Magento 2 Extension Changelog
 
 ## Version 4.4.3
-_Tue 04 May 2021
+_Mon 17 May 2021
 
 ### Supported Editions & Versions
 
