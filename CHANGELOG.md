@@ -4,10 +4,11 @@
     </a>
 </div>
 
-# Sezzle Magento 2 Extension Changelog
+# Sezzle Magento 1 Extension Changelog
 
 ## Version 4.4.3
-_Mon 17 May 2021
+
+_Mon 17 May 2021_
 
 ### Supported Editions & Versions
 
