@@ -24,6 +24,7 @@
 !/build.xml
 !/phpunit.xml*
 !/phpdox.xml*
+!/CODEOWNERS
 
 # Don't ignore readme files
 !/*.md
